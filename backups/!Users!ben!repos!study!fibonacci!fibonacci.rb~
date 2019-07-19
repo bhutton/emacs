@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+class Fibonacci
+  def calculate(number)
+    return [0] if number.zero?
+
+    fibonacci = [0, 1]
+
+    2.upto(number) do |i|
+      fibonacci.push(fibonacci[i-1] + fibonacci[i-2])
+    end
+    
+    fibonacci
+  end
+end
