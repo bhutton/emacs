@@ -98,6 +98,9 @@
 (setq dumb-jump-selector 'helm)
 (setq dumb-jump-force-searcher nil)
 
+(setq inhibit-splash-screen t
+      initial-scratch-message nil
+      initial-major-mode 'ruby-mode)
 
 (defun duplicate-line()
   (interactive)
@@ -118,3 +121,5 @@
 (exec-path-from-shell-initialize))
 (exec-path-from-shell-copy-env "GEM_PATH")
 (projectile-rails-global-mode)
+
+(treemacs)
