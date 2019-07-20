@@ -1,1 +1,1 @@
-nil
+("~/repos/study/factorial/" "~/.emacs.d/" "~/repos/study/railsapi/")

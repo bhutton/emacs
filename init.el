@@ -49,7 +49,7 @@
      ("\\?\\?\\?+" . "#dc752f"))))
  '(package-selected-packages
    (quote
-    (projectile-rails exec-path-from-shell spacemacs-theme ruby-refactor emr dumb-jump rspec-mode centaur-tabs auto-complete-exuberant-ctags ## auto-complete color-theme-sanityinc-tomorrow better-defaults)))
+    (bundler projectile-rails exec-path-from-shell spacemacs-theme ruby-refactor emr dumb-jump rspec-mode centaur-tabs auto-complete-exuberant-ctags ## auto-complete color-theme-sanityinc-tomorrow better-defaults)))
  '(pdf-view-midnight-colors (quote ("#655370" . "#fbf8ef"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -113,6 +113,13 @@
 )
 (global-set-key (kbd "C-d") 'duplicate-line)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
+(define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
+
+(require 'projectile)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(projectile-mode +1)
+
+
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode-launch)
 
 (load-theme 'spacemacs-light t)
