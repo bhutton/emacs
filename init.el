@@ -62,6 +62,7 @@
 
 ;; Show line numbers
 (global-linum-mode)
+(global-hl-line-mode)
 
 ;; Typography
 (set-face-attribute 'default nil
