@@ -12,7 +12,6 @@
 ; list the packages you want
 (setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode))
 
-
 ; install the missing packages
 (dolist (package package-list)
   (unless (package-installed-p package)
@@ -20,72 +19,6 @@
 
 
 (require 'better-defaults)
-(require 'color-theme-sanityinc-tomorrow)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector
-   (vector "#d6d6d6" "#c82829" "#718c00" "#eab700" "#4271ae" "#8959a8" "#3e999f" "#4d4d4c"))
- '(beacon-color "#c82829")
- '(custom-enabled-themes (quote (sanityinc-solarized-light)))
- '(custom-safe-themes
-   (quote
-    ("392395ee6e6844aec5a76ca4f5c820b97119ddc5290f4e0f58b38c9748181e8d" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "170bb47b35baa3d2439f0fd26b49f4278e9a8decf611aa33a0dad1397620ddc3" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "0dd2666921bd4c651c7f8a724b3416e95228a13fca1aa27dc0022f4e023bf197" "d5aec3a39364bc4c6c13f472b2d0cdaebd5cff7a6e4839749be2156fcc075006" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" default)))
- '(fci-rule-color "#d6d6d6")
- '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
- '(frame-background-mode (quote light))
- '(hl-sexp-background-color "#efebe9")
- '(hl-todo-keyword-faces
-   (quote
-    (("TODO" . "#dc752f")
-     ("NEXT" . "#dc752f")
-     ("THEM" . "#2d9574")
-     ("PROG" . "#3a81c3")
-     ("OKAY" . "#3a81c3")
-     ("DONT" . "#f2241f")
-     ("FAIL" . "#f2241f")
-     ("DONE" . "#42ae2c")
-     ("NOTE" . "#b1951d")
-     ("KLUDGE" . "#b1951d")
-     ("HACK" . "#b1951d")
-     ("TEMP" . "#b1951d")
-     ("FIXME" . "#dc752f")
-     ("XXX+" . "#dc752f")
-     ("\\?\\?\\?+" . "#dc752f"))))
- '(nrepl-message-colors
-   (quote
-    ("#183691" "#888a88" "#539100" "#888a88" "#0086b3" "#183691" "#539100" "#888a88")))
- '(package-selected-packages
-   (quote
-    (flatui-theme sublime-themes color-theme-sanityinc-solarized leuven-theme one-themes chyla-theme bundler projectile-rails exec-path-from-shell spacemacs-theme ruby-refactor emr dumb-jump rspec-mode centaur-tabs auto-complete-exuberant-ctags ## auto-complete color-theme-sanityinc-tomorrow better-defaults)))
- '(pdf-view-midnight-colors (quote ("#655370" . "#fbf8ef")))
- '(vc-annotate-background nil)
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#c82829")
-     (40 . "#f5871f")
-     (60 . "#eab700")
-     (80 . "#718c00")
-     (100 . "#3e999f")
-     (120 . "#4271ae")
-     (140 . "#8959a8")
-     (160 . "#c82829")
-     (180 . "#f5871f")
-     (200 . "#eab700")
-     (220 . "#718c00")
-     (240 . "#3e999f")
-     (260 . "#4271ae")
-     (280 . "#8959a8")
-     (300 . "#c82829")
-     (320 . "#f5871f")
-     (340 . "#eab700")
-     (360 . "#718c00"))))
- '(vc-annotate-very-old-color nil)
- '(window-divider-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -113,11 +46,12 @@
 
 
 ;; Typography
-(set-face-attribute 'default nil
-                    :family "Source Code Pro"
-                    :height 150
-                    :weight 'normal
-                    :width 'normal)
+;(set-face-attribute 'default nil
+;                    :family "Source Code Pro"
+;                    :height 150
+                    ;:weight 'normal
+                    ;:width 'normal
+;)
 
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "s-f") #'helm-projectile-ag)
@@ -163,15 +97,20 @@
 (global-set-key (kbd "C-d") 'duplicate-line)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
+(define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
+(define-key prog-mode-map (kbd "s-b") 'dumb-jump-go)
+(define-key prog-mode-map (kbd "s-[") 'dumb-jump-back)
+(define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
+(define-key prog-mode-map (kbd "s-<s-left>") 'back-to-indentation)
 
+(require 'treemacs)
+(require 'dash)
 (require 'projectile)
+(require 'all-the-icons)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (projectile-mode +1)
 
-
-(add-hook 'ruby-mode-hook 'ruby-refactor-mode-launch)
-
-(load-theme 'chyla t)
+(load-theme 'doom-opera-light t)
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
@@ -179,4 +118,44 @@
 (projectile-rails-global-mode)
 
 (treemacs)
+(setq treemacs-no-png-images t)
+
+(centaur-tabs-mode)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("d5aec3a39364bc4c6c13f472b2d0cdaebd5cff7a6e4839749be2156fcc075006" "1a1cdd9b407ceb299b73e4afd1b63d01bbf2e056ec47a9d95901f4198a0d2428" "8dce5b23232d0a490f16d62112d3abff6babeef86ae3853241a85856f9b0a6e7" "c3e6b52caa77cb09c049d3c973798bc64b5c43cc437d449eacf35b3e776bf85c" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "732b807b0543855541743429c9979ebfb363e27ec91e82f463c91e68c772f6e3" "6fdaae4be8a6ed9c891f655b25579113e8281d0c8ef27a7d20f9beab8d71fe9c" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" default)))
+ '(nrepl-message-colors
+   (quote
+    ("#183691" "#888a88" "#539100" "#888a88" "#0086b3" "#183691" "#539100" "#888a88")))
+ '(package-selected-packages
+   (quote
+    (all-the-icons espresso-theme twilight-bright-theme apropospriate-theme material-theme treemacs-projectile sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode projectile-rails one-themes leuven-theme helm-projectile helm-ag flatui-theme exec-path-from-shell emr dumb-jump color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags ag ac-inf-ruby)))
+ '(pdf-view-midnight-colors (quote ("#888a88" . "#edf5dc")))
+ '(vc-annotate-background "#d5dec4")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#888a88")
+     (40 . "#183691")
+     (60 . "#888a88")
+     (80 . "#888a88")
+     (100 . "#888a88")
+     (120 . "#539100")
+     (140 . "#888a88")
+     (160 . "#888a88")
+     (180 . "#888a88")
+     (200 . "#888a88")
+     (220 . "#63a35c")
+     (240 . "#0086b3")
+     (260 . "#183691")
+     (280 . "#888a88")
+     (300 . "#0086b3")
+     (320 . "#888a88")
+     (340 . "#539100")
+     (360 . "#888a88"))))
+ '(vc-annotate-very-old-color "#888a88"))
 

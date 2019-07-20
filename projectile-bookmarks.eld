@@ -1,1 +1,1 @@
-("~/repos/study/fibonacci/" "~/.emacs.d/" "~/repos/study/factorial/" "~/repos/study/railsapi/")
+("~/repos/study/factorial/" "~/.emacs.d/" "~/repos/study/railsapi/" "~/repos/study/fibonacci/")

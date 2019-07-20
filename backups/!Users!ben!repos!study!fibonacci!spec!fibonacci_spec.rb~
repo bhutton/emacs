@@ -7,7 +7,8 @@ describe 'Fibonacci' do
   end
 
   context 'when condition' do
-    it 'succeeds' do      expect(@response.calculate(0)).to eq([0])
+    it 'succeeds' do
+      expect(@response.calculate(0)).to eq([0])
       expect(@response.calculate(1)).to eq([0, 1])
       expect(@response.calculate(2)).to eq([0, 1, 1])
       expect(@response.calculate(3)).to eq([0, 1, 1, 2])
