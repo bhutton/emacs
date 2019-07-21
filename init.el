@@ -143,7 +143,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (all-the-icons espresso-theme twilight-bright-theme apropospriate-theme material-theme treemacs-projectile sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode projectile-rails one-themes leuven-theme helm-projectile helm-ag flatui-theme exec-path-from-shell emr dumb-jump color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags ag ac-inf-ruby)))
+    (recompile-on-save mocha all-the-icons espresso-theme twilight-bright-theme apropospriate-theme material-theme treemacs-projectile sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode projectile-rails one-themes leuven-theme helm-projectile helm-ag flatui-theme exec-path-from-shell emr dumb-jump color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags ag ac-inf-ruby)))
  '(pdf-view-midnight-colors (quote ("#888a88" . "#edf5dc")))
  '(vc-annotate-background "#d5dec4")
  '(vc-annotate-color-map
@@ -167,4 +167,5 @@
      (340 . "#539100")
      (360 . "#888a88"))))
  '(vc-annotate-very-old-color "#888a88"))
+
 
