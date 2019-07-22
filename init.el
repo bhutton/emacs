@@ -29,8 +29,9 @@
 (setq package-list '(better-defaults chyla))
 
 ;; Show line numbers
+(defun line-numbers ()
 (global-linum-mode)
-(global-hl-line-mode)
+(global-hl-line-mode))
 
 (require 'linum)
 (defun linum-update-window-scale-fix (win)
@@ -58,7 +59,9 @@
 (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
 
 ;; Autoclose paired syntax elements like parens, quotes, etc
-(add-hook 'ruby-mode-hook 'ruby-electric-mode)
+(add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
+
+(add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
@@ -72,6 +75,11 @@
 (require 'seeing-is-believing)
 
 (add-hook 'ruby-mode-hook 'auto-complete-mode)
+(add-hook 'ruby-mode-hook 'linum-mode)
+(add-hook 'ruby-mode-hook 'hl-line-mode)
+
+(add-hook 'js-mode-hook 'linum-mode)
+(add-hook 'js-mode-hook 'hl-line-mode)
 
 (require 'ruby-test-mode)
 (add-hook 'ruby-mode-hook 'ruby-test-mode)
@@ -96,6 +104,7 @@
   (next-line 1)
   (yank)
 )
+
 (global-set-key (kbd "C-d") 'duplicate-line)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
@@ -103,6 +112,7 @@
 (define-key prog-mode-map (kbd "s-b") 'dumb-jump-go)
 (define-key prog-mode-map (kbd "s-[") 'dumb-jump-back)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
+(define-key prog-mode-map (kbd "s-<s-left>") 'back-to-indentation)
 (define-key prog-mode-map (kbd "s-<s-left>") 'back-to-indentation)
 
 (require 'treemacs)
@@ -112,7 +122,7 @@
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (projectile-mode +1)
 
-(load-theme 'doom-opera-light t)
+(load-theme 'intellij t)
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
@@ -132,7 +142,7 @@
    ["#282c34" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#bbc2cf"])
  '(custom-safe-themes
    (quote
-    ("cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d5aec3a39364bc4c6c13f472b2d0cdaebd5cff7a6e4839749be2156fcc075006" "1a1cdd9b407ceb299b73e4afd1b63d01bbf2e056ec47a9d95901f4198a0d2428" "8dce5b23232d0a490f16d62112d3abff6babeef86ae3853241a85856f9b0a6e7" "c3e6b52caa77cb09c049d3c973798bc64b5c43cc437d449eacf35b3e776bf85c" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "732b807b0543855541743429c9979ebfb363e27ec91e82f463c91e68c772f6e3" "6fdaae4be8a6ed9c891f655b25579113e8281d0c8ef27a7d20f9beab8d71fe9c" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" default)))
+    ("a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d5aec3a39364bc4c6c13f472b2d0cdaebd5cff7a6e4839749be2156fcc075006" "1a1cdd9b407ceb299b73e4afd1b63d01bbf2e056ec47a9d95901f4198a0d2428" "8dce5b23232d0a490f16d62112d3abff6babeef86ae3853241a85856f9b0a6e7" "c3e6b52caa77cb09c049d3c973798bc64b5c43cc437d449eacf35b3e776bf85c" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "732b807b0543855541743429c9979ebfb363e27ec91e82f463c91e68c772f6e3" "6fdaae4be8a6ed9c891f655b25579113e8281d0c8ef27a7d20f9beab8d71fe9c" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" default)))
  '(fci-rule-color "#5B6268")
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
@@ -143,7 +153,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (recompile-on-save mocha all-the-icons espresso-theme twilight-bright-theme apropospriate-theme material-theme treemacs-projectile sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode projectile-rails one-themes leuven-theme helm-projectile helm-ag flatui-theme exec-path-from-shell emr dumb-jump color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags ag ac-inf-ruby)))
+    (intellij-theme recompile-on-save mocha all-the-icons espresso-theme twilight-bright-theme apropospriate-theme material-theme treemacs-projectile sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode projectile-rails one-themes leuven-theme helm-projectile helm-ag flatui-theme exec-path-from-shell emr dumb-jump color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags ag ac-inf-ruby)))
  '(pdf-view-midnight-colors (quote ("#888a88" . "#edf5dc")))
  '(vc-annotate-background "#d5dec4")
  '(vc-annotate-color-map
@@ -168,4 +178,14 @@
      (360 . "#888a88"))))
  '(vc-annotate-very-old-color "#888a88"))
 
+(require 'ansi-color)
+(defun endless/colorize-compilation ()
+  "Colorize from `compilation-filter-start' to `point'."
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region
+     compilation-filter-start (point))))
 
+(add-hook 'compilation-filter-hook
+          #'endless/colorize-compilation)
+
+(setq compilation-scroll-output t)

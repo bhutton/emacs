@@ -1,1 +1,1 @@
-("~/repos/vpsmanager-new/app/" "~/.emacs.d/" "~/repos/vpsmanager-new/" "~/repos/study/railsapi/" "~/repos/study/factorial/" "~/repos/study/fibonacci/")
+("~/repos/study/railsapi/" "~/repos/vpsmanager-new/app/" "~/.emacs.d/" "~/repos/study/factorial/" "~/repos/vpsmanager-new/" "~/repos/study/fibonacci/")
