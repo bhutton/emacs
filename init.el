@@ -132,7 +132,7 @@ the current position of point, then move it to the beginning of the line."
     (when (eq pt (point))
       (beginning-of-line))))
 
-(global-set-key (kbd "C-d") 'duplicate-line)
+(global-set-key (kbd "s-d") 'duplicate-line)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
@@ -140,7 +140,6 @@ the current position of point, then move it to the beginning of the line."
 (define-key prog-mode-map (kbd "s-[") 'dumb-jump-back)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
-;(define-key prog-mode-map (kbd "s-M-l") 'indent-region)
 
 (require 'treemacs)
 (require 'dash)
@@ -163,6 +162,8 @@ the current position of point, then move it to the beginning of the line."
 (setq treemacs-no-png-images t)
 
 (centaur-tabs-mode)
+(global-set-key (kbd "s-{") 'centaur-tabs-backward)
+(global-set-key (kbd "s-}") 'centaur-tabs-forward)
 
 ;(setq treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
 ;      treemacs-indentation 1)
@@ -249,6 +250,8 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "S-s-<up>") 'move-text-up)
 (global-set-key (kbd "S-s-<down>") 'move-text-down)
 (global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
+(global-set-key (kbd "s-w") 'kill-buffer)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
