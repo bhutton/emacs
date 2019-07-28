@@ -1,3 +1,4 @@
+(package-initialize)
 ; list the repositories containing them
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
@@ -30,36 +31,46 @@
 
 ;; Show line numbers
 (defun line-numbers ()
-(global-linum-mode)
-(global-hl-line-mode))
+  (global-hl-line-mode))
 
 (require 'linum)
 (defun linum-update-window-scale-fix (win)
   "fix linum for scaled text"
   (set-window-margins win
-          (ceiling (* (if (boundp 'text-scale-mode-step)
-                  (expt text-scale-mode-step
-                    text-scale-mode-amount) 1)
-              (if (car (window-margins))
-                  (car (window-margins)) 1)
-              ))))
+                      (ceiling (* (if (boundp 'text-scale-mode-step)
+                                      (expt text-scale-mode-step
+                                            text-scale-mode-amount) 1)
+                                  (if (car (window-margins))
+                                      (car (window-margins)) 1)
+                                  ))))
 (advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
 
 
 ;; Typography
-;(set-face-attribute 'default nil
-;                    :family "Source Code Pro"
-;                    :height 150
-                    ;:weight 'normal
-                    ;:width 'normal
-;)
+                                        ;(set-face-attribute 'default nil
+                                        ;                    :family "Source Code Pro"
+                                        ;                    :height 150
+                                        ;:weight 'normal
+                                        ;:width 'normal
+                                        ;)
 
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "s-f") #'helm-projectile-ag)
-(global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
+ (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
+
+
+;loads ruby mode when a .rb file is opened.
+(autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
+(setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
+(setq auto-mode-alist  (cons '(".rhtml$" . html-mode) auto-mode-alist))
 
 ;; Autoclose paired syntax elements like parens, quotes, etc
 (add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
+(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
+;(add-hook 'enh-ruby-mode-hook 'robe-mode)
+;(add-hook 'enh-ruby-mode-hook 'yard-mode)
+;(add-hook 'enh-ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
+;(add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode)
 
 (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
@@ -103,7 +114,23 @@
   (open-line 1)
   (next-line 1)
   (yank)
-)
+  )
+
+(defun beginning-of-line-or-indentation ()
+  "move to beginning of line, or indentation"
+  (interactive)
+  (if (bolp)
+      (back-to-indentation)
+    (beginning-of-line)))
+
+(defun smart-line-beginning ()
+  "Move point to the beginning of text on the current line; if that is already
+the current position of point, then move it to the beginning of the line."
+  (interactive)
+  (let ((pt (point)))
+    (beginning-of-line-text)
+    (when (eq pt (point))
+      (beginning-of-line))))
 
 (global-set-key (kbd "C-d") 'duplicate-line)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
@@ -112,15 +139,18 @@
 (define-key prog-mode-map (kbd "s-b") 'dumb-jump-go)
 (define-key prog-mode-map (kbd "s-[") 'dumb-jump-back)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
-(define-key prog-mode-map (kbd "s-<s-left>") 'back-to-indentation)
-(define-key prog-mode-map (kbd "s-<s-left>") 'back-to-indentation)
+(define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
+;(define-key prog-mode-map (kbd "s-M-l") 'indent-region)
 
 (require 'treemacs)
 (require 'dash)
+
 (require 'projectile)
-(require 'all-the-icons)
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (projectile-mode +1)
+
+(require 'all-the-icons)
 
 (load-theme 'intellij t)
 
@@ -133,59 +163,119 @@
 (setq treemacs-no-png-images t)
 
 (centaur-tabs-mode)
+
+;(setq treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
+;      treemacs-indentation 1)
+
+  (setq treemacs-icon-tag-node-open-png   (propertize "− " 'face 'font-lock-keyword-face)
+        treemacs-icon-tag-node-closed-png (propertize "+ " 'face 'font-lock-keyword-face)
+        treemacs-icon-tag-leaf-png        (propertize "🞄 " 'face 'font-lock-keyword-face))
+
+(defun move-line (n)
+  "Move the current line up or down by N lines."
+  (interactive "p")
+  (setq col (current-column))
+  (beginning-of-line) (setq start (point))
+  (end-of-line) (forward-char) (setq end (point))
+  (let ((line-text (delete-and-extract-region start end)))
+    (forward-line n)
+    (insert line-text)
+    ;; restore point to original column in moved line
+    (forward-line -1)
+    (forward-char col)))
+
+(defun move-line-up (n)
+  "Move the current line up by N lines."
+  (interactive "p")
+  (move-line (if (null n) -1 (- n))))
+
+(defun move-line-down (n)
+  "Move the current line down by N lines."
+  (interactive "p")
+  (move-line (if (null n) 1 n)))
+
+;(global-set-key (kbd "S-s-<up>") 'move-line-up)
+;(global-set-key (kbd "S-s-<down>") 'move-line-down)
+(global-set-key (kbd "S-s-f") 'helm-projectile-find-file)
+(global-set-key (kbd "S-<delete>") 'kill-whole-line)
+
+(set-face-attribute 'default nil :height 130)
+
+
+(defun move-text-internal (arg)
+   (cond
+    ((and mark-active transient-mark-mode)
+     (if (> (point) (mark))
+            (exchange-point-and-mark))
+     (let ((column (current-column))
+              (text (delete-and-extract-region (point) (mark))))
+       (forward-line arg)
+       (move-to-column column t)
+       (set-mark (point))
+       (insert text)
+       (exchange-point-and-mark)
+       (setq deactivate-mark nil)))
+    (t
+     (beginning-of-line)
+     (when (or (> arg 0) (not (bobp)))
+       (forward-line)
+       (when (or (< arg 0) (not (eobp)))
+            (transpose-lines arg))
+       (forward-line -1)))))
+
+(defun move-text-down (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines down."
+   (interactive "*p")
+   (move-text-internal arg))
+
+(defun move-text-up (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines up."
+   (interactive "*p")
+   (move-text-internal (- arg)))
+
+(defun comment-or-uncomment-region-or-line ()
+    "Comments or uncomments the region or the current line if there's no active region."
+    (interactive)
+    (let (beg end)
+        (if (region-active-p)
+            (setq beg (region-beginning) end (region-end))
+            (setq beg (line-beginning-position) end (line-end-position)))
+        (comment-or-uncomment-region beg end)))
+
+;(global-set-key [\M-\S-up] 'move-text-up)
+;(global-set-key [\M-\S-down] 'move-text-down)
+(global-set-key (kbd "S-s-<up>") 'move-text-up)
+(global-set-key (kbd "S-s-<down>") 'move-text-down)
+(global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#282c34" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#bbc2cf"])
  '(custom-safe-themes
    (quote
-    ("a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "d5aec3a39364bc4c6c13f472b2d0cdaebd5cff7a6e4839749be2156fcc075006" "1a1cdd9b407ceb299b73e4afd1b63d01bbf2e056ec47a9d95901f4198a0d2428" "8dce5b23232d0a490f16d62112d3abff6babeef86ae3853241a85856f9b0a6e7" "c3e6b52caa77cb09c049d3c973798bc64b5c43cc437d449eacf35b3e776bf85c" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "732b807b0543855541743429c9979ebfb363e27ec91e82f463c91e68c772f6e3" "6fdaae4be8a6ed9c891f655b25579113e8281d0c8ef27a7d20f9beab8d71fe9c" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" default)))
- '(fci-rule-color "#5B6268")
- '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
- '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
- '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
- '(nrepl-message-colors
+    ("a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default)))
+ '(ensime-sem-high-faces
    (quote
-    ("#183691" "#888a88" "#539100" "#888a88" "#0086b3" "#183691" "#539100" "#888a88")))
- '(objed-cursor-color "#ff6c6b")
+    ((var :foreground "#000000" :underline
+          (:style wave :color "yellow"))
+     (val :foreground "#000000")
+     (varField :foreground "#600e7a" :slant italic)
+     (valField :foreground "#600e7a" :slant italic)
+     (functionCall :foreground "#000000" :slant italic)
+     (implicitConversion :underline
+                         (:color "#c0c0c0"))
+     (implicitParams :underline
+                     (:color "#c0c0c0"))
+     (operator :foreground "#000080")
+     (param :foreground "#000000")
+     (class :foreground "#20999d")
+     (trait :foreground "#20999d" :slant italic)
+     (object :foreground "#5974ab" :slant italic)
+     (package :foreground "#000000")
+     (deprecated :strike-through "#000000"))))
  '(package-selected-packages
    (quote
-    (intellij-theme recompile-on-save mocha all-the-icons espresso-theme twilight-bright-theme apropospriate-theme material-theme treemacs-projectile sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode projectile-rails one-themes leuven-theme helm-projectile helm-ag flatui-theme exec-path-from-shell emr dumb-jump color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags ag ac-inf-ruby)))
- '(pdf-view-midnight-colors (quote ("#888a88" . "#edf5dc")))
- '(vc-annotate-background "#d5dec4")
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#888a88")
-     (40 . "#183691")
-     (60 . "#888a88")
-     (80 . "#888a88")
-     (100 . "#888a88")
-     (120 . "#539100")
-     (140 . "#888a88")
-     (160 . "#888a88")
-     (180 . "#888a88")
-     (200 . "#888a88")
-     (220 . "#63a35c")
-     (240 . "#0086b3")
-     (260 . "#183691")
-     (280 . "#888a88")
-     (300 . "#0086b3")
-     (320 . "#888a88")
-     (340 . "#539100")
-     (360 . "#888a88"))))
- '(vc-annotate-very-old-color "#888a88"))
-
-(require 'ansi-color)
-(defun endless/colorize-compilation ()
-  "Colorize from `compilation-filter-start' to `point'."
-  (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region
-     compilation-filter-start (point))))
-
-(add-hook 'compilation-filter-hook
-          #'endless/colorize-compilation)
-
-(setq compilation-scroll-output t)
+    (enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))))

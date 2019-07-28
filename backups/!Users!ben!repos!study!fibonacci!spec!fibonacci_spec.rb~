@@ -15,7 +15,6 @@ describe 'Fibonacci' do
       expect(@response.calculate(4)).to eq([0, 1, 1, 2, 3])
       expect(@response.calculate(5)).to eq([0, 1, 1, 2, 3, 5])
       expect(@response.calculate(6)).to eq([0, 1, 1, 2, 3, 5, 8])
-      expect(@response.calculate(7)).to eq([0, 1, 1, 2, 3, 5, 8, 13])
     end
   end
 end
