@@ -140,6 +140,8 @@ the current position of point, then move it to the beginning of the line."
 (define-key prog-mode-map (kbd "s-[") 'dumb-jump-back)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
+(define-key prog-mode-map (kbd "s-[") 'previous-buffer)
+(define-key prog-mode-map (kbd "s-]") 'next-buffer)
 
 (require 'treemacs)
 (require 'dash)
@@ -153,6 +155,12 @@ the current position of point, then move it to the beginning of the line."
 
 (load-theme 'intellij t)
 
+;; (require 'kaolin-themes)
+;; (load-theme 'kaolin-dark t)
+;; ;; Apply treemacs customization for Kaolin themes, requires the all-the-icons package.
+;; (kaolin-treemacs-theme)
+
+
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
 (exec-path-from-shell-copy-env "GEM_PATH")
@@ -164,6 +172,9 @@ the current position of point, then move it to the beginning of the line."
 (centaur-tabs-mode)
 (global-set-key (kbd "s-{") 'centaur-tabs-backward)
 (global-set-key (kbd "s-}") 'centaur-tabs-forward)
+
+(scroll-bar-mode)
+
 
 ;(setq treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
 ;      treemacs-indentation 1)
@@ -259,7 +270,7 @@ the current position of point, then move it to the beginning of the line."
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default)))
+    ("030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default)))
  '(ensime-sem-high-faces
    (quote
     ((var :foreground "#000000" :underline
@@ -281,4 +292,4 @@ the current position of point, then move it to the beginning of the line."
      (deprecated :strike-through "#000000"))))
  '(package-selected-packages
    (quote
-    (enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))))
+    (kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))))
