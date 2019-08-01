@@ -2,6 +2,10 @@
 ; list the repositories containing them
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
+;(setq load-path (cons (expand-file-name "~/.emacs.d/") load-path))
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+
+
 
 ; activate all the packages (in particular autoloads)
 (package-initialize)
@@ -63,6 +67,11 @@
 (autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
 (setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist  (cons '(".rhtml$" . html-mode) auto-mode-alist))
+
+(autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+(add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+
+(require 'ruby-debug)
 
 ;; Autoclose paired syntax elements like parens, quotes, etc
 (add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
@@ -135,7 +144,6 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "s-d") 'duplicate-line)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
-(define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "s-b") 'dumb-jump-go)
 (define-key prog-mode-map (kbd "s-[") 'dumb-jump-back)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
@@ -185,7 +193,7 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "s-{") 'centaur-tabs-backward)
 (global-set-key (kbd "s-}") 'centaur-tabs-forward)
 
-;; (scroll-bar-mode)
+(scroll-bar-mode)
 
 ;(setq treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
 ;      treemacs-indentation 1)
