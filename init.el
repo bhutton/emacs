@@ -156,6 +156,7 @@ the current position of point, then move it to the beginning of the line."
 (define-key prog-mode-map (kbd "s-[") 'previous-buffer)
 (define-key prog-mode-map (kbd "s-]") 'next-buffer)
 
+(use-package treemacs :ensure t)
 (require 'treemacs)
 (require 'dash)
 
