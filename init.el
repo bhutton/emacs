@@ -88,6 +88,7 @@
 (add-to-list 'auto-mode-alist
              '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . ruby-mode))
 
+(require 'rvm)
 (rvm-use-default)
 
 (setq seeing-is-believing-prefix "C-.")
@@ -140,6 +141,12 @@ the current position of point, then move it to the beginning of the line."
     (beginning-of-line-text)
     (when (eq pt (point))
       (beginning-of-line))))
+
+(when (memq window-system '(mac ns x))
+  (require 'exec-path-from-shell)
+  (setq-default exec-path-from-shell-shell-name "/bin/zsh")
+  (exec-path-from-shell-copy-env "PATH")
+(exec-path-from-shell-initialize))
 
 (global-set-key (kbd "s-d") 'duplicate-line)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
@@ -273,6 +280,7 @@ the current position of point, then move it to the beginning of the line."
             (setq beg (region-beginning) end (region-end))
             (setq beg (line-beginning-position) end (line-end-position)))
         (comment-or-uncomment-region beg end)))
+
 
 ;(global-set-key [\M-\S-up] 'move-text-up)
 ;(global-set-key [\M-\S-down] 'move-text-down)
