@@ -15,7 +15,7 @@
   (package-refresh-contents))
 
 ; list the packages you want
-(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode treemacs ruby-debug))
+(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode treemacs))
 
 ; install the missing packages
 (dolist (package package-list)
@@ -70,8 +70,6 @@
 
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
-
-(require 'ruby-debug)
 
 ;; Autoclose paired syntax elements like parens, quotes, etc
 (add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
