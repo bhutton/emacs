@@ -15,7 +15,7 @@
   (package-refresh-contents))
 
 ; list the packages you want
-(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode))
+(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode treemacs))
 
 ; install the missing packages
 (dolist (package package-list)
