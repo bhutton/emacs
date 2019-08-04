@@ -15,13 +15,12 @@
   (package-refresh-contents))
 
 ; list the packages you want
-(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode treemacs exec-path-from-shell))
+(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode))
 
 ; install the missing packages
 (dolist (package package-list)
   (unless (package-installed-p package)
     (package-install package)))
-
 
 (require 'better-defaults)
 (custom-set-faces
@@ -71,13 +70,18 @@
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
 
+(require 'ruby-debug)
+
 ;; Autoclose paired syntax elements like parens, quotes, etc
-(add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
-(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
-;(add-hook 'enh-ruby-mode-hook 'robe-mode)
-;(add-hook 'enh-ruby-mode-hook 'yard-mode)
-;(add-hook 'enh-ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
-;(add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode)
+;(add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
+;(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
+(add-hook 'enh-ruby-mode-hook 'robe-mode)
+(add-hook 'enh-ruby-mode-hook 'yard-mode)
+(add-hook 'enh-ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
+(add-hook 'enh-ruby-mode-hook 'linum-mode)
+(add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode)
+
+(add-hook 'find-file-hook 'linum-mode)
 
 (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
@@ -94,8 +98,6 @@
 (require 'seeing-is-believing)
 
 (add-hook 'ruby-mode-hook 'auto-complete-mode)
-(add-hook 'ruby-mode-hook 'linum-mode)
-(add-hook 'ruby-mode-hook 'hl-line-mode)
 
 (add-hook 'js-mode-hook 'linum-mode)
 (add-hook 'js-mode-hook 'hl-line-mode)
@@ -375,3 +377,5 @@ the current position of point, then move it to the beginning of the line."
 	     (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
 		 (flymake-mode))
 	     ))
+(package-initialize)
+; list the repositories containing them
