@@ -1,0 +1,2 @@
+;;; -*- no-byte-compile: t -*-
+(define-package "recompile-on-save" "20151126.1446" "Trigger recompilation on file save." '((dash "1.1.0") (cl-lib "0.5")) :commit "92e11446869d878803d4f3dec5d2101380c12bb2" :keywords '("convenience" "files" "processes" "tools") :authors '(("Marian Schubert" . "marian.schubert@gmail.com")) :maintainer '("Marian Schubert" . "marian.schubert@gmail.com") :url "https://github.com/maio/recompile-on-save.el")
