@@ -166,6 +166,7 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "M-s-<left>") 'windmove-left)
 (global-set-key (kbd "M-s-<up>") 'windmove-up)
 (global-set-key (kbd "M-s-<down>") 'windmove-down)
+
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "s-b") 'dumb-jump-go)
