@@ -74,14 +74,28 @@
 
 ;; Autoclose paired syntax elements like parens, quotes, etc
 ;(add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
-;(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
-(add-hook 'enh-ruby-mode-hook 'robe-mode)
-(add-hook 'enh-ruby-mode-hook 'yard-mode)
-(add-hook 'enh-ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
-(add-hook 'enh-ruby-mode-hook 'linum-mode)
-(add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode)
+                                        ;(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
+(require 'ruby-test-mode)
+;; (add-hook 'ruby-mode-hook 'ruby-test-mode)
+
+;; (add-hook 'enh-ruby-mode-hook 'robe-mode)
+;; (add-hook 'enh-ruby-mode-hook 'yard-mode)
+;; (add-hook 'enh-ruby-mode-hook 'ruby-electric-mode)
+;; (add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode)
+;; (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
+
+;; (add-hook 'ruby-mode-hook 'robe-mode)
+(add-hook 'ruby-mode-hook 'yard-mode)
+(add-hook 'ruby-mode-hook 'ruby-electric-mode)
+(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
+(add-hook 'ruby-mode-hook 'ruby-test-mode)
+
+
+
 
 (add-hook 'find-file-hook 'linum-mode)
+(add-hook 'text-mode-hook 'linum-mode)
+(add-hook 'prog-mode-hook 'linum-mode)
 
 (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
@@ -99,11 +113,9 @@
 
 (add-hook 'ruby-mode-hook 'auto-complete-mode)
 
-(add-hook 'js-mode-hook 'linum-mode)
-(add-hook 'js-mode-hook 'hl-line-mode)
+;; (add-hook 'js-mode-hook 'linum-mode)
+;; (add-hook 'js-mode-hook 'hl-line-mode)
 
-(require 'ruby-test-mode)
-(add-hook 'ruby-mode-hook 'ruby-test-mode)
 
 (delete-selection-mode 1)
 
@@ -149,6 +161,7 @@ the current position of point, then move it to the beginning of the line."
 (exec-path-from-shell-initialize))
 
 (global-set-key (kbd "s-d") 'duplicate-line)
+(global-set-key (kbd "M-]") 'ace-window)
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "s-b") 'dumb-jump-go)
@@ -157,6 +170,7 @@ the current position of point, then move it to the beginning of the line."
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
 (define-key prog-mode-map (kbd "s-[") 'previous-buffer)
 (define-key prog-mode-map (kbd "s-]") 'next-buffer)
+
 
 (require 'treemacs)
 (require 'dash)
@@ -325,7 +339,7 @@ the current position of point, then move it to the beginning of the line."
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    (quote
-    (undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+    (yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
