@@ -59,7 +59,7 @@
 
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "s-f") #'helm-projectile-ag)
- (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
+(global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
 
 ;typescript
 (defun setup-tide-mode ()
@@ -225,9 +225,14 @@ the current position of point, then move it to the beginning of the line."
 (define-key ruby-mode-map (kbd "s-b") 'dumb-jump-go)
 (define-key ruby-mode-map (kbd "s-[") 'dumb-jump-back)
 
-;(define-key typescript-mode-hook (kbd "s-b") 'tide-jump-to-definition)
-;(define-key typescript-mode-hook (kbd "s-[") 'tide-jump-back)
 
+(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;; Better imenu
+(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+(define-key js2-mode-map (kbd "s-b") 'dumb-jump-go)
+(define-key js2-mode-map (kbd "s-[") 'dumb-jump-back)
 
 (require 'treemacs)
 (require 'dash)
@@ -391,7 +396,8 @@ the current position of point, then move it to the beginning of the line."
      (deprecated :strike-through "#000000"))))
  '(fci-rule-color "#9e9e9e")
  '(jdee-db-active-breakpoint-face-colors (cons "#fafafa" "#3b6ea8"))
- '(jdee-db-requested-breakpoint-face-colors (cons "#fafafa" "#4f894c"))
+ '(j
+   dee-db-requested-breakpoint-face-colors (cons "#fafafa" "#4f894c"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#fafafa" "#bdbdbd"))
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
