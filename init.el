@@ -74,6 +74,20 @@
   ;; `M-x package-install [ret] company`
   (company-mode +1))
 
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving
+(add-hook 'before-save-hook 'tide-format-before-save)
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
+(eval-after-load "tide"
+  '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
+(eval-after-load "tide"
+  '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
+
+
 (require 'flycheck)
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
@@ -83,6 +97,8 @@
               (setup-tide-mode))))
 ;; enable typescript-tslint checker
 (flycheck-add-mode 'typescript-tslint 'web-mode)
+
+
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -125,9 +141,6 @@
 (add-hook 'ruby-mode-hook 'ruby-electric-mode)
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode)
 (add-hook 'ruby-mode-hook 'ruby-test-mode)
-
-
-
 
 (add-hook 'find-file-hook 'linum-mode)
 (add-hook 'text-mode-hook 'linum-mode)
@@ -205,12 +218,15 @@ the current position of point, then move it to the beginning of the line."
 
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
-(define-key prog-mode-map (kbd "s-b") 'dumb-jump-go)
-(define-key prog-mode-map (kbd "s-[") 'dumb-jump-back)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
 (define-key prog-mode-map (kbd "s-[") 'previous-buffer)
 (define-key prog-mode-map (kbd "s-]") 'next-buffer)
+(define-key ruby-mode-map (kbd "s-b") 'dumb-jump-go)
+(define-key ruby-mode-map (kbd "s-[") 'dumb-jump-back)
+
+;(define-key typescript-mode-hook (kbd "s-b") 'tide-jump-to-definition)
+;(define-key typescript-mode-hook (kbd "s-[") 'tide-jump-back)
 
 
 (require 'treemacs)
