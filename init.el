@@ -66,7 +66,7 @@
   (interactive)
   (tide-setup)
   (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  ;; (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   ;; company is an optional dependency. You have to
@@ -97,6 +97,7 @@
               (setup-tide-mode))))
 ;; enable typescript-tslint checker
 (flycheck-add-mode 'typescript-tslint 'web-mode)
+;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
 
 
@@ -395,14 +396,13 @@ the current position of point, then move it to the beginning of the line."
      (package :foreground "#000000")
      (deprecated :strike-through "#000000"))))
  '(fci-rule-color "#9e9e9e")
+ '(j dee-db-requested-breakpoint-face-colors)
  '(jdee-db-active-breakpoint-face-colors (cons "#fafafa" "#3b6ea8"))
- '(j
-   dee-db-requested-breakpoint-face-colors (cons "#fafafa" "#4f894c"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#fafafa" "#bdbdbd"))
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    (quote
-    (typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+    (company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
