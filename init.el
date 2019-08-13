@@ -115,6 +115,53 @@
 ;(autoload 'typescript-mode "typescript-mode" "Major mode for editing typescript scripts." t)
 ;(setq auto-mode-alist  (cons '(".tsx$" . typescript-mode) auto-mode-alist))
 
+;JavaScript
+(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;; Better imenu
+(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+
+(require 'js2-refactor)
+(require 'xref-js2)
+
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
+(js2r-add-keybindings-with-prefix "C-c C-r")
+(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+;; unbind it.
+(define-key js-mode-map (kbd "M-.") nil)
+
+(add-hook 'js2-mode-hook (lambda ()
+  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+
+(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+(require 'rjsx-mode)
+(rjsx-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
+
+;; (require 'prettier-js)
+
+;; (add-hook 'js2-mode-hook 'prettier-js-mode)
+;; (add-hook 'web-mode-hook 'prettier-js-mode)
+
+;; (setq prettier-js-args '(
+;;   "--trailing-comma" "all"
+;;   "--bracket-spacing" "false"
+;; ))
+
+;; (defun enable-minor-mode (my-pair)
+;;   "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+;;   (if (buffer-file-name)
+;;       (if (string-match (car my-pair) buffer-file-name)
+;;       (funcall (cdr my-pair)))))
+
+;; (add-hook 'web-mode-hook #'(lambda ()
+;;                             (enable-minor-mode
+;;                              '("\\.jsx?\\'" . prettier-js-mode))))
+
 ;loads ruby mode when a .rb file is opened.
 (autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
 (setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
@@ -216,6 +263,10 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "M-s-<left>") 'windmove-left)
 (global-set-key (kbd "M-s-<up>") 'windmove-up)
 (global-set-key (kbd "M-s-<down>") 'windmove-down)
+(global-set-key (kbd "s-<s-right>") 'move-end-of-line)
+(global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
+
+
 
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
@@ -402,7 +453,7 @@ the current position of point, then move it to the beginning of the line."
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    (quote
-    (company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+    (rjsx-mode xref-js2 js2-refactor prettier-js company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
