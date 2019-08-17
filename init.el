@@ -33,8 +33,8 @@
 (setq package-list '(better-defaults chyla))
 
 ;; Show line numbers
-;; (defun line-numbers ()
-;;   (global-hl-line-mode))
+;(defun line-numbers ()
+;   (global-hl-line-mode))
 
 (require 'linum)
 (defun linum-update-window-scale-fix (win)
@@ -119,7 +119,7 @@
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
-;; Better imenu
+; Better imenu
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
 
 (require 'js2-refactor)
@@ -131,26 +131,48 @@
 
 ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
 ;; unbind it.
-(define-key js-mode-map (kbd "M-.") nil)
+;; (define-key js-mode-map (kbd "M-.") nil)
 
 (add-hook 'js2-mode-hook (lambda ()
   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
 (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
-(require 'rjsx-mode)
-(rjsx-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
+ (require 'rjsx-mode)
+ (rjsx-mode)
+ (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
+ (setq web-mode-content-types-alist
+   '(("jsx" . "\\.js[x]?\\'")))
 
-;; (require 'prettier-js)
+ (add-hook 'rjsx-mode-hook
+           (lambda ()
+             (setq indent-tabs-mode nil) ;;Use space instead of tab
+             (setq js-indent-level 2) ;;space width is 2 (default is 4)
+            (setq js2-strict-missing-semi-warning nil))) ;;disable the semicolon warning
 
-;; (add-hook 'js2-mode-hook 'prettier-js-mode)
-;; (add-hook 'web-mode-hook 'prettier-js-mode)
+;; (add-hook 'js-mode-hook (lambda () (tern-mode t)))
 
-;; (setq prettier-js-args '(
-;;   "--trailing-comma" "all"
-;;   "--bracket-spacing" "false"
-;; ))
+;; (eval-after-load 'tern
+;;    '(progn
+;;       (require 'tern-auto-complete)
+;;       (tern-ac-setup)))
+
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
+(add-to-list 'company-backends 'company-tern)
+(add-to-list 'company-backends 'ac-js2-company)
+(setq ac-js2-evaluate-calls t)
+(add-to-list 'company-backends 'company-flow)
+
+(require 'prettier-js)
+
+ (add-hook 'js2-mode-hook 'prettier-js-mode)
+ (add-hook 'web-mode-hook 'prettier-js-mode)
+
+ (setq prettier-js-args '(
+   "--trailing-comma" "all"
+   "--bracket-spacing" "false"
+ ))
 
 ;; (defun enable-minor-mode (my-pair)
 ;;   "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
@@ -193,6 +215,7 @@
 (add-hook 'find-file-hook 'linum-mode)
 (add-hook 'text-mode-hook 'linum-mode)
 (add-hook 'prog-mode-hook 'linum-mode)
+(add-hook 'prog-mode-hook 'hl-line-mode)
 
 (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
@@ -283,7 +306,7 @@ the current position of point, then move it to the beginning of the line."
 
 ;; Better imenu
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-(define-key js2-mode-map (kbd "s-b") 'dumb-jump-go)
+(define-key js2-mode-map (kbd "s-b") 'ac-js2-jump-to-definition)
 (define-key js2-mode-map (kbd "s-[") 'dumb-jump-back)
 
 (require 'treemacs)
@@ -453,7 +476,7 @@ the current position of point, then move it to the beginning of the line."
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    (quote
-    (rjsx-mode xref-js2 js2-refactor prettier-js company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+    (ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
