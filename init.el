@@ -240,9 +240,9 @@
 (delete-selection-mode 1)
 
 (dumb-jump-mode)
-(setq dumb-jump-aggressive t)
-(setq dumb-jump-selector 'helm)
-(setq dumb-jump-force-searcher nil)
+(setq dumb-jump-aggressive nil)
+(setq dumb-jump-selector 'ivy)
+(setq dumb-jump-force-searcher 'ag)
 
 (setq inhibit-splash-screen t
       initial-scratch-message nil
@@ -306,7 +306,7 @@ the current position of point, then move it to the beginning of the line."
 
 ;; Better imenu
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-(define-key js2-mode-map (kbd "s-b") 'ac-js2-jump-to-definition)
+(define-key js2-mode-map (kbd "s-b") 'dumb-jump-go)
 (define-key js2-mode-map (kbd "s-[") 'dumb-jump-back)
 
 (require 'treemacs)
@@ -476,7 +476,7 @@ the current position of point, then move it to the beginning of the line."
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    (quote
-    (ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+    (find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
