@@ -1,6 +1,6 @@
 (package-initialize)
 ; list the repositories containing them
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+(setq package-archives '(("gnu" . "http://mirrors.163.com/elpa/gnu/")
                          ("melpa" . "https://melpa.org/packages/")))
 ;(setq load-path (cons (expand-file-name "~/.emacs.d/") load-path))
 (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -388,6 +388,17 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "S-s-f") 'helm-projectile-find-file)
 (global-set-key (kbd "S-<delete>") 'kill-whole-line)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; undo tree mode                                                         ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;turn on everywhere
+(global-undo-tree-mode 1)
+;; make ctrl-z undo
+(global-set-key (kbd "s-z") 'undo)
+;; make ctrl-Z redo
+(defalias 'redo 'undo-tree-redo)
+(global-set-key (kbd "s-Z") 'redo)
 (set-face-attribute 'default nil :height 130)
 
 (defun move-text-internal (arg)
