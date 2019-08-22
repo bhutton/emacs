@@ -185,6 +185,14 @@
 ;;                              '("\\.jsx?\\'" . prettier-js-mode))))
 
 ;loads ruby mode when a .rb file is opened.
+(setq abg-required-packages 
+      (list 'xml-rpc 'magit 'gh 'inf-ruby))
+
+(dolist (package abg-required-packages)
+  (when (not (package-installed-p package))
+    (package-refresh-contents)
+    (package-install package)))
+
 (autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
 (setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist  (cons '(".rhtml$" . html-mode) auto-mode-alist))
@@ -207,6 +215,8 @@
 ;; (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
 
 ;; (add-hook 'ruby-mode-hook 'robe-mode)
+(add-hook 'ruby-mode-hook
+          (lambda () (rvm-activate-corresponding-ruby)))
 (add-hook 'ruby-mode-hook 'yard-mode)
 (add-hook 'ruby-mode-hook 'ruby-electric-mode)
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode)
@@ -488,6 +498,7 @@ the current position of point, then move it to the beginning of the line."
  '(package-selected-packages
    (quote
     (find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+ '(safe-local-variable-values (quote ((ruby-test-runner . rspec))))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
