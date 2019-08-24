@@ -6,7 +6,6 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 
-
 ; activate all the packages (in particular autoloads)
 (package-initialize)
 
@@ -292,10 +291,10 @@ the current position of point, then move it to the beginning of the line."
 
 (global-set-key (kbd "s-d") 'duplicate-line)
 (global-set-key (kbd "M-]") 'other-window)
-(global-set-key (kbd "M-s-<right>") 'windmove-right)
-(global-set-key (kbd "M-s-<left>") 'windmove-left)
-(global-set-key (kbd "M-s-<up>") 'windmove-up)
-(global-set-key (kbd "M-s-<down>") 'windmove-down)
+(global-set-key (kbd "M-C-<right>") 'windmove-right)
+(global-set-key (kbd "M-C-<left>") 'windmove-left)
+(global-set-key (kbd "M-C-<up>") 'windmove-up)
+(global-set-key (kbd "M-C-<down>") 'windmove-down)
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
 
@@ -338,7 +337,7 @@ the current position of point, then move it to the beginning of the line."
 (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
       doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
-(load-theme 'doom-opera-light t)
+(load-theme 'doom-solarized-light t)
 (doom-themes-treemacs-config)
 (doom-themes-visual-bell-config)
 (doom-themes-org-config)
@@ -361,7 +360,7 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "s-{") 'centaur-tabs-backward)
 (global-set-key (kbd "s-}") 'centaur-tabs-forward)
 
-(scroll-bar-mode)
+;; (scroll-bar-mode)
 
 ;(setq treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
 ;      treemacs-indentation 1)
@@ -551,4 +550,12 @@ the current position of point, then move it to the beginning of the line."
 		 (flymake-mode))
 	     ))
 (package-initialize)
+
+;; Click [here](https://github.com/hbin/dotfiles-for-emacs) to take a further look.
+(set-frame-font "Menlo:pixelsize=14")
+
+;; If you use Emacs Daemon mode
+(add-to-list 'default-frame-alist
+               (cons 'font "Menlo:pixelsize=14"))
+
 ; list the repositories containing them
