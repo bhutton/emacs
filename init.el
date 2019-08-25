@@ -355,10 +355,16 @@ the current position of point, then move it to the beginning of the line."
 
 (treemacs)
 (setq treemacs-no-png-images t)
-
+(setq centaur-tabs-style "wave")
+(setq centaur-tabs-height 32)
+(setq centaur-tabs-set-icons t)
+(setq centaur-tabs-gray-out-icons 'buffer)
+(setq centaur-tabs-set-bar 'over)
 (centaur-tabs-mode)
+(centaur-tabs-headline-match)
 (global-set-key (kbd "s-{") 'centaur-tabs-backward)
 (global-set-key (kbd "s-}") 'centaur-tabs-forward)
+
 
 ;; (scroll-bar-mode)
 
