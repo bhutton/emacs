@@ -35,6 +35,8 @@
 ;(defun line-numbers ()
 ;   (global-hl-line-mode))
 
+(cua-selection-mode 1)
+
 (require 'linum)
 (defun linum-update-window-scale-fix (win)
   "fix linum for scaled text"
