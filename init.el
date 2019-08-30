@@ -61,6 +61,7 @@
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "s-f") #'helm-projectile-ag)
 (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
+(global-set-key (kbd "s-b") #'dumb-jump-go)
 
 ;typescript
 (defun setup-tide-mode ()
@@ -140,7 +141,7 @@
 (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
  (require 'rjsx-mode)
- (rjsx-mode)
+ ;; (rjsx-mode)
  (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
  (setq web-mode-content-types-alist
    '(("jsx" . "\\.js[x]?\\'")))
@@ -269,6 +270,28 @@
   (yank)
   )
 
+(defun duplicate-line-or-region (&optional n)
+  "Duplicate current line, or region if active.
+With argument N, make N copies.
+With negative N, comment out original line and use the absolute value."
+  (interactive "*p")
+  (let ((use-region (use-region-p)))
+    (save-excursion
+      (let ((text (if use-region        ;Get region if active, otherwise line
+                      (buffer-substring (region-beginning) (region-end))
+                    (prog1 (thing-at-point 'line)
+                      (end-of-line)
+                      (if (< 0 (forward-line 1)) ;Go to beginning of next line, or make a new one
+                          (newline))))))
+        (dotimes (i (abs (or n 1)))     ;Insert N times, or once if not specified
+          (insert text))))
+    (if use-region nil                  ;Only if we're working with a line (not a region)
+      (let ((pos (- (point) (line-beginning-position)))) ;Save column
+        (if (> 0 n)                             ;Comment out original with negative arg
+            (comment-region (line-beginning-position) (line-end-position)))
+        (forward-line 1)
+        (forward-char pos)))))
+
 (defun beginning-of-line-or-indentation ()
   "move to beginning of line, or indentation"
   (interactive)
@@ -291,7 +314,7 @@ the current position of point, then move it to the beginning of the line."
   (exec-path-from-shell-copy-env "PATH")
 (exec-path-from-shell-initialize))
 
-(global-set-key (kbd "s-d") 'duplicate-line)
+(global-set-key (kbd "s-d") 'duplicate-line-or-region)
 (global-set-key (kbd "M-]") 'other-window)
 (global-set-key (kbd "M-C-<right>") 'windmove-right)
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
@@ -336,6 +359,7 @@ the current position of point, then move it to the beginning of the line."
 (require 'doom-themes)
 
 ;; Global settings (defaults)
+;; Global settings (defaults)
 (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
       doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
@@ -357,7 +381,7 @@ the current position of point, then move it to the beginning of the line."
 
 (treemacs)
 (setq treemacs-no-png-images t)
-(setq centaur-tabs-style "wave")
+(setq centaur-tabs-style "box")
 (setq centaur-tabs-height 32)
 (setq centaur-tabs-set-icons t)
 (setq centaur-tabs-gray-out-icons 'buffer)
@@ -560,10 +584,12 @@ the current position of point, then move it to the beginning of the line."
 (package-initialize)
 
 ;; Click [here](https://github.com/hbin/dotfiles-for-emacs) to take a further look.
-(set-frame-font "Menlo:pixelsize=14")
+;; (set-frame-font "Menlo:pixelsize=14")
+(set-frame-font "Hack:pixelsize=14")
 
 ;; If you use Emacs Daemon mode
 (add-to-list 'default-frame-alist
-               (cons 'font "Menlo:pixelsize=14"))
+               (cons 'font "Hack:pixelsize=14"))
+               ;; (cons 'font "Menlo:pixelsize=14"))
 
 ; list the repositories containing them
