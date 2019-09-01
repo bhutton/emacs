@@ -202,7 +202,7 @@
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
 
-(require 'ruby-debug)
+;; (require 'ruby-debug)
 
 ;; Autoclose paired syntax elements like parens, quotes, etc
 ;(add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
