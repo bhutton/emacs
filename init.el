@@ -89,14 +89,14 @@
 
 
 (require 'flycheck)
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-hook 'web-mode-hook
+(require 'typescript-mode)
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+(add-hook 'typescript-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
 ;; enable typescript-tslint checker
-(flycheck-add-mode 'typescript-tslint 'web-mode)
+(flycheck-add-mode 'typescript-tslint 'typescript-mode)
 ;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
 
@@ -143,7 +143,7 @@
  (require 'rjsx-mode)
  ;; (rjsx-mode)
  (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
- (setq web-mode-content-types-alist
+ (setq typescript-mode-content-types-alist
    '(("jsx" . "\\.js[x]?\\'")))
 
  (add-hook 'rjsx-mode-hook
@@ -169,7 +169,7 @@
 (require 'prettier-js)
 
  (add-hook 'js2-mode-hook 'prettier-js-mode)
- (add-hook 'web-mode-hook 'prettier-js-mode)
+ (add-hook 'typescript-mode-hook 'prettier-js-mode)
 
  (setq prettier-js-args '(
    "--trailing-comma" "all"
@@ -182,7 +182,7 @@
 ;;       (if (string-match (car my-pair) buffer-file-name)
 ;;       (funcall (cdr my-pair)))))
 
-;; (add-hook 'web-mode-hook #'(lambda ()
+;; (add-hook 'typescript-mode-hook #'(lambda ()
 ;;                             (enable-minor-mode
 ;;                              '("\\.jsx?\\'" . prettier-js-mode))))
 
