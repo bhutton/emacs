@@ -392,6 +392,7 @@ the current position of point, then move it to the beginning of the line."
 (setq centaur-tabs-set-bar 'over)
 (centaur-tabs-mode)
 (centaur-tabs-headline-match)
+(centaur-tabs-group-by-projectile-project)
 (global-set-key (kbd "s-{") 'centaur-tabs-backward)
 (global-set-key (kbd "s-}") 'centaur-tabs-forward)
 
