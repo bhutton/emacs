@@ -57,6 +57,7 @@
 (global-set-key (kbd "s-f") #'helm-projectile-ag)
 (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
 (global-set-key (kbd "s-b") #'dumb-jump-go)
+(global-set-key (kbd "s-r") #'replace-string)
 
 ;typescript
 (setq create-lockfiles nil)
@@ -80,7 +81,7 @@
 ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(add-hook 'web-mode-hook #'setup-tide-mode)
 
 (eval-after-load "tide"
   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
@@ -91,14 +92,14 @@
 
 
 (require 'flycheck)
-(require 'typescript-mode)
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
-(add-hook 'typescript-mode-hook
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
 ;; enable typescript-tslint checker
-(flycheck-add-mode 'typescript-tslint 'typescript-mode)
+(flycheck-add-mode 'typescript-tslint 'web-mode)
 ;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
 
@@ -109,13 +110,13 @@
 ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(add-hook 'web-mode-hook #'setup-tide-mode)
 ;(require 'ansi-color)
 ;(defun colorize-compilation-buffer ()
 ;  (Ansi-color-apply-on-region compilation-filter-start (point-max)))
 ;(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-;(autoload 'typescript-mode "typescript-mode" "Major mode for editing typescript scripts." t)
-;(setq auto-mode-alist  (cons '(".tsx$" . typescript-mode) auto-mode-alist))
+;(autoload 'web-mode "web-mode" "Major mode for editing typescript scripts." t)
+;(setq auto-mode-alist  (cons '(".tsx$" . web-mode) auto-mode-alist))
 
 (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
 
@@ -145,7 +146,7 @@
  (require 'rjsx-mode)
  ;; (rjsx-mode)
  (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
- (setq typescript-mode-content-types-alist
+ (setq web-mode-content-types-alist
    '(("jsx" . "\\.js[x]?\\'")))
 
  (add-hook 'rjsx-mode-hook
@@ -171,7 +172,7 @@
 (require 'prettier-js)
 
  (add-hook 'js2-mode-hook 'prettier-js-mode)
- (add-hook 'typescript-mode-hook 'prettier-js-mode)
+ (add-hook 'web-mode-hook 'prettier-js-mode)
 
  (setq prettier-js-args '(
    "--trailing-comma" "all"
@@ -184,7 +185,7 @@
 ;; ;;       (if (string-match (car my-pair) buffer-file-name)
 ;; ;;       (funcall (cdr my-pair)))))
 
-;; ;; (add-hook 'typescript-mode-hook #'(lambda ()
+;; ;; (add-hook 'web-mode-hook #'(lambda ()
 ;; ;;                             (enable-minor-mode
 ;; ;;                              '("\\.jsx?\\'" . prettier-js-mode))))
 
@@ -537,7 +538,8 @@ the current position of point, then move it to the beginning of the line."
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    (quote
-    (spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company typescript-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+    (spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode
+               yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
  '(safe-local-variable-values (quote ((ruby-test-runner . rspec))))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
