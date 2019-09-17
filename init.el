@@ -86,6 +86,8 @@
   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
 (eval-after-load "tide"
   '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
+(eval-after-load "tide"
+  '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
 
 
 (require 'flycheck)
