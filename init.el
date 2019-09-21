@@ -91,6 +91,7 @@
   '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
 
 
+
 (require 'flycheck)
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
@@ -120,9 +121,27 @@
 
 (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
 
+(defun test-suite ()
+  (interactive)
+  (with-output-to-temp-buffer "*test-runner*"
+    (flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
+      (kill-matching-buffers "*test-runner*"))
+    (kill-matching-buffers "*test-runner*")
+    (shell-command (concat "CI=true npm test --prefix " projectile-project-root " &")
+                   "*test-runner*"
+                   "*Messages*")
+    (get-buffer-create "*test-runner*")))
+
 ;JavaScript
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+
+(add-hook 'js2-mode-hook
+          (lambda ()
+            (set (make-local-variable 'testing-command)
+                 (test-javascript))))
+
 
 ; Better imenu
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
@@ -133,6 +152,7 @@
 (add-hook 'js2-mode-hook #'js2-refactor-mode)
 (js2r-add-keybindings-with-prefix "C-c C-r")
 (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+(define-key js2-mode-map (kbd "C-t") #'test-suite)
 
 ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
 ;; unbind it.
