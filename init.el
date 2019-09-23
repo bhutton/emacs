@@ -103,7 +103,7 @@
 (flycheck-add-mode 'typescript-tslint 'web-mode)
 ;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
-
+(define-key web-mode-map (kbd "C-t") #'test-suite)
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
