@@ -53,11 +53,19 @@
                                         ;:width 'normal
                                         ;)
 
+
+;;keep cursor at same position when scrolling
+(setq scroll-preserve-screen-position 1)
+;;scroll window up/down by one line
+(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
+(global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
+
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "s-f") #'helm-projectile-ag)
 (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
 (global-set-key (kbd "s-b") #'dumb-jump-go)
 (global-set-key (kbd "s-r") #'replace-string)
+
 
 ;typescript
 (setq create-lockfiles nil)
