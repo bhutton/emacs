@@ -59,6 +59,8 @@
 ;;scroll window up/down by one line
 (global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
 (global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
+(global-set-key (kbd "M-s-<down>") (kbd "C-x ^"))
+(global-set-key (kbd "M-s-<up>") (kbd "C-u -1 C-x ^"))
 
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "s-f") #'helm-projectile-ag)
@@ -596,8 +598,8 @@ the current position of point, then move it to the beginning of the line."
 (require 'flymake)
 
 ;; I don't like the default colors :)
-(set-face-background 'flymake-errline "red4")
-(set-face-background 'flymake-warnline "dark slate blue")
+(set-face-background 'flymake-errline "white")
+(set-face-background 'flymake-warnline "white")
 
 ;; Invoke ruby with '-c' to get syntax checking
 (defun flymake-ruby-init ()
