@@ -12,6 +12,14 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
+;; fix the PATH variable
+(defun set-exec-path-from-shell-PATH ()
+  (let ((path-from-shell (shell-command-to-string "TERM=vt100 $SHELL -i -c 'echo $PATH'")))
+    (setenv "PATH" path-from-shell)
+    (setq exec-path (split-string path-from-shell path-separator))))
+
+(when window-system (set-exec-path-from-shell-PATH))
+
 ; list the packages you want
 (setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode))
 
@@ -86,12 +94,15 @@
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
-(setq-default typescript-indent-level 2)
-
 ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 
 (add-hook 'web-mode-hook #'setup-tide-mode)
+
+(setq web-mode-markup-indent-offset 2)
+(setq web-mode-css-indent-offset 2)
+(setq web-mode-code-indent-offset 2)
+(setq web-mode-indent-style 2)
 
 (eval-after-load "tide"
   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
@@ -145,6 +156,7 @@
 ;JavaScript
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-hook 'js-mode-hook js-indent-level 2)
 
 
 (add-hook 'js2-mode-hook
@@ -155,6 +167,8 @@
 
 ; Better imenu
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+
+(setq js-indent-level 2)
 
 (require 'js2-refactor)
 (require 'xref-js2)
@@ -173,16 +187,14 @@
 
 (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
- (require 'rjsx-mode)
- ;; (rjsx-mode)
- (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
- (setq web-mode-content-types-alist
+(require 'rjsx-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
+(setq web-mode-content-types-alist
    '(("jsx" . "\\.js[x]?\\'")))
 
- (add-hook 'rjsx-mode-hook
+(add-hook 'rjsx-mode-hook
            (lambda ()
              (setq indent-tabs-mode nil) ;;Use space instead of tab
-             (setq js-indent-level 2) ;;space width is 2 (default is 4)
             (setq js2-strict-missing-semi-warning nil))) ;;disable the semicolon warning
 
 ;; (add-hook 'js-mode-hook (lambda () (tern-mode t)))
@@ -568,8 +580,7 @@ the current position of point, then move it to the beginning of the line."
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    (quote
-    (spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode
-               yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
+    (clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
  '(safe-local-variable-values (quote ((ruby-test-runner . rspec))))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
