@@ -117,6 +117,7 @@
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
@@ -124,6 +125,10 @@
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "ts" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+(add-hook 'web-mode-hook
+          (lambda ()
+            (when (string-equal "js" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
 ;; enable typescript-tslint checker
 (flycheck-add-mode 'typescript-tslint 'web-mode)
@@ -159,21 +164,21 @@
     (get-buffer-create "*test-runner*")))
 
 ;JavaScript
-(require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(add-hook 'js-mode-hook js-indent-level 2)
+;(require 'js2-mode)
+;(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;(add-hook 'js-mode-hook js-indent-level 2)
 
 
-(add-hook 'js2-mode-hook
-          (lambda ()
-            (set (make-local-variable 'testing-command)
-                 (test-javascript))))
+;(add-hook 'js2-mode-hook
+;          (lambda ()
+;            (set (make-local-variable 'testing-command)
+;                 (test-javascript))))
 
 
 ; Better imenu
-(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+;(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
 
-(setq js-indent-level 2)
+;(setq js-indent-level 2)
 
 (require 'js2-refactor)
 (require 'xref-js2)
@@ -192,15 +197,15 @@
 
 (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
-(require 'rjsx-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
-(setq web-mode-content-types-alist
-   '(("jsx" . "\\.js[x]?\\'")))
+;(require 'rjsx-mode)
+;(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
+;(setq web-mode-content-types-alist
+;   '(("jsx" . "\\.js[x]?\\'")))
 
-(add-hook 'rjsx-mode-hook
-           (lambda ()
-             (setq indent-tabs-mode nil) ;;Use space instead of tab
-            (setq js2-strict-missing-semi-warning nil))) ;;disable the semicolon warning
+;(add-hook 'rjsx-mode-hook
+;           (lambda ()
+;             (setq indent-tabs-mode nil) ;;Use space instead of tab
+;            (setq js2-strict-missing-semi-warning nil))) ;;disable the semicolon warning
 
 ;; (add-hook 'js-mode-hook (lambda () (tern-mode t)))
 
@@ -385,13 +390,13 @@ the current position of point, then move it to the beginning of the line."
 (define-key ruby-mode-map (kbd "s-[") 'dumb-jump-back)
 
 
-(require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;(require 'js2-mode)
+;(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
 ;; Better imenu
-(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-(define-key js2-mode-map (kbd "s-b") 'dumb-jump-go)
-(define-key js2-mode-map (kbd "s-[") 'dumb-jump-back)
+;(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+;(define-key js2-mode-map (kbd "s-b") 'dumb-jump-go)
+;(define-key js2-mode-map (kbd "s-[") 'dumb-jump-back)
 
 (require 'treemacs)
 (require 'dash)
