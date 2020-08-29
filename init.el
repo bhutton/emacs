@@ -439,7 +439,7 @@ the current position of point, then move it to the beginning of the line."
 (projectile-rails-global-mode)
 
 (treemacs)
-(setq treemacs-no-png-images t)
+;(setq treemacs-no-png-images t)
 (setq centaur-tabs-style "box")
 (setq centaur-tabs-height 32)
 (setq centaur-tabs-set-icons t)
@@ -646,13 +646,14 @@ the current position of point, then move it to the beginning of the line."
 ;; (package-initialize)
 
 ;; Click [here](https://github.com/hbin/dotfiles-for-emacs) to take a further look.
-;; (set-frame-font "Menlo:pixelsize=14")
-(set-frame-font "Hack:pixelsize=14")
+(set-frame-font "Menlo:pixelsize=14")
+;;(set-frame-font "Hack:pixelsize=14")
 
 ;; If you use Emacs Daemon mode
 (add-to-list 'default-frame-alist
-               (cons 'font "Hack:pixelsize=14"))
-;; (cons 'font "Menlo:pixelsize=14"))
+              ;; (cons 'font "Hack:pixelsize=14"))
+(cons 'font "Menlo:pixelsize=14"))
+;;(set-frame-font "Hack-14" nil t)
 
 (defvar line-padding 3)
 (defun add-line-padding ()
