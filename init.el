@@ -39,6 +39,7 @@
 (setq package-list '(better-defaults chyla))
 
 (cua-selection-mode 1)
+(yas-global-mode 1)
 
 (require 'linum)
 (defun linum-update-window-scale-fix (win)
@@ -155,9 +156,9 @@
 (defun test-suite ()
   (interactive)
   (with-output-to-temp-buffer "*test-runner*"
-    (flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
-      (kill-matching-buffers "*test-runner*"))
-    (kill-matching-buffers "*test-runner*")
+    ;(flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
+    ;  (kill-matching-buffers "*test-runner*"))
+    ;(kill-matching-buffers "*test-runner*")
     (shell-command (concat "CI=true npm test --prefix " projectile-project-root " &")
                    "*test-runner*"
                    "*Messages*")
