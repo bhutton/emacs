@@ -162,7 +162,7 @@
     (shell-command (concat "CI=true npm test --prefix " projectile-project-root " &")
                    "*test-runner*"
                    "*Messages*")
-    (get-buffer-create "*test-runner*")))
+    (async-shell-command-buffer "*test-runner*")))
 
 ;JavaScript
 ;(require 'js2-mode)
