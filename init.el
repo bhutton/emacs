@@ -153,16 +153,17 @@
 
 (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
 
+;(async-shell-command-buffer "*test-runner*")
 (defun test-suite ()
   (interactive)
   (with-output-to-temp-buffer "*test-runner*"
     ;(flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
     ;  (kill-matching-buffers "*test-runner*"))
     ;(kill-matching-buffers "*test-runner*")
-    (shell-command (concat "CI=true npm test --prefix " projectile-project-root " &")
+    (async-shell-command (concat "CI=true npm test --prefix " projectile-project-root " &")
                    "*test-runner*"
                    "*Messages*")
-    (async-shell-command-buffer "*test-runner*")))
+    ))
 
 ;JavaScript
 ;(require 'js2-mode)
