@@ -1,6 +1,13 @@
-; list the repositories containing them
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+;; (package-initialize)
+
+                                        ;list the repositories containing them
+;; (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+;;                          ("melpa" . "https://melpa.org/packages/")))
 ;; (setq load-path (cons (expand-file-name "~/.emacs.d/") load-path))
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
@@ -113,7 +120,26 @@
 (eval-after-load "tide"
   '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
 
+;; Enabling only some features
+(setq dap-auto-configure-features '(sessions locals controls tooltip))
 
+(require 'lsp-mode)
+(require 'lsp-ui)
+(require 'dap-java)
+(add-hook 'java-mode-hook #'lsp)
+
+
+(require 'lsp-java-boot)
+
+;; to enable the lenses
+(add-hook 'lsp-mode-hook #'lsp-lens-mode)
+(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
+
+(add-hook 'dap-stopped-hook
+          (lambda (arg) (call-interactively #'dap-hydra)))
+
+(define-key java-mode-map (kbd "s-b") #'lsp-goto-implementation)
+(lsp-mode)
 
 (require 'flycheck)
 (require 'web-mode)
@@ -161,8 +187,16 @@
     ;(flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
     ;  (kill-matching-buffers "*test-runner*"))
     ;(kill-matching-buffers "*test-runner*")
-    (shell-command (concat "CI=true npm test --prefix " projectile-project-root " &")
+    (shell-command (concat "CI=true npm test --prefix &")
                    "*test-runner*"
+                   "*Messages*")
+    ))
+
+(defun test-suite-jest ()
+  (interactive)
+  (with-output-to-temp-buffer "*jest-runner*"
+    (shell-command (concat "echo " projectile-project- " && cd .. && jest " projectile-project-root " &")
+                   "*jest-runner*"
                    "*Messages*")
     ))
 
@@ -309,7 +343,7 @@
 
 (delete-selection-mode 1)
 
- (dumb-jump-mode)
+(dumb-jump-mode)
 (setq dumb-jump-aggressive nil)
 (setq dumb-jump-selector 'ivy)
 (setq dumb-jump-force-searcher 'ag)
@@ -590,7 +624,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing 0.2)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(jest-test-mode autopair yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
+   '(lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode autopair yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
  '(safe-local-variable-values '((ruby-test-runner . rspec)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
