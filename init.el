@@ -120,26 +120,153 @@
 (eval-after-load "tide"
   '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
 
-;; Enabling only some features
-(setq dap-auto-configure-features '(sessions locals controls tooltip))
 
-(require 'lsp-mode)
-(require 'lsp-ui)
-(require 'dap-java)
-(add-hook 'java-mode-hook #'lsp)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Java
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun tkj-insert-serial-version-uuid()
+  (interactive)
+  (insert "private static final long serialVersionUID = 1L;"))
+
+(defun tkj-default-code-style-hook()
+  (setq c-basic-offset 2
+        c-label-offset 0
+        tab-width 2
+        indent-tabs-mode nil
+        compile-command "mvn -q -o -f ~/src/content-engine/engine/engine-core/pom.xml test -DtrimStackTrace=false"
+        require-final-newline nil))
+(add-hook 'java-mode-hook 'tkj-default-code-style-hook)
+
+(use-package flycheck
+  :init
+  (add-to-list 'display-buffer-alist
+               `(,(rx bos "*Flycheck errors*" eos)
+                 (display-buffer-reuse-window
+                  display-buffer-in-side-window)
+                 (side            . bottom)
+                 (reusable-frames . visible)
+                 (window-height   . 0.15))))
+
+;(use-package idle-highlight)
+
+(defun my-java-mode-hook ()
+  (auto-fill-mode)
+  (flycheck-mode)
+  (git-gutter+-mode)
+  (gtags-mode)
+  ;(idle-highlight)
+  (subword-mode)
+  (yas-minor-mode)
+  (set-fringe-style '(8 . 0))
+  (define-key c-mode-base-map (kbd "C-M-j") 'tkj-insert-serial-version-uuid)
+  (define-key c-mode-base-map (kbd "C-m") 'c-context-line-break)
+  (define-key c-mode-base-map (kbd "S-<f7>") 'gtags-find-tag-from-here)
+
+  ;; Fix indentation for anonymous classes
+  (c-set-offset 'substatement-open 0)
+  (if (assoc 'inexpr-class c-offsets-alist)
+      (c-set-offset 'inexpr-class 0))
+
+  ;; Indent arguments on the next line as indented body.
+  (c-set-offset 'arglist-intro '++))
+(add-hook 'java-mode-hook 'my-java-mode-hook)
+
+(use-package projectile :ensure t)
+(use-package yasnippet :ensure t)
+(use-package lsp-mode :ensure t
+  :bind (("\C-\M-b" . lsp-find-implementation)
+         ("M-RET" . lsp-execute-code-action))
+  :config
+  (setq lsp-inhibit-message t
+        lsp-eldoc-render-all nil
+        lsp-enable-file-watchers nil
+        lsp-highlight-symbol-at-point nil)
+
+  ;; Performance tweaks, see
+  ;; https://github.com/emacs-lsp/lsp-mode#performance
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-idle-delay 0.500)
+  )
+
+(use-package hydra :ensure t)
+(use-package company-lsp :ensure t)
+(use-package lsp-ui
+  :ensure t
+  :config
+  (setq lsp-prefer-flymake nil
+        lsp-ui-doc-delay 5.0
+        lsp-ui-sideline-enable nil
+        lsp-ui-sideline-show-symbol nil))
+
+(use-package lsp-java
+  :ensure t
+  :init
+  (setq lsp-java-vmargs
+        (list
+         "-noverify"
+         "-Xmx2G"
+         "-XX:+UseG1GC"
+         "-XX:+UseStringDeduplication"
+         ;"-javaagent:/home/torstein/.m2/repository/org/projectlombok/lombok/1.18.4/lombok-1.18.4.jar"
+         )
+
+        ;; Don't organise imports on save
+        lsp-java-save-action-organize-imports nil
+
+        ;; Currently (2019-04-24), dap-mode works best with Oracle
+        ;; JDK, see https://github.com/emacs-lsp/dap-mode/issues/31
+        ;;
+        ;; lsp-java-java-path "~/.emacs.d/oracle-jdk-12.0.1/bin/java"
+        lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home/bin/java"
+        )
+
+  :config
+  (add-hook 'java-mode-hook #'lsp)
+)
+
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+  :config
+  (dap-mode t)
+  (dap-ui-mode t)
+  (dap-tooltip-mode 1)
+  (tooltip-mode 1)
+  (dap-register-debug-template
+   "localhost:5005"
+   (list :type "java"
+         :request "attach"
+         :hostName "localhost"
+         :port 5005))
+  (dap-register-debug-template
+   "lxd"
+   (list :type "java"
+         :request "attach"
+         :hostName "10.152.112.168"
+         :port 5005))
+  )
+
+(use-package dap-java
+  :ensure nil
+  :after (lsp-java)
+
+  ;; The :bind here makes use-package fail to lead the dap-java block!
+  ;; :bind
+  ;; (("C-c R" . dap-java-run-test-class)
+  ;;  ("C-c d" . dap-java-debug-test-method)
+  ;;  ("C-c r" . dap-java-run-test-method)
+  ;;  )
+
+  :config
+  (global-set-key (kbd "<f7>") 'dap-step-in)
+  (global-set-key (kbd "<f8>") 'dap-next)
+  (global-set-key (kbd "<f9>") 'dap-continue)
+  (global-set-key (kbd "s-b") 'lsp-find-implementation)
+  )
 
 
-(require 'lsp-java-boot)
 
-;; to enable the lenses
-(add-hook 'lsp-mode-hook #'lsp-lens-mode)
-(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
-
-(add-hook 'dap-stopped-hook
-          (lambda (arg) (call-interactively #'dap-hydra)))
-
-(define-key java-mode-map (kbd "s-b") #'lsp-goto-implementation)
-(lsp-mode)
 
 (require 'flycheck)
 (require 'web-mode)
@@ -624,7 +751,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing 0.2)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode autopair yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
+   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode autopair yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
  '(safe-local-variable-values '((ruby-test-runner . rspec)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
