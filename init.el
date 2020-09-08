@@ -5,6 +5,12 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 ;; (package-initialize)
 
+;; This is only needed once, near the top of the file
+(eval-when-compile
+  ;; Following line is not needed if use-package.el is in ~/.emacs.d
+  (add-to-list 'load-path "~/.emacs.d/use-package/")
+  (require 'use-package))
+
                                         ;list the repositories containing them
 ;; (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
 ;;                          ("melpa" . "https://melpa.org/packages/")))
@@ -28,7 +34,11 @@
 (when window-system (set-exec-path-from-shell-PATH))
 
 ; list the packages you want
-(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode))
+(setq package-list '
+	(better-defaults helm helm-switch-shell helm-projectile helm-ag ruby-electric rvm seeing-is-believing 
+	chruby inf-ruby ruby-test-mode yasnippet autopair flycheck web-mode js2-refactor xref-js2 prettier-js
+	dumb-jump exec-path-from-shell all-the-icons spaceline doom-themes spacemacs-theme projectile-rails
+	centaur-tabs undo-tree))
 
 ; install the missing packages
 (dolist (package package-list)

@@ -17,14 +17,10 @@ which mode the compilation buffer should run in.
 \(fn TASK-NAME &optional MODE)" nil nil)
 
 (autoload 'rake-rerun "rake" "\
-Re-runs the last task
-
-\(fn)" t nil)
+Re-runs the last task" t nil)
 
 (autoload 'rake-regenerate-cache "rake" "\
-Regenerates the rake's cache for the current project.
-
-\(fn)" t nil)
+Regenerates the rake's cache for the current project." t nil)
 
 (autoload 'rake-find-task "rake" "\
 Finds a rake task.

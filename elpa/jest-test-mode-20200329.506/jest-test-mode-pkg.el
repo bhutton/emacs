@@ -1,2 +1,0 @@
-;;; Generated package description from /Users/ben/.emacs.d/elpa/jest-test-mode-20200329.506/jest-test-mode.el  -*- no-byte-compile: t -*-
-(define-package "jest-test-mode" "20200329.506" "Minor mode for running Node.js tests using jest" '((emacs "25.1")) :commit "f04d08db36715d7509fd68448f74f917c6c1a382" :authors '(("Raymond Huang" . "rymndhng@gmail.com")) :maintainer '("Raymond Huang" . "rymndhng@gmail.com") :url "https://github.com/rymndhng/jest-test-mode.el")

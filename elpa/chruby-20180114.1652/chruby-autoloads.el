@@ -21,9 +21,7 @@ choose what ruby you want to activate
 \(fn RUBY-VERSION)" t nil)
 
 (autoload 'chruby-use-corresponding "chruby" "\
-search for .ruby-version and activate the corresponding ruby
-
-\(fn)" t nil)
+search for .ruby-version and activate the corresponding ruby" t nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "chruby" '("chruby-")))
 
