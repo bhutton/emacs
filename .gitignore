@@ -2,3 +2,10 @@ backups
 projectile-bookmarks.eld
 .cache
 ac-comphist.dat
+elpa
+.init.el.swp
+auto-save-list
+custom.el
+transient
+workspace
+places
