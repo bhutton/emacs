@@ -1,20 +1,11 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-;; (package-initialize)
 
-;; This is only needed once, near the top of the file
 (eval-when-compile
   ;; Following line is not needed if use-package.el is in ~/.emacs.d
   (add-to-list 'load-path "~/.emacs.d/use-package/")
   (require 'use-package))
 
-                                        ;list the repositories containing them
-;; (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-;;                          ("melpa" . "https://melpa.org/packages/")))
-;; (setq load-path (cons (expand-file-name "~/.emacs.d/") load-path))
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 
@@ -47,10 +38,6 @@
 
 (require 'better-defaults)
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(default ((t (:background nil)))))
 
 (setq package-list '(better-defaults chyla))
@@ -96,41 +83,37 @@
 (global-set-key (kbd "s-r") #'replace-string)
 
 
-;typescript
-(setq create-lockfiles nil)
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
- (flycheck-mode +1)
-  ;; (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-idle-time 0)
-  ;; company is an optional dependency. You have to
-  ;; install it separately via package-install
-  ;; `M-x package-install [ret] company`
-  (company-mode +1))
+;; ;typescript
+;; (setq create-lockfiles nil)
+;; (defun setup-tide-mode ()
+;;   (interactive)
+;;   (tide-setup)
+;;  (flycheck-mode +1)
+;;   (eldoc-mode +1)
+;;   (tide-hl-identifier-idle-time 0)
+;;   (company-mode +1))
 
-;; aligns annotation to the right hand side
-(setq company-tooltip-align-annotations t)
+;; ;; aligns annotation to the right hand side
+;; (setq company-tooltip-align-annotations t)
 
-;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
+;; ;; formats the buffer before saving
+;; (add-hook 'before-save-hook 'tide-format-before-save)
 
-(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
-(add-hook 'web-mode-hook #'setup-tide-mode)
+;; (add-hook 'web-mode-hook #'setup-tide-mode)
 
-(setq web-mode-markup-indent-offset 2)
-(setq web-mode-css-indent-offset 2)
-(setq web-mode-code-indent-offset 2)
-(setq web-mode-indent-style 2)
+;; (setq web-mode-markup-indent-offset 2)
+;; (setq web-mode-css-indent-offset 2)
+;; (setq web-mode-code-indent-offset 2)
+;; (setq web-mode-indent-style 2)
 
-(eval-after-load "tide"
-  '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
-(eval-after-load "tide"
-  '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
-(eval-after-load "tide"
-  '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
+;; (eval-after-load "tide"
+;;   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
+;; (eval-after-load "tide"
+;;   '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
+;; (eval-after-load "tide"
+;;   '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -277,55 +260,231 @@
   (global-set-key (kbd "s-b") 'lsp-find-implementation)
   )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End Java
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(lsp-dependency 'javascript-typescript-langserver
+                '(:system "javascript-typescript-stdio")
+                '(:npm :package "javascript-typescript-langserver"
+                       :path "javascript-typescript-stdio"))
+
+(defgroup lsp-typescript-javascript nil
+  "Support for TypeScript/JavaScript, using Sourcegraph's JavaScript/TypeScript language server."
+  :group 'lsp-mode
+  :link '(url-link "https://github.com/sourcegraph/javascript-typescript-langserver"))
+
+(defcustom lsp-clients-typescript-javascript-server-args '()
+  "Extra arguments for the typescript-language-server language server."
+  :group 'lsp-typescript-javascript
+  :risky t
+  :type '(repeat string))
+
+(defun lsp-typescript-javascript-tsx-jsx-activate-p (filename &optional _)
+  "Check if the javascript-typescript language server should be enabled based on FILENAME."
+  (or (string-match-p (rx (one-or-more anything) "." (or "ts" "js") (opt "x") string-end) filename)
+      (and (derived-mode-p 'js-mode 'js2-mode 'typescript-mode)
+           (not (derived-mode-p 'json-mode)))))
+
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection (lambda ()
+                                                          (cons (lsp-package-path 'javascript-typescript-langserver)
+                                                                lsp-clients-typescript-javascript-server-args)))
+                  :activation-fn 'lsp-typescript-javascript-tsx-jsx-activate-p
+                  :priority -3
+                  :completion-in-comments? t
+                  :server-id 'jsts-ls
+                  :download-server-fn (lambda (_client callback error-callback _update?)
+                                        (lsp-package-ensure
+                                         'javascript-typescript-langserver
+                                         callback
+                                         error-callback))))
+
+
+(defgroup lsp-typescript nil
+  "LSP support for TypeScript, using Theia/Typefox's TypeScript Language Server."
+  :group 'lsp-mode
+  :link '(url-link "https://github.com/theia-ide/typescript-language-server"))
+
+(defcustom lsp-clients-typescript-server-args '("--stdio")
+  "Extra arguments for the typescript-language-server language server."
+  :group 'lsp-typescript
+  :risky t
+  :type '(repeat string))
+
+(defcustom lsp-clients-typescript-log-verbosity "info"
+  "The server log verbosity."
+  :group 'lsp-typescript
+  :type 'string)
+
+(defcustom lsp-clients-typescript-plugins (vector)
+  "The list of plugins to load.
+It should be a vector of plist with keys `:location' and `:name'
+where `:name' is the name of the package and `:location' is the
+directory containing the package. Example:
+\(vector
+   \(list :name \"@vsintellicode/typescript-intellicode-plugin\"
+         :location \"<path>.vscode/extensions/visualstudioexptteam.vscodeintellicode-1.1.9/\"))"
+  :group 'lsp-typescript
+  :type  '(restricted-sexp :tag "Vector"
+                           :match-alternatives
+                           (lambda (xs)
+                             (and (vectorp xs) (seq-every-p
+                                                (-lambda ((&plist :name :location))
+                                                  (and name location))
+                                                xs)))))
+
+(lsp-dependency 'typescript-language-server
+                '(:system "typescript-language-server")
+                '(:npm :package "typescript-language-server"
+                       :path "typescript-language-server"))
+
+(lsp-dependency 'typescript
+                '(:system "tsserver")
+                '(:npm :package "typescript"
+                       :path "tsserver"))
+
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection (lambda ()
+                                                          `(,(lsp-package-path 'typescript-language-server)
+                                                            "--tsserver-path"
+                                                            ,(lsp-package-path 'typescript)
+                                                            ,@lsp-clients-typescript-server-args)))
+                  :activation-fn 'lsp-typescript-javascript-tsx-jsx-activate-p
+                  :priority -2
+                  :completion-in-comments? t
+                  :initialization-options (lambda ()
+                                            (list :plugins lsp-clients-typescript-plugins
+                                                  :logVerbosity lsp-clients-typescript-log-verbosity
+                                                  :tsServerPath (lsp-package-path 'typescript)))
+                  :ignore-messages '("readFile .*? requested by TypeScript but content not available")
+                  :server-id 'ts-ls
+                  :download-server-fn (lambda (_client callback error-callback _update?)
+                                        (lsp-package-ensure
+                                         'typescript
+                                         (-partial #'lsp-package-ensure
+                                                   'typescript-language-server
+                                                   callback
+                                                   error-callback)
+                                         error-callback))))
+
+
+(defgroup lsp-flow nil
+  "LSP support for the Flow Javascript type checker."
+  :group 'lsp-mode
+  :link '(url-link "https://flow.org"))
+
+(defcustom lsp-clients-flow-server "flow"
+  "The Flow executable to use.
+Leave as just the executable name to use the default behavior of
+finding the executable with variable `exec-path'."
+  :group 'lsp-flow
+  :risky t
+  :type 'file)
+
+(defcustom lsp-clients-flow-server-args '("lsp")
+  "Extra arguments for starting the Flow language server."
+  :group 'lsp-flow
+  :risky t
+  :type '(repeat string))
+
+(defun lsp-clients-flow-tag-file-present-p (file-name)
+  "Check if the '// @flow' or `/* @flow */' tag is present in
+the contents of FILE-NAME."
+  (if-let ((buffer (find-buffer-visiting file-name)))
+      (with-current-buffer buffer
+        (lsp-clients-flow-tag-string-present-p))
+    (with-temp-buffer
+      (insert-file-contents file-name)
+      (lsp-clients-flow-tag-string-present-p))))
+
+(defun lsp-clients-flow-tag-string-present-p ()
+  "Helper for `lsp-clients-flow-tag-file-present-p' that works
+with the file contents."
+  (save-excursion
+    (goto-char (point-min))
+    (let (stop found)
+      (while (not stop)
+        (unless (re-search-forward "[^\n[:space:]]" nil t)
+          (setq stop t))
+        (if (= (point) (point-min)) (setq stop t) (backward-char))
+        (cond ((or (looking-at "//+[ ]*@flow")
+                   (looking-at "/\\**[ ]*@flow")
+                   (looking-at "[ ]*\\*[ ]*@flow"))
+               (setq found t) (setq stop t))
+              ((or (looking-at "//") (looking-at "*"))
+               (forward-line))
+              ((looking-at "/\\*")
+               (save-excursion
+                 (unless (re-search-forward "*/" nil t) (setq stop t)))
+               (forward-line))
+              (t (setq stop t))))
+      found)))
+
+(defun lsp-clients-flow-project-p (file-name)
+  "Check if FILE-NAME is part of a Flow project, that is, if
+there is a .flowconfig file in the folder hierarchy."
+  (locate-dominating-file file-name ".flowconfig"))
+
+(defun lsp-clients-flow-activate-p (file-name _mode)
+  "Check if the Flow language server should be enabled for a
+particular FILE-NAME and MODE."
+  (and (derived-mode-p 'js-mode 'web-mode 'js2-mode 'flow-js2-mode 'rjsx-mode)
+       (or (lsp-clients-flow-project-p file-name)
+           (lsp-clients-flow-tag-file-present-p file-name))))
+
+(lsp-register-client
+ (make-lsp-client :new-connection
+                  (lsp-stdio-connection (lambda ()
+                                          (cons lsp-clients-flow-server
+                                                lsp-clients-flow-server-args)))
+                  :priority -1
+                  :activation-fn 'lsp-clients-flow-activate-p
+                  :server-id 'flow-ls))
+
+(provide 'lsp-javascript)
+;;; lsp-javascript.el ends here
 
 
 
 (require 'flycheck)
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "tsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "ts" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "js" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
-;; enable typescript-tslint checker
-(flycheck-add-mode 'typescript-tslint 'web-mode)
-;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
-(define-key web-mode-map (kbd "C-t") #'test-suite)
 
-;; aligns annotation to the right hand side
-(setq company-tooltip-align-annotations t)
+;; (require 'web-mode)
+;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode))))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "ts" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode))))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "js" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode))))
 
-;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
+;; ;; enable typescript-tslint checker
+;; (flycheck-add-mode 'typescript-tslint 'web-mode)
 
-(add-hook 'web-mode-hook #'setup-tide-mode)
-;(require 'ansi-color)
-;(defun colorize-compilation-buffer ()
-;  (Ansi-color-apply-on-region compilation-filter-start (point-max)))
-;(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-;(autoload 'web-mode "web-mode" "Major mode for editing typescript scripts." t)
-;(setq auto-mode-alist  (cons '(".tsx$" . web-mode) auto-mode-alist))
+;; (define-key web-mode-map (kbd "C-t") #'test-suite)
 
-(setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
+;; ;; aligns annotation to the right hand side
+;; (setq company-tooltip-align-annotations t)
 
-;(async-shell-command-buffer "*test-runner*")
+;; ;; formats the buffer before saving
+;; (add-hook 'before-save-hook 'tide-format-before-save)
+
+;; (add-hook 'web-mode-hook #'setup-tide-mode)
+
+;; (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
+
 (defun test-suite ()
   (interactive)
   (with-output-to-temp-buffer "*test-runner*"
-    ;(flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
-    ;  (kill-matching-buffers "*test-runner*"))
-    ;(kill-matching-buffers "*test-runner*")
     (shell-command (concat "CI=true npm test --prefix &")
                    "*test-runner*"
                    "*Messages*")
@@ -339,83 +498,35 @@
                    "*Messages*")
     ))
 
-;JavaScript
-;(require 'js2-mode)
-;(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-;(add-hook 'js-mode-hook js-indent-level 2)
+;; (require 'js2-refactor)
+;; (require 'xref-js2)
 
+;; (add-hook 'js2-mode-hook #'js2-refactor-mode)
+;; (js2r-add-keybindings-with-prefix "C-c C-r")
+;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+;; (define-key js2-mode-map (kbd "C-t") #'test-suite)
 
-;(add-hook 'js2-mode-hook
-;          (lambda ()
-;            (set (make-local-variable 'testing-command)
-;                 (test-javascript))))
+;; (add-hook 'js2-mode-hook (lambda ()
+;;   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
-
-; Better imenu
-;(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-
-;(setq js-indent-level 2)
-
-(require 'js2-refactor)
-(require 'xref-js2)
-
-(add-hook 'js2-mode-hook #'js2-refactor-mode)
-(js2r-add-keybindings-with-prefix "C-c C-r")
-(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-(define-key js2-mode-map (kbd "C-t") #'test-suite)
-
-;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
-;; unbind it.
-;; (define-key js-mode-map (kbd "M-.") nil)
-
-(add-hook 'js2-mode-hook (lambda ()
-  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-
-(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-
-;(require 'rjsx-mode)
-;(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
-;(setq web-mode-content-types-alist
-;   '(("jsx" . "\\.js[x]?\\'")))
-
-;(add-hook 'rjsx-mode-hook
-;           (lambda ()
-;             (setq indent-tabs-mode nil) ;;Use space instead of tab
-;            (setq js2-strict-missing-semi-warning nil))) ;;disable the semicolon warning
-
-;; (add-hook 'js-mode-hook (lambda () (tern-mode t)))
-
-;; (eval-after-load 'tern
-;;    '(progn
-;;       (require 'tern-auto-complete)
-;;       (tern-ac-setup)))
+;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
 (require 'company)
 (add-hook 'after-init-hook 'global-company-mode)
 (add-to-list 'company-backends 'company-tern)
-(add-to-list 'company-backends 'ac-js2-company)
-(setq ac-js2-evaluate-calls t)
+;; (add-to-list 'company-backends 'ac-js2-company)
+;; (setq ac-js2-evaluate-calls t)
 (add-to-list 'company-backends 'company-flow)
 
-(require 'prettier-js)
+;; (require 'prettier-js)
 
- (add-hook 'js2-mode-hook 'prettier-js-mode)
- (add-hook 'web-mode-hook 'prettier-js-mode)
+ ;; (add-hook 'js2-mode-hook 'prettier-js-mode)
+ ;; (add-hook 'web-mode-hook 'prettier-js-mode)
 
- (setq prettier-js-args '(
-   "--trailing-comma" "all"
-   "--bracket-spacing" "false"
- ))
-
-;; ;; (defun enable-minor-mode (my-pair)
-;; ;;   "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-;; ;;   (if (buffer-file-name)
-;; ;;       (if (string-match (car my-pair) buffer-file-name)
-;; ;;       (funcall (cdr my-pair)))))
-
-;; ;; (add-hook 'web-mode-hook #'(lambda ()
-;; ;;                             (enable-minor-mode
-;; ;;                              '("\\.jsx?\\'" . prettier-js-mode))))
+ ;; (setq prettier-js-args '(
+ ;;   "--trailing-comma" "all"
+ ;;   "--bracket-spacing" "false"
+ ;; ))
 
 ;loads ruby mode when a .rb file is opened.
 (setq abg-required-packages 
@@ -433,21 +544,8 @@
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
 
-;; ;; (require 'ruby-debug)
-
-;; ;; Autoclose paired syntax elements like parens, quotes, etc
-;; ;(add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
-;;                                         ;(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
 (require 'ruby-test-mode)
-;; ;; (add-hook 'ruby-mode-hook 'ruby-test-mode)
 
-;; ;; (add-hook 'enh-ruby-mode-hook 'robe-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'yard-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'ruby-electric-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
-
-;; ;; (add-hook 'ruby-mode-hook 'robe-mode)
 (add-hook 'ruby-mode-hook
           (lambda () (rvm-activate-corresponding-ruby)))
 (add-hook 'ruby-mode-hook 'yard-mode)
@@ -460,7 +558,7 @@
 (add-hook 'prog-mode-hook 'linum-mode)
 (add-hook 'prog-mode-hook 'hl-line-mode)
 
-(add-hook 'javascript-mode-hook 'recompile-on-save-mode)
+;; (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
@@ -476,16 +574,9 @@
 
 (add-hook 'ruby-mode-hook 'auto-complete-mode)
 
-;; ;; (add-hook 'js-mode-hook 'linum-mode)
-;; ;; (add-hook 'js-mode-hook 'hl-line-mode)
 
 
 (delete-selection-mode 1)
-
-;(dumb-jump-mode)
-;(setq dumb-jump-aggressive nil)
-;(setq dumb-jump-selector 'ivy)
-;(setq dumb-jump-force-searcher 'ag)
 
 (setq inhibit-splash-screen t
       initial-scratch-message nil
@@ -562,18 +653,8 @@ the current position of point, then move it to the beginning of the line."
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
 (define-key prog-mode-map (kbd "s-[") 'previous-buffer)
 (define-key prog-mode-map (kbd "s-]") 'next-buffer)
-;(define-key ruby-mode-map (kbd "s-b") 'dumb-jump-go)
-;(define-key ruby-mode-map (kbd "s-[") 'dumb-jump-back)
 
 
-
-;(require 'js2-mode)
-;(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-
-;; Better imenu
-;(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-;(define-key js2-mode-map (kbd "s-b") 'dumb-jump-go)
-;(define-key js2-mode-map (kbd "s-[") 'dumb-jump-back)
 
 (require 'treemacs)
 (require 'dash)
@@ -585,15 +666,12 @@ the current position of point, then move it to the beginning of the line."
 
 (require 'all-the-icons)
 
-;; (load-theme 'intellij t)
 
 (require 'spaceline-config)
-;; (spaceline-spacemacs-theme)
 (spaceline-emacs-theme)
 
 (require 'doom-themes)
 
-;; Global settings (defaults)
 ;; Global settings (defaults)
 (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
        doom-themes-enable-italic t) ; if nil, italics is universally disabled
@@ -604,19 +682,12 @@ the current position of point, then move it to the beginning of the line."
 (doom-themes-visual-bell-config)
 (doom-themes-org-config)
 
-;; ;; (require 'kaolin-themes)
-;; ;; (load-theme 'kaolin-dark t)
-;; ;; ;; Apply treemacs customization for Kaolin themes, requires the all-the-icons package.
-;; ;; (kaolin-treemacs-theme)
-
-
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
 (exec-path-from-shell-copy-env "GEM_PATH")
 (projectile-rails-global-mode)
 
 (treemacs)
-;(setq treemacs-no-png-images t)
 (setq centaur-tabs-style "box")
 (setq centaur-tabs-height 32)
 (setq centaur-tabs-set-icons t)
@@ -661,8 +732,6 @@ the current position of point, then move it to the beginning of the line."
   (interactive "p")
   (move-line (if (null n) 1 n)))
 
-;(global-set-key (kbd "S-s-<up>") 'move-line-up)
-;(global-set-key (kbd "S-s-<down>") 'move-line-down)
 (global-set-key (kbd "S-s-f") 'helm-projectile-find-file)
 (global-set-key (kbd "S-<delete>") 'kill-whole-line)
 
@@ -764,7 +833,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing 0.2)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode autopair yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
+   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode autopair yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
  '(safe-local-variable-values '((ruby-test-runner . rspec)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
