@@ -85,13 +85,13 @@
 
 ;; ;typescript
 ;; (setq create-lockfiles nil)
-;; (defun setup-tide-mode ()
-;;   (interactive)
-;;   (tide-setup)
-;;  (flycheck-mode +1)
-;;   (eldoc-mode +1)
-;;   (tide-hl-identifier-idle-time 0)
-;;   (company-mode +1))
+(defun setup-tide-mode ()
+   (interactive)
+   (tide-setup)
+  (flycheck-mode +1)
+   (eldoc-mode +1)
+   (tide-hl-identifier-idle-time 0)
+   (company-mode +1))
 
 ;; ;; aligns annotation to the right hand side
 ;; (setq company-tooltip-align-annotations t)
@@ -101,7 +101,7 @@
 
 ;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
-;; (add-hook 'web-mode-hook #'setup-tide-mode)
+(add-hook 'lsp-hook #'setup-tide-mode)
 
 ;; (setq web-mode-markup-indent-offset 2)
 ;; (setq web-mode-css-indent-offset 2)
@@ -112,8 +112,8 @@
 ;;   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
 ;; (eval-after-load "tide"
 ;;   '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
-;; (eval-after-load "tide"
-;;   '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
+(eval-after-load "tide"
+  '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -188,9 +188,11 @@
   (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
   (setq lsp-idle-delay 0.500)
-  (setq lsp-log-io t))
+  (setq lsp-log-io t)
+  (define-key lsp-mode-map (kbd "C-t") #'test-suite))
 
-(define-key lsp-mode-map (kbd "C-t") #'test-suite)
+                                        ;(define-key lsp-mode-map (kbd "C-t") #'test-suite)
+
 
 (use-package hydra :ensure t)
 (use-package company-lsp :ensure t)
@@ -278,21 +280,25 @@
 ;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
 ;; (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 ;; (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
-;; (add-hook 'web-mode-hook
-;;           (lambda ()
-;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
-;;               (setup-tide-mode))))
-;; (add-hook 'web-mode-hook
-;;           (lambda ()
-;;             (when (string-equal "ts" (file-name-extension buffer-file-name))
-;;               (setup-tide-mode))))
-;; (add-hook 'web-mode-hook
-;;           (lambda ()
-;;             (when (string-equal "js" (file-name-extension buffer-file-name))
-;;               (setup-tide-mode))))
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (when (string-equal "tsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (when (string-equal "jsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (when (string-equal "ts" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (when (string-equal "js" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
 
 ;; ;; enable typescript-tslint checker
-;; (flycheck-add-mode 'typescript-tslint 'web-mode)
+(flycheck-add-mode 'typescript-tslint 'lsp-mode)
 
 ;; (define-key web-mode-map (kbd "C-t") #'test-suite)
 
@@ -300,7 +306,7 @@
 ;; (setq company-tooltip-align-annotations t)
 
 ;; ;; formats the buffer before saving
-;; (add-hook 'before-save-hook 'tide-format-before-save)
+(add-hook 'before-save-hook 'tide-format-before-save)
 
 ;; (add-hook 'web-mode-hook #'setup-tide-mode)
 
@@ -342,15 +348,14 @@
 ;; (setq ac-js2-evaluate-calls t)
 (add-to-list 'company-backends 'company-flow)
 
-;; (require 'prettier-js)
+(require 'prettier-js)
+ (add-hook 'js2-mode-hook 'prettier-js-mode)
+ (add-hook 'web-mode-hook 'prettier-js-mode)
 
- ;; (add-hook 'js2-mode-hook 'prettier-js-mode)
- ;; (add-hook 'web-mode-hook 'prettier-js-mode)
-
- ;; (setq prettier-js-args '(
- ;;   "--trailing-comma" "all"
- ;;   "--bracket-spacing" "false"
- ;; ))
+ (setq prettier-js-args '(
+   "--trailing-comma" "all"
+   "--bracket-spacing" "false"
+ ))
 
 ;loads ruby mode when a .rb file is opened.
 (setq abg-required-packages 

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: afterAll
+# key: afterAll
+# --
+afterAll(() => {
+  $0
+});
