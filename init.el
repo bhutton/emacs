@@ -36,7 +36,8 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-(require 'better-defaults)
+(require
+ 'better-defaults)
 (custom-set-faces
  '(default ((t (:background nil)))))
 
@@ -206,6 +207,10 @@
         lsp-ui-sideline-enable nil
         lsp-ui-sideline-show-symbol nil))
 
+(require 'dap-firefox)
+(require 'dap-chrome)
+(require 'dap-node)
+
 (use-package lsp-java
   :ensure t
   :init
@@ -282,6 +287,7 @@
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
 (add-hook 'lsp-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
