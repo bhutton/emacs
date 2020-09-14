@@ -36,7 +36,8 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-(require 'better-defaults)
+(require
+ 'better-defaults)
 (custom-set-faces
  '(default ((t (:background nil)))))
 
@@ -205,6 +206,10 @@
         lsp-ui-doc-delay 5.0
         lsp-ui-sideline-enable nil
         lsp-ui-sideline-show-symbol nil))
+
+(require 'dap-firefox)
+(require 'dap-chrome)
+(require 'dap-node)
 
 (use-package lsp-java
   :ensure t
