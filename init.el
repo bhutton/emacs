@@ -429,6 +429,13 @@
   (yank)
   )
 
+(defun insert-line-below()
+  (interactive)
+  (move-end-of-line 1)
+  (open-line 1)
+  (next-line 1)
+  )
+
 (defun duplicate-line-or-region (&optional n)
   "Duplicate current line, or region if active.
 With argument N, make N copies.
@@ -474,6 +481,7 @@ the current position of point, then move it to the beginning of the line."
 (exec-path-from-shell-initialize))
 
 (global-set-key (kbd "s-d") 'duplicate-line-or-region)
+(global-set-key (kbd "S-RET") 'duplicate-line-or-region)
 (global-set-key (kbd "M-]") 'other-window)
 (global-set-key (kbd "M-C-<right>") 'windmove-right)
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
@@ -482,16 +490,12 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
 
-
-
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
 (define-key prog-mode-map (kbd "s-[") 'previous-buffer)
 (define-key prog-mode-map (kbd "s-]") 'next-buffer)
-
-
 
 (require 'treemacs)
 (require 'dash)
