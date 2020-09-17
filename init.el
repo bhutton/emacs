@@ -481,7 +481,7 @@ the current position of point, then move it to the beginning of the line."
 (exec-path-from-shell-initialize))
 
 (global-set-key (kbd "s-d") 'duplicate-line-or-region)
-(global-set-key (kbd "S-RET") 'duplicate-line-or-region)
+(global-set-key (kbd "S-<return>") 'insert-line-below)
 (global-set-key (kbd "M-]") 'other-window)
 (global-set-key (kbd "M-C-<right>") 'windmove-right)
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
