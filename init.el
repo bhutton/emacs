@@ -45,6 +45,7 @@
 
 (cua-selection-mode 1)
 (yas-global-mode 1)
+(scroll-bar-mode 1)
 (autopair-global-mode 1)
 
 (require 'linum)
@@ -529,6 +530,9 @@ the current position of point, then move it to the beginning of the line."
 (projectile-rails-global-mode)
 
 (treemacs)
+(treemacs-load-theme "Default")
+;; (treemacs-load-theme "Netbeans")
+;; (treemacs-load-theme "Idea")
 (setq centaur-tabs-style "box")
 (setq centaur-tabs-height 32)
 (setq centaur-tabs-set-icons t)
