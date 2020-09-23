@@ -438,6 +438,7 @@
   (move-end-of-line 1)
   (open-line 1)
   (next-line 1)
+  (indent-according-to-mode)
   )
 
 (defun duplicate-line-or-region (&optional n)
