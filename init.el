@@ -36,6 +36,8 @@
   (unless (package-installed-p package)
     (package-install package)))
 
+(setq scroll-step 1)
+
 (require
  'better-defaults)
 (custom-set-faces
@@ -279,6 +281,8 @@
   (global-set-key (kbd "<f8>") 'dap-next)
   (global-set-key (kbd "<f9>") 'dap-continue)
   (global-set-key (kbd "s-b") 'lsp-find-implementation)
+  (global-set-key (kbd "C-b") 'lsp-find-implementation)
+  (define-key lsp-mode-map (kbd "C-t") #'dap-java-run-test-class)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
