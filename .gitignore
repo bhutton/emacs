@@ -9,3 +9,4 @@ custom.el
 transient
 workspace
 places
+.lsp-session-v1
