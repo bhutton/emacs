@@ -499,7 +499,7 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "M-<down>") 'windmove-delete-down)
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
-(global-set-key (kbd "C-1") 'treemacs-select-window)
+(global-set-key (kbd "s-1") 'treemacs-select-window)
 
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
