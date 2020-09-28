@@ -52,17 +52,17 @@
 (scroll-bar-mode 1)
 (smartparens-global-mode 1)
 
-(require 'linum)
-(defun linum-update-window-scale-fix (win)
-  "fix linum for scaled text"
-  (set-window-margins win
-                      (ceiling (* (if (boundp 'text-scale-mode-step)
-                                      (expt text-scale-mode-step
-                                            text-scale-mode-amount) 1)
-                                  (if (car (window-margins))
-                                      (car (window-margins)) 1)
-                                  ))))
-(advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
+;; (require 'linum)
+;; (defun linum-update-window-scale-fix (win)
+;;   "fix linum for scaled text"
+;;   (set-window-margins win
+;;                       (ceiling (* (if (boundp 'text-scale-mode-step)
+;;                                       (expt text-scale-mode-step
+;;                                             text-scale-mode-amount) 1)
+;;                                   (if (car (window-margins))
+;;                                       (car (window-margins)) 1)
+;;                                   ))))
+;; (advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
 
 
 ;; Typography
@@ -162,6 +162,7 @@
   (define-key c-mode-base-map (kbd "C-M-j") 'tkj-insert-serial-version-uuid)
   (define-key c-mode-base-map (kbd "C-m") 'c-context-line-break)
   (define-key c-mode-base-map (kbd "S-<f7>") 'gtags-find-tag-from-here)
+  (define-key c-mode-base-map (kbd "C-t") #'dap-java-run-test-class)
 
   ;; Fix indentation for anonymous classes
   (c-set-offset 'substatement-open 0)
@@ -187,13 +188,19 @@
          ("M-RET" . lsp-execute-code-action))
   :config
   (setq lsp-inhibit-message t
-        lsp-eldoc-render-all nil
+        lsp-eldoc-render-all t
         lsp-enable-file-watchers nil
-        lsp-highlight-symbol-at-point nil)
+        lsp-enable-symbol-highlighting t
+        lsp-headerline-breadcrumb-enable nil
+        lsp-highlight-symbol-at-point t
+        lsp-modeline-code-actions-enable nil
+        lsp-modeline-diagnostics-enable nil
+        )
+  
 
   ;; Performance tweaks, see
   ;; https://github.com/emacs-lsp/lsp-mode#performance
-  (setq gc-cons-threshold 100000000)
+  (setq gc-cons-threshold 1000000)
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
   (setq lsp-idle-delay 0.500)
   (setq lsp-log-io t)
@@ -285,9 +292,12 @@
   ;; (define-key lsp-mode-map (kbd "C-t") #'dap-java-run-test-class)
   )
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End Java
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 (require 'flycheck)
 
@@ -528,7 +538,8 @@ the current position of point, then move it to the beginning of the line."
 (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
        doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
-(load-theme 'doom-solarized-light t)
+;; (load-theme 'doom-solarized-light t)
+(load-theme 'doom-tomorrow-day t)
 (load-theme 'spacemacs-light t)
 (doom-themes-treemacs-config)
 (doom-themes-visual-bell-config)
@@ -789,3 +800,204 @@ Version 2017-06-02"
 ;; (setq line-spacing 2)
 
 ; list the repositories containing them
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Shell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun spawn-shell (name)
+  "Create a new shell buffer
+taken from http://stackoverflow.com/a/4116113/446256"
+
+  (interactive "MName of shell buffer to create: ")
+  (pop-to-buffer (get-buffer-create (generate-new-buffer-name name)))
+  (shell (current-buffer)))
+
+(defun my-shell-mode-hook ()
+  (process-send-string (get-buffer-process (current-buffer))
+                       "export PAGER=cat\n")
+  (process-send-string (get-buffer-process (current-buffer))
+                       "uprompt\n\n\n"))(
+  add-hook 'shell-mode-hook 'my-shell-mode-hook)
+
+(setq-default explicit-shell-file-name "/bin/bash")
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; BASH settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq sh-basic-offset 2
+      sh-indentation 2)
+
+;; snippets, please
+(add-hook 'sh-mode-hook 'yas-minor-mode)
+
+;; on the fly syntax checking
+(add-hook 'sh-mode-hook 'flycheck-mode)
+
+;; show git changes in the gutter
+(add-hook 'sh-mode-hook 'git-gutter+-mode)
+
+;; Allow functions on the form <word>.<rest>(). Without my change,
+;; allowing punctuation characters in the function name,, only
+;; <rest>() is allowed.
+(setq sh-imenu-generic-expression
+      (quote
+       ((sh
+         (nil "^\\s-*function\\s-+\\([[:alpha:]_][[:alnum:]\\s._]*\\)\\s-*\\(?:()\\)?" 1)
+         (nil "^\\s-*\\([[:alpha:]_][[:alnum:]\\s._]*\\)\\s-*()" 1)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Interpret shell escapes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun display-ansi-colors ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Appearance settings regardless of window system
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq frame-background-mode nil
+      column-number-mode t
+      frame-title-format (concat invocation-name "@" (system-name) " {%f}")
+      inhibit-startup-screen t
+      initial-scratch-message "# Hi Torstein, what do you want to do today?\n\n"
+      initial-major-mode 'markdown-mode
+      ;; no visible or audible bells, please
+      visible-bell nil
+      ring-bell-function (lambda nil (message "")))
+
+;; Nice window divider in TTY emacs
+(defun my-change-window-divider ()
+  (let ((display-table (or buffer-display-table standard-display-table)))
+    (set-display-table-slot display-table 5 ?│)
+    (set-window-display-table (selected-window) display-table)))
+(add-hook 'window-configuration-change-hook 'my-change-window-divider)
+
+(defun tkj-presentation-mode()
+  (interactive)
+  (when window-system
+    (progn
+      (use-package one-themes)
+      (load-theme 'one-light t)
+      (set-face-attribute 'default nil
+                          :family "Source Code Pro"
+                          :height 140
+                          :weight 'normal
+                          :width 'normal))))
+
+(defun tkj-left-margin-focus()
+  (interactive)
+  (set-window-margins nil 10))
+
+(defun tkj-left-margin-zero()
+  (interactive)
+  (set-window-margins nil 0))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Automatically expand these words and characters
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(set-default 'abbrev-mode t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Open files into this Emacs instance from anywhere using
+;; 'emacsclient <file>'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Is this causing '<key> undefined' errors? (server-start)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Compile buffer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package compile
+  :init
+  (setq compilation-ask-about-save nil
+        compilation-scroll-output 'next-error
+        ;; Don't stop on info or warnings.
+        compilation-skip-threshold 2)
+  )
+
+;; Taken from https://emacs.stackexchange.com/questions/31493/print-elapsed-time-in-compilation-buffer/56130#56130
+(make-variable-buffer-local 'my-compilation-start-time)
+
+(add-hook 'compilation-start-hook #'my-compilation-start-hook)
+(defun my-compilation-start-hook (proc)
+  (setq my-compilation-start-time (current-time)))
+
+(add-hook 'compilation-finish-functions #'my-compilation-finish-function)
+(defun my-compilation-finish-function (buf why)
+  (let* ((elapsed  (time-subtract nil my-compilation-start-time))
+         (msg (format "Compilation took: %s" (format-time-string "%T.%N" elapsed t))))
+    (save-excursion (goto-char (point-max)) (insert msg))
+    (message "Compilation %s: %s" (string-trim-right why) msg)))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Buffers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Make C-x C-b maximise the buffer list window, this saves two
+;; additional shortcuts from the normal behaviour.
+(use-package helm
+  :init
+  (defun tkj-list-buffers()
+    (interactive)
+    (let ((helm-full-frame t))
+      (helm-mini)))
+
+  :bind
+  ("C-x C-b" . 'tkj-list-buffers))
+
+(defun close-all-buffers ()
+  (interactive)
+  (mapc 'kill-buffer (buffer-list)))
+
+;; buffer names and mini buffer
+(use-package uniquify
+  :ensure nil
+  :init
+  (setq uniquify-buffer-name-style 'forward
+        uniquify-separator ":"
+        uniquify-strip-common-suffix nil
+        read-file-name-completion-ignore-case t))
+
+;; Auto scroll the compilation window
+(setq compilation-scroll-output t)
+
+;; Scroll up and down while keeping the cursor where it is.
+(defun help/scroll-up-one-line ()
+  (interactive)
+  (scroll-down 1))
+(defun help/scroll-down-one-line ()
+  (interactive)
+  (scroll-up 1))
+(global-set-key (kbd "M-p") 'help/scroll-down-one-line)
+(global-set-key (kbd "M-n") 'help/scroll-up-one-line)
+
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region compilation-filter-start (point))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Prefer UTF 8, but don't override current encoding if specified
+;; (unless you specify a write hook).
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(prefer-coding-system 'utf-8-unix)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Editing VC log messages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'log-edit-hook (lambda () (flyspell-mode 1)))
+
+;; use imagemagick, if available
+(when (fboundp 'imagemagick-register-types)
+  (imagemagick-register-types))
