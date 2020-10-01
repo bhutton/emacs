@@ -398,6 +398,7 @@
 
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+(require 'multiple-cursors)
 
 (require 'ruby-test-mode)
 
@@ -510,6 +511,7 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
 (global-set-key (kbd "s-1") 'treemacs-select-window)
+(global-set-key (kbd "s-e") 'mc/edit-ends-of-lines)
 
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
