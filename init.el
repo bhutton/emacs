@@ -870,7 +870,7 @@ taken from http://stackoverflow.com/a/4116113/446256"
       column-number-mode t
       frame-title-format (concat invocation-name "@" (system-name) " {%f}")
       inhibit-startup-screen t
-      initial-scratch-message "# Hi Torstein, what do you want to do today?\n\n"
+      initial-scratch-message "# Hi Ben, what do you want to do today?\n\n"
       initial-major-mode 'markdown-mode
       ;; no visible or audible bells, please
       visible-bell nil
