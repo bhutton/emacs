@@ -1003,3 +1003,5 @@ taken from http://stackoverflow.com/a/4116113/446256"
 ;; use imagemagick, if available
 (when (fboundp 'imagemagick-register-types)
   (imagemagick-register-types))
+
+(toggle-frame-maximized)
