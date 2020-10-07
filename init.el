@@ -173,6 +173,8 @@
   (c-set-offset 'arglist-intro '++))
 (add-hook 'java-mode-hook 'my-java-mode-hook)
 
+(use-package vterm :ensure t)
+
 (use-package projectile :ensure t)
 (use-package yasnippet :ensure t)
 (use-package lsp-mode :ensure t
@@ -248,6 +250,9 @@
   :config
   (add-hook 'java-mode-hook #'lsp)
 )
+
+(require 'dap-node)
+(require 'dap-firefox)
 
 (use-package dap-mode
   :ensure t
