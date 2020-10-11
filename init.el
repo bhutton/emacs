@@ -295,6 +295,7 @@
   (global-set-key (kbd "s-b") 'lsp-find-implementation)
   (global-set-key (kbd "C-b") 'lsp-find-implementation)
   ;; (define-key lsp-mode-map (kbd "C-t") #'dap-java-run-test-class)
+  (setq dap-java-test-additional-args '("-n" "\".*(Test|IT).*\""))
   )
 
 
