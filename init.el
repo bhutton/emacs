@@ -346,11 +346,26 @@
 
 (defun test-suite ()
   (interactive)
+  (projectile-save-project-buffers)
   (with-output-to-temp-buffer "*test-runner*"
-    (shell-command (concat "CI=true npm test --prefix &")
-                   "*test-runner*"
-                   "*Messages*")
-    ))
+    (when(string= (file-name-extension buffer-file-name) "js")
+      (npm-test))
+    (when(string= (file-name-extension buffer-file-name) "jsx")
+      (npm-test))
+    (when(string= (file-name-extension buffer-file-name) "ts")
+      (npm-test))
+    (when(string= (file-name-extension buffer-file-name) "tsx")
+      (npm-test))
+    )
+  (when(string= (file-name-extension buffer-file-name) "java")
+    (dap-java-run-test-class))
+  )
+
+(defun npm-test()
+  (shell-command (concat "CI=true npm test --prefix &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
 
 (defun test-suite-jest ()
   (interactive)
