@@ -217,7 +217,7 @@
   :ensure t
   :config
   (setq lsp-prefer-flymake nil
-        lsp-ui-doc-delay 5.0
+        lsp-ui-doc-delay 1.0
         lsp-ui-sideline-enable nil
         lsp-ui-sideline-show-symbol nil))
 
@@ -346,6 +346,7 @@
 
 (defun test-suite ()
   (interactive)
+  (lsp-format-buffer)
   (projectile-save-project-buffers)
   (with-output-to-temp-buffer "*test-runner*"
     (when(string= (file-name-extension buffer-file-name) "js")
