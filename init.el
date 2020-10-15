@@ -926,6 +926,8 @@ taken from http://stackoverflow.com/a/4116113/446256"
   (interactive)
   (set-window-margins nil 0))
 
+(set-default 'truncate-lines t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Automatically expand these words and characters
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
