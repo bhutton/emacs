@@ -87,6 +87,7 @@
 (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
 (global-set-key (kbd "s-b") #'xref-find-definitions)
 (global-set-key (kbd "s-r") #'replace-string)
+(global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 
 
 ;; ;typescript
@@ -98,6 +99,7 @@
    (eldoc-mode +1)
    (tide-hl-identifier-idle-time 0)
    (company-mode +1))
+
 
 ;; ;; aligns annotation to the right hand side
 ;; (setq company-tooltip-align-annotations t)
@@ -118,8 +120,8 @@
 ;;   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
 ;; (eval-after-load "tide"
 ;;   '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
-(eval-after-load "tide"
-  '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
+;; (eval-after-load "tide"
+;;   '(define-key tide-mode-map (kbd "C-M-l") '))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -206,7 +208,8 @@
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
   (setq lsp-idle-delay 0.500)
   (setq lsp-log-io t)
-  (define-key lsp-mode-map (kbd "C-t") #'test-suite))
+  (define-key lsp-mode-map (kbd "C-t") #'test-suite)
+  (define-key lsp-mode-map (kbd "C-M-l") #'format-and-save))
 
                                         ;(define-key lsp-mode-map (kbd "C-t") #'test-suite)
 
@@ -343,6 +346,10 @@
 ;; (add-hook 'web-mode-hook #'setup-tide-mode)
 
 ;; (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
+(defun format-and-save ()
+  (interactive)
+  (lsp-format-buffer)
+  (save-buffer))
 
 (defun test-suite ()
   (interactive)
