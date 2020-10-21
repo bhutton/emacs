@@ -83,19 +83,24 @@
 (global-set-key (kbd "M-s-<up>") (kbd "C-u -1 C-x ^"))
 
 (global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "s-f") #'helm-projectile-ag)
 (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
 (global-set-key (kbd "s-b") #'xref-find-definitions)
 (global-set-key (kbd "s-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
+(global-set-key (kbd "s-F") #'projectile-find-file)
 
+(add-hook 'isearch-mode-hook
+  (lambda ()
+  (define-key isearch-mode-map (kbd "s-f") 'isearch-repeat-forward)
+  )
+)
 
 ;; ;typescript
 ;; (setq create-lockfiles nil)
 (defun setup-tide-mode ()
    (interactive)
    (tide-setup)
-  (flycheck-mode +1)
+   (flycheck-mode +1)
    (eldoc-mode +1)
    (tide-hl-identifier-idle-time 0)
    (company-mode +1))
