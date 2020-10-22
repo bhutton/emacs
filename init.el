@@ -88,6 +88,7 @@
 (global-set-key (kbd "s-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 (global-set-key (kbd "s-F") #'projectile-find-file)
+(global-set-key (kbd "C-f") #'helm-projectile-ag)
 
 (add-hook 'isearch-mode-hook
   (lambda ()
