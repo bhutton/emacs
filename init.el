@@ -38,6 +38,9 @@
 
 (setq scroll-step 1)
 
+(setq mark-ring-max 6)
+(setq global-mark-ring-max 6)
+
 (require
  'better-defaults)
 (custom-set-faces
@@ -312,7 +315,8 @@
 ;; End Java
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
+(require 'back-button)
+(back-button-mode 1)
 
 (require 'flycheck)
 
@@ -553,8 +557,8 @@ the current position of point, then move it to the beginning of the line."
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
-(define-key prog-mode-map (kbd "s-[") 'previous-buffer)
-(define-key prog-mode-map (kbd "s-]") 'next-buffer)
+(define-key prog-mode-map (kbd "s-[") 'back-button-global-backward)
+(define-key prog-mode-map (kbd "s-]") 'back-button-global-forward)
 
 (require 'treemacs)
 (require 'dash)
