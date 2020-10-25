@@ -17,12 +17,17 @@
   (package-refresh-contents))
 
 ;; fix the PATH variable
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (shell-command-to-string "TERM=vt100 $SHELL -i -c 'echo $PATH'")))
-    (setenv "PATH" path-from-shell)
-    (setq exec-path (split-string path-from-shell path-separator))))
+;; (defun set-exec-path-from-shell-PATH ()
+;;   (let ((path-from-shell (shell-command-to-string "TERM=vt100 $SHELL -i -c 'echo $PATH'")))
+;;     (setenv "PATH" path-from-shell)
+;;     (setq exec-path (split-string path-from-shell path-separator))))
 
-(when window-system (set-exec-path-from-shell-PATH))
+;; (when window-system (set-exec-path-from-shell-PATH))
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-copy-env "JUNIT_CLASS_PATH")
+  (exec-path-from-shell-initialize))
+
 
 ; list the packages you want
 (setq package-list '
@@ -246,7 +251,7 @@
          "-Xmx2G"
          "-XX:+UseG1GC"
          "-XX:+UseStringDeduplication"
-         ;"-javaagent:/home/torstein/.m2/repository/org/projectlombok/lombok/1.18.4/lombok-1.18.4.jar"
+         "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar" 
          )
 
         ;; Don't organise imports on save
@@ -1047,3 +1052,4 @@ taken from http://stackoverflow.com/a/4116113/446256"
   (imagemagick-register-types))
 
 (toggle-frame-maximized)
+
