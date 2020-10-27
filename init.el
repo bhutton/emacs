@@ -575,7 +575,7 @@ the current position of point, then move it to the beginning of the line."
 
 ;; (load-theme 'doom-solarized-light t)
 (load-theme 'doom-tomorrow-day t)
-(load-theme 'spacemacs-light t)
+;; (load-theme 'Spacemacs-light t)
 (doom-themes-treemacs-config)
 (doom-themes-visual-bell-config)
 (doom-themes-org-config)
