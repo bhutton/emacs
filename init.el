@@ -16,18 +16,6 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; fix the PATH variable
-;; (defun set-exec-path-from-shell-PATH ()
-;;   (let ((path-from-shell (shell-command-to-string "TERM=vt100 $SHELL -i -c 'echo $PATH'")))
-;;     (setenv "PATH" path-from-shell)
-;;     (setq exec-path (split-string path-from-shell path-separator))))
-
-;; (when window-system (set-exec-path-from-shell-PATH))
-
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-copy-env "JUNIT_CLASS_PATH")
-  (exec-path-from-shell-initialize))
-
 
 ; list the packages you want
 (setq package-list '
@@ -95,8 +83,8 @@
 (global-set-key (kbd "s-b") #'xref-find-definitions)
 (global-set-key (kbd "s-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
-(global-set-key (kbd "s-F") #'projectile-find-file)
-(global-set-key (kbd "C-f") #'helm-projectile-ag)
+(global-set-key (kbd "C-f") #'projectile-find-file)
+(global-set-key (kbd "s-F") #'helm-projectile-ag)
 
 (add-hook 'isearch-mode-hook
   (lambda ()
