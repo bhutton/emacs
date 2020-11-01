@@ -186,7 +186,9 @@
   (c-set-offset 'arglist-intro '++))
 (add-hook 'java-mode-hook 'my-java-mode-hook)
 
-(use-package vterm :ensure t)
+;(use-package vterm :ensure t)
+(add-to-list 'load-path "~/.emacs.d/emacs-libvterm")
+(require 'vterm)
 
 (use-package projectile :ensure t)
 (use-package yasnippet :ensure t)
@@ -235,9 +237,9 @@
         lsp-ui-sideline-enable nil
         lsp-ui-sideline-show-symbol nil))
 
-(require 'dap-firefox)
-(require 'dap-chrome)
-(require 'dap-node)
+;(require 'dap-firefox)
+;(require 'dap-chrome)
+;(require 'dap-node)
 
 (use-package lsp-java
   :ensure t
