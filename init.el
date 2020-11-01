@@ -41,6 +41,15 @@
 
 (require 'smartparens-config)
 
+;; Draws a line between the beginning and ending of block indents
+(require 'highlight-indent-guides)
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+(setq highlight-indent-guides-method 'character)
+;; (setq highlight-indent-guides-auto-enabled 'nil)
+;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
+;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
+;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+
 (setq package-list '(better-defaults chyla))
 
 (cua-selection-mode 1)
@@ -335,6 +344,7 @@
             (when (string-equal "js" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
 
+
 ;; ;; enable typescript-tslint checker
 (flycheck-add-mode 'typescript-tslint 'lsp-mode)
 
@@ -567,18 +577,22 @@ the current position of point, then move it to the beginning of the line."
 (require 'spaceline-config)
 (spaceline-emacs-theme)
 
-(require 'doom-themes)
+(use-package doom-themes
+  :config
 
-;; Global settings (defaults)
-(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-       doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
-;; (load-theme 'doom-solarized-light t)
-(load-theme 'doom-tomorrow-day t)
-(load-theme 'spacemacs-light t)
-(doom-themes-treemacs-config)
-(doom-themes-visual-bell-config)
-(doom-themes-org-config)
+  (load-theme 'doom-solarized-light t)
+  ;; (load-theme 'doom-material)
+  ;; (load-theme 'doom-one-light)
+  ;; (load-theme 'doom-tomorrow-day t)
+  ;; (load-theme 'spacemacs-light t)
+  (setq doom-themes-treemacs-theme "doom-colors") 
+  (doom-themes-treemacs-config)
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
@@ -586,7 +600,7 @@ the current position of point, then move it to the beginning of the line."
 (projectile-rails-global-mode)
 
 (treemacs)
-(treemacs-load-theme "Default")
+;; (treemacs-load-theme "Default")
 ;; (treemacs-load-theme "Netbeans")
 ;; (treemacs-load-theme "Idea")
 (setq centaur-tabs-style "box")
