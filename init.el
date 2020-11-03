@@ -586,11 +586,13 @@ the current position of point, then move it to the beginning of the line."
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
-  (load-theme 'doom-solarized-light t)
+  ;; (load-theme 'doom-solarized-light t)
   ;; (load-theme 'doom-material)
-  ;; (load-theme 'doom-one-light)
+  (load-theme 'doom-one-light t)
   ;; (load-theme 'doom-tomorrow-day t)
   ;; (load-theme 'spacemacs-light t)
+  ;;; OPTIONAL
+
   (setq doom-themes-treemacs-theme "doom-colors") 
   (doom-themes-treemacs-config)
   (doom-themes-visual-bell-config)
