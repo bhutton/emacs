@@ -107,16 +107,17 @@
    (interactive)
    (tide-setup)
    (flycheck-mode +1)
+   (setq flycheck-check-syntax-automatically '(save mode-enabled))
    (eldoc-mode +1)
-   (tide-hl-identifier-idle-time 0)
+   (tide-hl-identifier-idle-time +1)
    (company-mode +1))
 
 
 ;; ;; aligns annotation to the right hand side
-;; (setq company-tooltip-align-annotations t)
+(setq company-tooltip-align-annotations t)
 
 ;; ;; formats the buffer before saving
-;; (add-hook 'before-save-hook 'tide-format-before-save)
+(add-hook 'before-save-hook 'tide-format-before-save)
 
 ;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
@@ -192,50 +193,109 @@
 
 (use-package projectile :ensure t)
 (use-package yasnippet :ensure t)
-(use-package lsp-mode :ensure t
-  :hook ((javascript-mode . lsp)
-         (js-mode . lsp)
-         (js2-mode . lsp)
-         (js-jsx-mode . lsp)
-         (js2-jsx-mode . lsp)
-         (typescript-mode . lsp)
-         (web-mode . lsp))
-  :commands (lsp lsp-deferred)
-  :bind (("\C-\M-b" . lsp-find-implementation)
-         ("M-RET" . lsp-execute-code-action))
-  :config
-  (setq lsp-inhibit-message t
-        lsp-eldoc-render-all t
-        lsp-enable-file-watchers nil
-        lsp-enable-symbol-highlighting t
-        lsp-headerline-breadcrumb-enable nil
-        lsp-highlight-symbol-at-point t
-        lsp-modeline-code-actions-enable nil
-        lsp-modeline-diagnostics-enable nil
-        )
+
+(use-package lsp-mode
+  :defer t
+  :commands lsp
+  :custom
+  (lsp-auto-guess-root nil)
+  (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
+  (lsp-file-watch-threshold 2000)
+  (read-process-output-max (* 1024 1024))
+  (lsp-eldoc-hook nil)
+  :bind (:map lsp-mode-map ("C-t" . test-suite))
+  :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
+  :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
+  :hook ((java-mode python-mode go-mode
+          js-mode js2-mode typescript-mode web-mode
+          c-mode c++-mode objc-mode) . lsp))
+
+;; (use-package lsp-mode :ensure t
+;;   :hook ((javascript-mode . lsp)
+;;          (js-mode . lsp)
+;;          (js2-mode . lsp)
+;;          (js-jsx-mode . lsp)
+;;          (js2-jsx-mode . lsp)
+;;          (typescript-mode . lsp)
+;;          (web-mode . lsp))
+;;   :commands (lsp lsp-deferred)
+;;   :bind (("\C-\M-b" . lsp-find-implementation)
+;;          ("M-RET" . lsp-execute-code-action))
+;;   :config
+;;   (setq lsp-inhibit-message t
+;;         lsp-eldoc-render-all t
+;;         lsp-enable-file-watchers nil
+;;         lsp-enable-symbol-highlighting t
+;;         lsp-headerline-breadcrumb-enable nil
+;;         lsp-highlight-symbol-at-point t
+;;         lsp-modeline-code-actions-enable nil
+;;         lsp-modeline-diagnostics-enable nil
+;;         )
   
 
-  ;; Performance tweaks, see
-  ;; https://github.com/emacs-lsp/lsp-mode#performance
-  (setq gc-cons-threshold 1000000)
-  (setq read-process-output-max (* 1024 1024)) ;; 1mb
-  (setq lsp-idle-delay 0.500)
-  (setq lsp-log-io t)
-  (define-key lsp-mode-map (kbd "C-t") #'test-suite)
-  (define-key lsp-mode-map (kbd "C-M-l") #'format-and-save))
+;;   ;; Performance tweaks, see
+;;   ;; https://github.com/emacs-lsp/lsp-mode#performance
+;;   (setq lsp-auto-guess-root nil)
+;;   (setq lsp-prefer-flymake nil)
+;;   (setq lsp-file-watch-threshold 2000)
+;;   (setq gc-cons-threshold 204800000000)
+;;   (setq read-process-output-max (* 1024 1024)) ;; 1mb
+;;   ;; (setq lsp-idle-delay 0.500)
+;;   ;; (setq lsp-log-io t)
+;;   (setq lsp-eldoc-hook nil)
+;;   (setq company-lsp-cache-candidates 'auto)
+;;   (define-key lsp-mode-map (kbd "C-t") #'test-suite)
+;;   (define-key lsp-mode-map (kbd "C-M-l") #'format-and-save))
 
-                                        ;(define-key lsp-mode-map (kbd "C-t") #'test-suite)
+;;                                         ;(define-key lsp-mode-map (kbd "C-t") #'test-suite)
 
 
 (use-package hydra :ensure t)
 (use-package company-lsp :ensure t)
+
 (use-package lsp-ui
-  :ensure t
+  :after lsp-mode
+  :diminish
+  :commands lsp-ui-mode
+  :custom-face
+  (lsp-ui-doc-background ((t (:background nil))))
+  (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+  :bind
+  (:map lsp-ui-mode-map
+        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+        ([remap xref-find-references] . lsp-ui-peek-find-references)
+        ("C-c u" . lsp-ui-imenu)
+        ("M-i" . lsp-ui-doc-focus-frame))
+  (:map lsp-mode-map
+        ("M-n" . forward-paragraph)
+        ("M-p" . backward-paragraph))
+  :custom
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-border (face-foreground 'default))
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-code-actions nil)
   :config
-  (setq lsp-prefer-flymake nil
-        lsp-ui-doc-delay 1.0
-        lsp-ui-sideline-enable nil
-        lsp-ui-sideline-show-symbol nil))
+  ;; Use lsp-ui-doc-webkit only in GUI
+  (if (display-graphic-p)
+      (setq lsp-ui-doc-use-webkit t))
+  ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
+  ;; https://github.com/emacs-lsp/lsp-ui/issues/243
+  (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+    (setq mode-line-format nil)))
+
+
+
+
+
+;; (use-package lsp-ui
+;;   :ensure t
+;;   :config
+;;   (setq lsp-prefer-flymake nil
+;;         lsp-ui-doc-delay 1.0
+;;         lsp-ui-sideline-enable nil
+;;         lsp-ui-sideline-show-symbol nil))
 
 ;(require 'dap-firefox)
 ;(require 'dap-chrome)
@@ -325,26 +385,28 @@
 (require 'flycheck)
 
 (require 'web-mode)
+
+(setq js-indent-level 2)
+(setq javascript-indent-level 2)
+(setq web-mode-markup-indent-offset 2)
+
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
 (add-hook 'lsp-mode-hook
           (lambda ()
-            (when (string-equal "tsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+            (when (string-equal "tsx" (file-name-extension buffer-file-name)))))
 (add-hook 'lsp-mode-hook
           (lambda ()
-            (when (string-equal "jsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+            (when (string-equal "jsx" (file-name-extension buffer-file-name)))))
 (add-hook 'lsp-mode-hook
           (lambda ()
-            (when (string-equal "ts" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+            (when (string-equal "ts" (file-name-extension buffer-file-name)))))
 (add-hook 'lsp-mode-hook
           (lambda ()
-            (when (string-equal "js" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+            (when (string-equal "js" (file-name-extension buffer-file-name)))))
 
 
 ;; ;; enable typescript-tslint checker
@@ -412,16 +474,26 @@
 ;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
 (require 'company)
+(require 'company-web-html)                          ; load company mode html backend
+;; and/or
+(require 'company-web-jade)                          ; load company mode jade backend
+(require 'company-web-slim)                          ; load company mode slim backend
+
 (add-hook 'after-init-hook 'global-company-mode)
+(setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0)
 (add-to-list 'company-backends 'company-tern)
-;; (add-to-list 'company-backends 'ac-js2-company)
+(add-to-list 'company-backends 'ac-js2-company)
 ;; (setq ac-js2-evaluate-calls t)
 (add-to-list 'company-backends 'company-flow)
+(add-to-list 'company-backends 'company-web)
+
 
 (require 'prettier-js)
- (add-hook 'js2-mode-hook 'prettier-js-mode)
- (add-hook 'web-mode-hook 'prettier-js-mode)
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'js-mode-hook 'prettier-js-mode)
+(add-hook 'lsp-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
 
  (setq prettier-js-args '(
    "--trailing-comma" "all"
