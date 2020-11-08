@@ -385,6 +385,13 @@
 (require 'flycheck)
 
 (require 'web-mode)
+(require 'add-node-modules-path)
+
+(defun web-mode-init-prettier-hook ()
+  (add-node-modules-path)
+  (prettier-js-mode))
+
+(add-hook 'web-mode-hook  'web-mode-init-prettier-hook)
 
 (setq js-indent-level 2)
 (setq javascript-indent-level 2)
