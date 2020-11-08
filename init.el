@@ -44,7 +44,7 @@
 ;; Draws a line between the beginning and ending of block indents
 (require 'highlight-indent-guides)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'character)
+(setq highlight-indent-guides-method 'bitmap)
 ;; (setq highlight-indent-guides-auto-enabled 'nil)
 ;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
 ;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
