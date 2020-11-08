@@ -44,6 +44,7 @@
 ;; Draws a line between the beginning and ending of block indents
 (require 'highlight-indent-guides)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+;; (setq highlight-indent-guides-bitmap-function 'highlight-indent-guides--bitmap-line)
 (setq highlight-indent-guides-method 'bitmap)
 ;; (setq highlight-indent-guides-auto-enabled 'nil)
 ;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
@@ -658,10 +659,12 @@ the current position of point, then move it to the beginning of the line."
 (require 'spaceline-config)
 (spaceline-emacs-theme)
 
+
 (use-package doom-themes
   :config
 
   ;; Global settings (defaults)
+  (solaire-global-mode +1)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
@@ -670,6 +673,7 @@ the current position of point, then move it to the beginning of the line."
   (load-theme 'doom-one-light t)
   ;; (load-theme 'doom-tomorrow-day t)
   ;; (load-theme 'spacemacs-light t)
+  ;; (load-theme 'doom-opera-light t)
   ;;; OPTIONAL
 
   (setq doom-themes-treemacs-theme "doom-colors") 
