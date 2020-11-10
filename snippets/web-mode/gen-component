@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: React Component
-# key: gencomp
+# key: gencomps
 # --
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';

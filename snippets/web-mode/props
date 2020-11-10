@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: PropTypes 
-# key: genprop
+# key: genprops
 # --
 $1.propTypes = {$2};
 
