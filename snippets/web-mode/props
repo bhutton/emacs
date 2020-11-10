@@ -2,7 +2,7 @@
 # name: PropTypes 
 # key: genprop
 # --
-$1.propTypes = {$2}
+$1.propTypes = {$2};
 
-$1.defaultProps = {$3}
+$1.defaultProps = {$3};
 
