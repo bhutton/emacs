@@ -1,7 +1,11 @@
-; list the repositories containing them
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
-;; (setq load-path (cons (expand-file-name "~/.emacs.d/") load-path))
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+(eval-when-compile
+  ;; Following line is not needed if use-package.el is in ~/.emacs.d
+  (add-to-list 'load-path "~/.emacs.d/use-package/")
+  (require 'use-package))
+
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 
@@ -12,45 +16,59 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; fix the PATH variable
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (shell-command-to-string "TERM=vt100 $SHELL -i -c 'echo $PATH'")))
-    (setenv "PATH" path-from-shell)
-    (setq exec-path (split-string path-from-shell path-separator))))
-
-(when window-system (set-exec-path-from-shell-PATH))
 
 ; list the packages you want
-(setq package-list '(better-defaults helm helm-projectile helm-ag ruby-electric rvm seeing-is-believing chruby inf-ruby ruby-test-mode))
+(setq package-list '
+	(better-defaults helm helm-switch-shell helm-projectile helm-ag ruby-electric rvm seeing-is-believing 
+	chruby inf-ruby ruby-test-mode yasnippet flycheck web-mode js2-refactor xref-js2 prettier-js
+	dumb-jump exec-path-from-shell all-the-icons spaceline doom-themes spacemacs-theme projectile-rails
+	centaur-tabs undo-tree tide))
 
 ; install the missing packages
 (dolist (package package-list)
   (unless (package-installed-p package)
     (package-install package)))
 
-(require 'better-defaults)
+(setq scroll-step 1)
+
+(setq mark-ring-max 6)
+(setq global-mark-ring-max 6)
+
+(require
+ 'better-defaults)
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(default ((t (:background nil)))))
+
+(require 'smartparens-config)
+
+;; Draws a line between the beginning and ending of block indents
+(require 'highlight-indent-guides)
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+;; (setq highlight-indent-guides-bitmap-function 'highlight-indent-guides--bitmap-line)
+(setq highlight-indent-guides-method 'bitmap)
+;; (setq highlight-indent-guides-auto-enabled 'nil)
+;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
+;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
+;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
 
 (setq package-list '(better-defaults chyla))
 
 (cua-selection-mode 1)
+(yas-global-mode 1)
+(scroll-bar-mode 1)
+(smartparens-global-mode 1)
 
-(require 'linum)
-(defun linum-update-window-scale-fix (win)
-  "fix linum for scaled text"
-  (set-window-margins win
-                      (ceiling (* (if (boundp 'text-scale-mode-step)
-                                      (expt text-scale-mode-step
-                                            text-scale-mode-amount) 1)
-                                  (if (car (window-margins))
-                                      (car (window-margins)) 1)
-                                  ))))
-(advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
+;; (require 'linum)
+;; (defun linum-update-window-scale-fix (win)
+;;   "fix linum for scaled text"
+;;   (set-window-margins win
+;;                       (ceiling (* (if (boundp 'text-scale-mode-step)
+;;                                       (expt text-scale-mode-step
+;;                                             text-scale-mode-amount) 1)
+;;                                   (if (car (window-margins))
+;;                                       (car (window-margins)) 1)
+;;                                   ))))
+;; (advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
 
 
 ;; Typography
@@ -71,170 +89,419 @@
 (global-set-key (kbd "M-s-<up>") (kbd "C-u -1 C-x ^"))
 
 (global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "s-f") #'helm-projectile-ag)
 (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
-(global-set-key (kbd "s-b") #'dumb-jump-go)
+(global-set-key (kbd "s-b") #'xref-find-definitions)
 (global-set-key (kbd "s-r") #'replace-string)
+(global-set-key (kbd "C-M-l") #'lsp-format-buffer)
+(global-set-key (kbd "C-f") #'projectile-find-file)
+(global-set-key (kbd "s-F") #'helm-projectile-ag)
 
+(add-hook 'isearch-mode-hook
+  (lambda ()
+  (define-key isearch-mode-map (kbd "s-f") 'isearch-repeat-forward)
+  )
+)
 
-;typescript
-(setq create-lockfiles nil)
+;; ;typescript
+;; (setq create-lockfiles nil)
 (defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
- (flycheck-mode +1)
-  ;; (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-idle-time 0)
-  ;; company is an optional dependency. You have to
-  ;; install it separately via package-install
-  ;; `M-x package-install [ret] company`
-  (company-mode +1))
+   (interactive)
+   (tide-setup)
+   (flycheck-mode +1)
+   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+   (eldoc-mode +1)
+   (tide-hl-identifier-idle-time +1)
+   (company-mode +1))
 
-;; aligns annotation to the right hand side
+
+;; ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
-;; formats the buffer before saving
+;; ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 
-(add-hook 'web-mode-hook #'setup-tide-mode)
+;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
-(setq web-mode-markup-indent-offset 2)
-(setq web-mode-css-indent-offset 2)
-(setq web-mode-code-indent-offset 2)
-(setq web-mode-indent-style 2)
+(add-hook 'lsp-hook #'setup-tide-mode)
 
-(eval-after-load "tide"
-  '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
-(eval-after-load "tide"
-  '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
-(eval-after-load "tide"
-  '(define-key tide-mode-map (kbd "C-M-l") 'tide-format))
+;; (setq web-mode-markup-indent-offset 2)
+;; (setq web-mode-css-indent-offset 2)
+;; (setq web-mode-code-indent-offset 2)
+;; (setq web-mode-indent-style 2)
+
+;; (eval-after-load "tide"
+;;   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
+;; (eval-after-load "tide"
+;;   '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
+;; (eval-after-load "tide"
+;;   '(define-key tide-mode-map (kbd "C-M-l") '))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Java
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun tkj-insert-serial-version-uuid()
+  (interactive)
+  (insert "private static final long serialVersionUID = 1L;"))
+
+(defun tkj-default-code-style-hook()
+  (setq c-basic-offset 2
+        c-label-offset 0
+        tab-width 2
+        indent-tabs-mode nil
+        compile-command "mvn -q -o -f ~/src/content-engine/engine/engine-core/pom.xml test -DtrimStackTrace=false"
+        require-final-newline nil))
+(add-hook 'java-mode-hook 'tkj-default-code-style-hook)
+
+(use-package flycheck
+  :init
+  (add-to-list 'display-buffer-alist
+               `(,(rx bos "*Flycheck errors*" eos)
+                 (display-buffer-reuse-window
+                  display-buffer-in-side-window)
+                 (side            . bottom)
+                 (reusable-frames . visible)
+                 (window-height   . 0.15))))
+
+;(use-package idle-highlight)
+
+(defun my-java-mode-hook ()
+  (auto-fill-mode)
+  (flycheck-mode)
+  (git-gutter+-mode)
+  (gtags-mode)
+  ;(idle-highlight)
+  (subword-mode)
+  (yas-minor-mode)
+  (set-fringe-style '(8 . 0))
+  (define-key c-mode-base-map (kbd "C-M-j") 'tkj-insert-serial-version-uuid)
+  (define-key c-mode-base-map (kbd "C-m") 'c-context-line-break)
+  (define-key c-mode-base-map (kbd "S-<f7>") 'gtags-find-tag-from-here)
+  (define-key c-mode-base-map (kbd "C-t") #'dap-java-run-test-class)
+
+  ;; Fix indentation for anonymous classes
+  (c-set-offset 'substatement-open 0)
+  (if (assoc 'inexpr-class c-offsets-alist)
+      (c-set-offset 'inexpr-class 0))
+
+  ;; Indent arguments on the next line as indented body.
+  (c-set-offset 'arglist-intro '++))
+(add-hook 'java-mode-hook 'my-java-mode-hook)
+
+;(use-package vterm :ensure t)
+(add-to-list 'load-path "~/.emacs.d/emacs-libvterm")
+(require 'vterm)
+
+(use-package projectile :ensure t)
+(use-package yasnippet :ensure t)
+
+(use-package lsp-mode
+  :defer t
+  :commands lsp
+  :custom
+  (lsp-auto-guess-root nil)
+  (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
+  (lsp-file-watch-threshold 2000)
+  (read-process-output-max (* 1024 1024))
+  (lsp-eldoc-hook nil)
+  :bind (:map lsp-mode-map ("C-t" . test-suite))
+  :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
+  :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
+  :hook ((java-mode python-mode go-mode
+          js-mode js2-mode typescript-mode web-mode
+          c-mode c++-mode objc-mode) . lsp))
+
+;; (use-package lsp-mode :ensure t
+;;   :hook ((javascript-mode . lsp)
+;;          (js-mode . lsp)
+;;          (js2-mode . lsp)
+;;          (js-jsx-mode . lsp)
+;;          (js2-jsx-mode . lsp)
+;;          (typescript-mode . lsp)
+;;          (web-mode . lsp))
+;;   :commands (lsp lsp-deferred)
+;;   :bind (("\C-\M-b" . lsp-find-implementation)
+;;          ("M-RET" . lsp-execute-code-action))
+;;   :config
+;;   (setq lsp-inhibit-message t
+;;         lsp-eldoc-render-all t
+;;         lsp-enable-file-watchers nil
+;;         lsp-enable-symbol-highlighting t
+;;         lsp-headerline-breadcrumb-enable nil
+;;         lsp-highlight-symbol-at-point t
+;;         lsp-modeline-code-actions-enable nil
+;;         lsp-modeline-diagnostics-enable nil
+;;         )
+  
+
+;;   ;; Performance tweaks, see
+;;   ;; https://github.com/emacs-lsp/lsp-mode#performance
+;;   (setq lsp-auto-guess-root nil)
+;;   (setq lsp-prefer-flymake nil)
+;;   (setq lsp-file-watch-threshold 2000)
+;;   (setq gc-cons-threshold 204800000000)
+;;   (setq read-process-output-max (* 1024 1024)) ;; 1mb
+;;   ;; (setq lsp-idle-delay 0.500)
+;;   ;; (setq lsp-log-io t)
+;;   (setq lsp-eldoc-hook nil)
+;;   (setq company-lsp-cache-candidates 'auto)
+;;   (define-key lsp-mode-map (kbd "C-t") #'test-suite)
+;;   (define-key lsp-mode-map (kbd "C-M-l") #'format-and-save))
+
+;;                                         ;(define-key lsp-mode-map (kbd "C-t") #'test-suite)
+
+
+(use-package hydra :ensure t)
+(use-package company-lsp :ensure t)
+
+(use-package lsp-ui
+  :after lsp-mode
+  :diminish
+  :commands lsp-ui-mode
+  :custom-face
+  (lsp-ui-doc-background ((t (:background nil))))
+  (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+  :bind
+  (:map lsp-ui-mode-map
+        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+        ([remap xref-find-references] . lsp-ui-peek-find-references)
+        ("C-c u" . lsp-ui-imenu)
+        ("M-i" . lsp-ui-doc-focus-frame))
+  (:map lsp-mode-map
+        ("M-n" . forward-paragraph)
+        ("M-p" . backward-paragraph))
+  :custom
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-border (face-foreground 'default))
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-code-actions nil)
+  :config
+  ;; Use lsp-ui-doc-webkit only in GUI
+  (if (display-graphic-p)
+      (setq lsp-ui-doc-use-webkit t))
+  ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
+  ;; https://github.com/emacs-lsp/lsp-ui/issues/243
+  (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+    (setq mode-line-format nil)))
+
+
+
+
+
+;; (use-package lsp-ui
+;;   :ensure t
+;;   :config
+;;   (setq lsp-prefer-flymake nil
+;;         lsp-ui-doc-delay 1.0
+;;         lsp-ui-sideline-enable nil
+;;         lsp-ui-sideline-show-symbol nil))
+
+;(require 'dap-firefox)
+;(require 'dap-chrome)
+;(require 'dap-node)
+
+(use-package lsp-java
+  :ensure t
+  :init
+  (setq lsp-java-vmargs
+        (list
+         "-noverify"
+         "-Xmx2G"
+         "-XX:+UseG1GC"
+         "-XX:+UseStringDeduplication"
+         "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar" 
+         )
+
+        ;; Don't organise imports on save
+        lsp-java-save-action-organize-imports nil
+
+        ;; Currently (2019-04-24), dap-mode works best with Oracle
+        ;; JDK, see https://github.com/emacs-lsp/dap-mode/issues/31
+        ;;
+        ;; lsp-java-java-path "~/.emacs.d/oracle-jdk-12.0.1/bin/java"
+        lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home/bin/java"
+        )
+
+  :config
+  (add-hook 'java-mode-hook #'lsp)
+)
+
+(require 'dap-node)
+(require 'dap-firefox)
+
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+  :config
+  (dap-mode t)
+  (dap-ui-mode t)
+  (dap-tooltip-mode 1)
+  (dap-ui-controls-mode 1)
+  (tooltip-mode 1)
+  (dap-register-debug-template
+   "localhost:5005"
+   (list :type "java"
+         :request "attach"
+         :hostName "localhost"
+         :port 5005))
+  (dap-register-debug-template
+   "lxd"
+   (list :type "java"
+         :request "attach"
+         :hostName "10.152.112.168"
+         :port 5005))
+  )
+
+(use-package dap-java
+  :ensure nil
+  :after (lsp-java)
+
+  ;; The :bind here makes use-package fail to lead the dap-java block!
+  ;; :bind
+  ;; (("C-c R" . dap-java-run-test-class)
+  ;;  ("C-c d" . dap-java-debug-test-method)
+  ;;  ("C-c r" . dap-java-run-test-method)
+  ;;  )
+
+  :config
+  (global-set-key (kbd "<f7>") 'dap-step-in)
+  (global-set-key (kbd "<f8>") 'dap-next)
+  (global-set-key (kbd "<f9>") 'dap-continue)
+  (global-set-key (kbd "s-b") 'lsp-find-implementation)
+  (global-set-key (kbd "C-b") 'lsp-find-implementation)
+  ;; (define-key lsp-mode-map (kbd "C-t") #'dap-java-run-test-class)
+  (setq dap-java-test-additional-args '("-n" "\".*(Test|IT).*\""))
+  )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End Java
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'back-button)
+(back-button-mode 1)
 
 (require 'flycheck)
+
 (require 'web-mode)
+(require 'add-node-modules-path)
+
+(defun web-mode-init-prettier-hook ()
+  (add-node-modules-path)
+  (prettier-js-mode))
+
+(add-hook 'web-mode-hook  'web-mode-init-prettier-hook)
+
+(setq js-indent-level 2)
+(setq javascript-indent-level 2)
+(setq web-mode-markup-indent-offset 2)
+
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
-(add-hook 'web-mode-hook
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
+(add-hook 'lsp-mode-hook
           (lambda ()
-            (when (string-equal "tsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
-(add-hook 'web-mode-hook
+            (when (string-equal "tsx" (file-name-extension buffer-file-name)))))
+(add-hook 'lsp-mode-hook
           (lambda ()
-            (when (string-equal "ts" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
-;; enable typescript-tslint checker
-(flycheck-add-mode 'typescript-tslint 'web-mode)
-;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+            (when (string-equal "jsx" (file-name-extension buffer-file-name)))))
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (when (string-equal "ts" (file-name-extension buffer-file-name)))))
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (when (string-equal "js" (file-name-extension buffer-file-name)))))
 
-(define-key web-mode-map (kbd "C-t") #'test-suite)
 
-;; aligns annotation to the right hand side
-(setq company-tooltip-align-annotations t)
+;; ;; enable typescript-tslint checker
+(flycheck-add-mode 'typescript-tslint 'lsp-mode)
 
-;; formats the buffer before saving
+;; (define-key web-mode-map (kbd "C-t") #'test-suite)
+
+;; ;; aligns annotation to the right hand side
+;; (setq company-tooltip-align-annotations t)
+
+;; ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 
-(add-hook 'web-mode-hook #'setup-tide-mode)
-;(require 'ansi-color)
-;(defun colorize-compilation-buffer ()
-;  (Ansi-color-apply-on-region compilation-filter-start (point-max)))
-;(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-;(autoload 'web-mode "web-mode" "Major mode for editing typescript scripts." t)
-;(setq auto-mode-alist  (cons '(".tsx$" . web-mode) auto-mode-alist))
+;; (add-hook 'web-mode-hook #'setup-tide-mode)
 
-(setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
+;; (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
+(defun format-and-save ()
+  (interactive)
+  (lsp-format-buffer)
+  (save-buffer))
 
 (defun test-suite ()
   (interactive)
+  (lsp-format-buffer)
+  (projectile-save-project-buffers)
   (with-output-to-temp-buffer "*test-runner*"
-    (flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
-      (kill-matching-buffers "*test-runner*"))
-    (kill-matching-buffers "*test-runner*")
-    (shell-command (concat "CI=true npm test --prefix " projectile-project-root " &")
-                   "*test-runner*"
+    (when(string= (file-name-extension buffer-file-name) "js")
+      (npm-test))
+    (when(string= (file-name-extension buffer-file-name) "jsx")
+      (npm-test))
+    (when(string= (file-name-extension buffer-file-name) "ts")
+      (npm-test))
+    (when(string= (file-name-extension buffer-file-name) "tsx")
+      (npm-test))
+    )
+  (when(string= (file-name-extension buffer-file-name) "java")
+    (dap-java-run-test-class))
+  )
+
+(defun npm-test()
+  (shell-command (concat "CI=true npm test --prefix &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
+
+(defun test-suite-jest ()
+  (interactive)
+  (with-output-to-temp-buffer "*jest-runner*"
+    (shell-command (concat "echo " projectile-project- " && cd .. && jest " projectile-project-root " &")
+                   "*jest-runner*"
                    "*Messages*")
-    (get-buffer-create "*test-runner*")))
+    ))
 
-;JavaScript
-(require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(add-hook 'js-mode-hook js-indent-level 2)
+;; (require 'js2-refactor)
+;; (require 'xref-js2)
 
+;; (add-hook 'js2-mode-hook #'js2-refactor-mode)
+;; (js2r-add-keybindings-with-prefix "C-c C-r")
+;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+;; (define-key js2-mode-map (kbd "C-t") #'test-suite)
 
-(add-hook 'js2-mode-hook
-          (lambda ()
-            (set (make-local-variable 'testing-command)
-                 (test-javascript))))
+;; (add-hook 'js2-mode-hook (lambda ()
+;;   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
-
-; Better imenu
-(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-
-(setq js-indent-level 2)
-
-(require 'js2-refactor)
-(require 'xref-js2)
-
-(add-hook 'js2-mode-hook #'js2-refactor-mode)
-(js2r-add-keybindings-with-prefix "C-c C-r")
-(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-(define-key js2-mode-map (kbd "C-t") #'test-suite)
-
-;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
-;; unbind it.
-;; (define-key js-mode-map (kbd "M-.") nil)
-
-(add-hook 'js2-mode-hook (lambda ()
-  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-
-(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-
-(require 'rjsx-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
-(setq web-mode-content-types-alist
-   '(("jsx" . "\\.js[x]?\\'")))
-
-(add-hook 'rjsx-mode-hook
-           (lambda ()
-             (setq indent-tabs-mode nil) ;;Use space instead of tab
-            (setq js2-strict-missing-semi-warning nil))) ;;disable the semicolon warning
-
-;; (add-hook 'js-mode-hook (lambda () (tern-mode t)))
-
-;; (eval-after-load 'tern
-;;    '(progn
-;;       (require 'tern-auto-complete)
-;;       (tern-ac-setup)))
+;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
 (require 'company)
+(require 'company-web-html)                          ; load company mode html backend
+;; and/or
+(require 'company-web-jade)                          ; load company mode jade backend
+(require 'company-web-slim)                          ; load company mode slim backend
+
 (add-hook 'after-init-hook 'global-company-mode)
+(setq company-minimum-prefix-length 1)
+(setq company-idle-delay 0)
 (add-to-list 'company-backends 'company-tern)
 (add-to-list 'company-backends 'ac-js2-company)
-(setq ac-js2-evaluate-calls t)
+;; (setq ac-js2-evaluate-calls t)
 (add-to-list 'company-backends 'company-flow)
+(add-to-list 'company-backends 'company-web)
+
 
 (require 'prettier-js)
-
- (add-hook 'js2-mode-hook 'prettier-js-mode)
- (add-hook 'web-mode-hook 'prettier-js-mode)
-
- (setq prettier-js-args '(
-   "--trailing-comma" "all"
-   "--bracket-spacing" "false"
- ))
-
-;; ;; (defun enable-minor-mode (my-pair)
-;; ;;   "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-;; ;;   (if (buffer-file-name)
-;; ;;       (if (string-match (car my-pair) buffer-file-name)
-;; ;;       (funcall (cdr my-pair)))))
-
-;; ;; (add-hook 'web-mode-hook #'(lambda ()
-;; ;;                             (enable-minor-mode
-;; ;;                              '("\\.jsx?\\'" . prettier-js-mode))))
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'js-mode-hook 'prettier-js-mode)
+(add-hook 'lsp-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;loads ruby mode when a .rb file is opened.
 (setq abg-required-packages 
@@ -251,22 +518,10 @@
 
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+(require 'multiple-cursors)
 
-;; ;; (require 'ruby-debug)
-
-;; ;; Autoclose paired syntax elements like parens, quotes, etc
-;; ;(add-hook 'ruby-mode-hook 'ruby-electric-mode global-linum-mode global-hl-line-mode)
-;;                                         ;(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
 (require 'ruby-test-mode)
-;; ;; (add-hook 'ruby-mode-hook 'ruby-test-mode)
 
-;; ;; (add-hook 'enh-ruby-mode-hook 'robe-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'yard-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'ruby-electric-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode)
-;; ;; (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
-
-;; ;; (add-hook 'ruby-mode-hook 'robe-mode)
 (add-hook 'ruby-mode-hook
           (lambda () (rvm-activate-corresponding-ruby)))
 (add-hook 'ruby-mode-hook 'yard-mode)
@@ -279,7 +534,7 @@
 (add-hook 'prog-mode-hook 'linum-mode)
 (add-hook 'prog-mode-hook 'hl-line-mode)
 
-(add-hook 'javascript-mode-hook 'recompile-on-save-mode)
+;; (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
@@ -295,16 +550,9 @@
 
 (add-hook 'ruby-mode-hook 'auto-complete-mode)
 
-;; ;; (add-hook 'js-mode-hook 'linum-mode)
-;; ;; (add-hook 'js-mode-hook 'hl-line-mode)
 
 
 (delete-selection-mode 1)
-
- (dumb-jump-mode)
-(setq dumb-jump-aggressive nil)
-(setq dumb-jump-selector 'ivy)
-(setq dumb-jump-force-searcher 'ag)
 
 (setq inhibit-splash-screen t
       initial-scratch-message nil
@@ -318,6 +566,14 @@
   (open-line 1)
   (next-line 1)
   (yank)
+  )
+
+(defun insert-line-below()
+  (interactive)
+  (move-end-of-line 1)
+  (open-line 1)
+  (next-line 1)
+  (indent-according-to-mode)
   )
 
 (defun duplicate-line-or-region (&optional n)
@@ -365,33 +621,24 @@ the current position of point, then move it to the beginning of the line."
 (exec-path-from-shell-initialize))
 
 (global-set-key (kbd "s-d") 'duplicate-line-or-region)
+(global-set-key (kbd "S-<return>") 'insert-line-below)
 (global-set-key (kbd "M-]") 'other-window)
 (global-set-key (kbd "M-C-<right>") 'windmove-right)
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
 (global-set-key (kbd "M-C-<up>") 'windmove-up)
 (global-set-key (kbd "M-C-<down>") 'windmove-down)
+(global-set-key (kbd "M-<down>") 'windmove-delete-down)
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
-
-
+(global-set-key (kbd "s-1") 'treemacs-select-window)
+(global-set-key (kbd "s-e") 'mc/edit-ends-of-lines)
 
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
-(define-key prog-mode-map (kbd "s-[") 'previous-buffer)
-(define-key prog-mode-map (kbd "s-]") 'next-buffer)
-(define-key ruby-mode-map (kbd "s-b") 'dumb-jump-go)
-(define-key ruby-mode-map (kbd "s-[") 'dumb-jump-back)
-
-
-(require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-
-;; Better imenu
-(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-(define-key js2-mode-map (kbd "s-b") 'dumb-jump-go)
-(define-key js2-mode-map (kbd "s-[") 'dumb-jump-back)
+(define-key prog-mode-map (kbd "s-[") 'back-button-global-backward)
+(define-key prog-mode-map (kbd "s-]") 'back-button-global-forward)
 
 (require 'treemacs)
 (require 'dash)
@@ -403,30 +650,31 @@ the current position of point, then move it to the beginning of the line."
 
 (require 'all-the-icons)
 
-;; (load-theme 'intellij t)
 
 (require 'spaceline-config)
-;; (spaceline-spacemacs-theme)
 (spaceline-emacs-theme)
 
-(require 'doom-themes)
 
-;; Global settings (defaults)
-;; Global settings (defaults)
-(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-       doom-themes-enable-italic t) ; if nil, italics is universally disabled
+(use-package doom-themes
+  :config
 
-(load-theme 'doom-solarized-light t)
-(load-theme 'spacemacs-light t)
-(doom-themes-treemacs-config)
-(doom-themes-visual-bell-config)
-(doom-themes-org-config)
+  ;; Global settings (defaults)
+  (solaire-global-mode +1)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
-;; ;; (require 'kaolin-themes)
-;; ;; (load-theme 'kaolin-dark t)
-;; ;; ;; Apply treemacs customization for Kaolin themes, requires the all-the-icons package.
-;; ;; (kaolin-treemacs-theme)
+  ;; (load-theme 'doom-solarized-light t)
+  ;; (load-theme 'doom-material)
+  (load-theme 'doom-one-light t)
+  ;; (load-theme 'doom-tomorrow-day t)
+  ;; (load-theme 'spacemacs-light t)
+  ;; (load-theme 'doom-opera-light t)
+  ;;; OPTIONAL
 
+  (setq doom-themes-treemacs-theme "doom-colors") 
+  (doom-themes-treemacs-config)
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
@@ -434,12 +682,15 @@ the current position of point, then move it to the beginning of the line."
 (projectile-rails-global-mode)
 
 (treemacs)
-(setq treemacs-no-png-images t)
+;; (treemacs-load-theme "Default")
+;; (treemacs-load-theme "Netbeans")
+;; (treemacs-load-theme "Idea")
 (setq centaur-tabs-style "box")
 (setq centaur-tabs-height 32)
 (setq centaur-tabs-set-icons t)
 (setq centaur-tabs-gray-out-icons 'buffer)
-(setq centaur-tabs-set-bar 'over)
+(setq centaur-tabs-set-bar 'under)
+(setq x-underline-at-descent-line t)
 (centaur-tabs-mode)
 (centaur-tabs-headline-match)
 (centaur-tabs-group-by-projectile-project)
@@ -479,8 +730,6 @@ the current position of point, then move it to the beginning of the line."
   (interactive "p")
   (move-line (if (null n) 1 n)))
 
-;(global-set-key (kbd "S-s-<up>") 'move-line-up)
-;(global-set-key (kbd "S-s-<down>") 'move-line-down)
 (global-set-key (kbd "S-s-f") 'helm-projectile-find-file)
 (global-set-key (kbd "S-<delete>") 'kill-whole-line)
 
@@ -556,11 +805,9 @@ the current position of point, then move it to the beginning of the line."
  '(ansi-color-names-vector
    ["#fafafa" "#99324b" "#4f894c" "#9a7500" "#3b6ea8" "#97365b" "#398eac" "#2a2a2a"])
  '(custom-safe-themes
-   (quote
-    ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default)))
+   '("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
  '(ensime-sem-high-faces
-   (quote
-    ((var :foreground "#000000" :underline
+   '((var :foreground "#000000" :underline
           (:style wave :color "yellow"))
      (val :foreground "#000000")
      (varField :foreground "#600e7a" :slant italic)
@@ -576,7 +823,7 @@ the current position of point, then move it to the beginning of the line."
      (trait :foreground "#20999d" :slant italic)
      (object :foreground "#5974ab" :slant italic)
      (package :foreground "#000000")
-     (deprecated :strike-through "#000000"))))
+     (deprecated :strike-through "#000000")))
  '(fci-rule-color "#9e9e9e")
  '(j dee-db-requested-breakpoint-face-colors)
  '(jdee-db-active-breakpoint-face-colors (cons "#fafafa" "#3b6ea8"))
@@ -584,9 +831,8 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing 0.2)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   (quote
-    (clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit rjsx-mode xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr dumb-jump doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby)))
- '(safe-local-variable-values (quote ((ruby-test-runner . rspec))))
+   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
+ '(safe-local-variable-values '((ruby-test-runner . rspec)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
@@ -641,13 +887,14 @@ the current position of point, then move it to the beginning of the line."
 ;; (package-initialize)
 
 ;; Click [here](https://github.com/hbin/dotfiles-for-emacs) to take a further look.
-;; (set-frame-font "Menlo:pixelsize=14")
-(set-frame-font "Hack:pixelsize=14")
+(set-frame-font "Menlo:pixelsize=14")
+;;(set-frame-font "Hack:pixelsize=14")
 
 ;; If you use Emacs Daemon mode
 (add-to-list 'default-frame-alist
-               (cons 'font "Hack:pixelsize=14"))
-;; (cons 'font "Menlo:pixelsize=14"))
+              ;; (cons 'font "Hack:pixelsize=14"))
+(cons 'font "Menlo:pixelsize=14"))
+;;(set-frame-font "Hack-14" nil t)
 
 (defvar line-padding 3)
 (defun add-line-padding ()
@@ -685,3 +932,209 @@ Version 2017-06-02"
 ;; (setq line-spacing 2)
 
 ; list the repositories containing them
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Shell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun spawn-shell (name)
+  "Create a new shell buffer
+taken from http://stackoverflow.com/a/4116113/446256"
+
+  (interactive "MName of shell buffer to create: ")
+  (pop-to-buffer (get-buffer-create (generate-new-buffer-name name)))
+  (shell (current-buffer)))
+
+(defun my-shell-mode-hook ()
+  (process-send-string (get-buffer-process (current-buffer))
+                       "export PAGER=cat\n")
+  (process-send-string (get-buffer-process (current-buffer))
+                       "uprompt\n\n\n"))(
+  add-hook 'shell-mode-hook 'my-shell-mode-hook)
+
+(setq-default explicit-shell-file-name "/bin/bash")
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; BASH settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq sh-basic-offset 2
+      sh-indentation 2)
+
+;; snippets, please
+(add-hook 'sh-mode-hook 'yas-minor-mode)
+
+;; on the fly syntax checking
+(add-hook 'sh-mode-hook 'flycheck-mode)
+
+;; show git changes in the gutter
+(add-hook 'sh-mode-hook 'git-gutter+-mode)
+
+;; Allow functions on the form <word>.<rest>(). Without my change,
+;; allowing punctuation characters in the function name,, only
+;; <rest>() is allowed.
+(setq sh-imenu-generic-expression
+      (quote
+       ((sh
+         (nil "^\\s-*function\\s-+\\([[:alpha:]_][[:alnum:]\\s._]*\\)\\s-*\\(?:()\\)?" 1)
+         (nil "^\\s-*\\([[:alpha:]_][[:alnum:]\\s._]*\\)\\s-*()" 1)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Interpret shell escapes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun display-ansi-colors ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Appearance settings regardless of window system
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq frame-background-mode nil
+      column-number-mode t
+      frame-title-format (concat invocation-name "@" (system-name) " {%f}")
+      inhibit-startup-screen t
+      initial-scratch-message "# Hi Ben, what do you want to do today?\n\n"
+      initial-major-mode 'markdown-mode
+      ;; no visible or audible bells, please
+      visible-bell nil
+      ring-bell-function (lambda nil (message "")))
+
+;; Nice window divider in TTY emacs
+(defun my-change-window-divider ()
+  (let ((display-table (or buffer-display-table standard-display-table)))
+    (set-display-table-slot display-table 5 ?│)
+    (set-window-display-table (selected-window) display-table)))
+(add-hook 'window-configuration-change-hook 'my-change-window-divider)
+
+(defun tkj-presentation-mode()
+  (interactive)
+  (when window-system
+    (progn
+      (use-package one-themes)
+      (load-theme 'one-light t)
+      (set-face-attribute 'default nil
+                          :family "Source Code Pro"
+                          :height 140
+                          :weight 'normal
+                          :width 'normal))))
+
+(defun tkj-left-margin-focus()
+  (interactive)
+  (set-window-margins nil 10))
+
+(defun tkj-left-margin-zero()
+  (interactive)
+  (set-window-margins nil 0))
+
+(set-default 'truncate-lines t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Automatically expand these words and characters
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(set-default 'abbrev-mode t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Open files into this Emacs instance from anywhere using
+;; 'emacsclient <file>'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Is this causing '<key> undefined' errors? (server-start)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Compile buffer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package compile
+  :init
+  (setq compilation-ask-about-save nil
+        compilation-scroll-output 'next-error
+        ;; Don't stop on info or warnings.
+        compilation-skip-threshold 2)
+  )
+
+;; Taken from https://emacs.stackexchange.com/questions/31493/print-elapsed-time-in-compilation-buffer/56130#56130
+(make-variable-buffer-local 'my-compilation-start-time)
+
+(add-hook 'compilation-start-hook #'my-compilation-start-hook)
+(defun my-compilation-start-hook (proc)
+  (setq my-compilation-start-time (current-time)))
+
+(add-hook 'compilation-finish-functions #'my-compilation-finish-function)
+(defun my-compilation-finish-function (buf why)
+  (let* ((elapsed  (time-subtract nil my-compilation-start-time))
+         (msg (format "Compilation took: %s" (format-time-string "%T.%N" elapsed t))))
+    (save-excursion (goto-char (point-max)) (insert msg))
+    (message "Compilation %s: %s" (string-trim-right why) msg)))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Buffers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Make C-x C-b maximise the buffer list window, this saves two
+;; additional shortcuts from the normal behaviour.
+(use-package helm
+  :init
+  (defun tkj-list-buffers()
+    (interactive)
+    (let ((helm-full-frame t))
+      (helm-mini)))
+
+  :bind
+  ("C-x C-b" . 'tkj-list-buffers))
+
+(defun close-all-buffers ()
+  (interactive)
+  (mapc 'kill-buffer (buffer-list)))
+
+;; buffer names and mini buffer
+(use-package uniquify
+  :ensure nil
+  :init
+  (setq uniquify-buffer-name-style 'forward
+        uniquify-separator ":"
+        uniquify-strip-common-suffix nil
+        read-file-name-completion-ignore-case t))
+
+;; Auto scroll the compilation window
+(setq compilation-scroll-output t)
+
+;; Scroll up and down while keeping the cursor where it is.
+(defun help/scroll-up-one-line ()
+  (interactive)
+  (scroll-down 1))
+(defun help/scroll-down-one-line ()
+  (interactive)
+  (scroll-up 1))
+(global-set-key (kbd "M-p") 'help/scroll-down-one-line)
+(global-set-key (kbd "M-n") 'help/scroll-up-one-line)
+
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region compilation-filter-start (point))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Prefer UTF 8, but don't override current encoding if specified
+;; (unless you specify a write hook).
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(prefer-coding-system 'utf-8-unix)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Editing VC log messages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'log-edit-hook (lambda () (flyspell-mode 1)))
+
+;; use imagemagick, if available
+(when (fboundp 'imagemagick-register-types)
+  (imagemagick-register-types))
+
+(toggle-frame-maximized)
+
