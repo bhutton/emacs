@@ -503,11 +503,6 @@
 (add-hook 'lsp-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
- (setq prettier-js-args '(
-   "--trailing-comma" "all"
-   "--bracket-spacing" "false"
- ))
-
 ;loads ruby mode when a .rb file is opened.
 (setq abg-required-packages 
       (list 'xml-rpc 'magit 'gh 'inf-ruby))
