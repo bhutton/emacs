@@ -153,6 +153,9 @@
         require-final-newline nil))
 (add-hook 'java-mode-hook 'tkj-default-code-style-hook)
 
+(use-package evil-nerd-commenter
+  :bind ("s-/" . evilnc-comment-or-uncomment-lines))
+
 (use-package flycheck
   :init
   (add-to-list 'display-buffer-alist
@@ -251,6 +254,17 @@
 ;;                                         ;(define-key lsp-mode-map (kbd "C-t") #'test-suite)
 
 
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :mode "\\.js\\'"
+  :mode "\\.tsx\\'"
+  :mode "\\.jsx\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2)
+  (require 'dap-node)
+  (dap-node-setup))
+
 (use-package hydra :ensure t)
 (use-package company-lsp :ensure t)
 
@@ -277,6 +291,7 @@
   (lsp-ui-sideline-enable nil)
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-code-actions nil)
+  (lsp-ui-doc-delay 2)
   :config
   ;; Use lsp-ui-doc-webkit only in GUI
   (if (display-graphic-p)
@@ -482,12 +497,14 @@
 ;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
 
 (require 'company)
+(require 'company-box)
 (require 'company-web-html)                          ; load company mode html backend
 ;; and/or
 (require 'company-web-jade)                          ; load company mode jade backend
 (require 'company-web-slim)                          ; load company mode slim backend
 
 (add-hook 'after-init-hook 'global-company-mode)
+(add-hook 'company-mode-hook 'company-box-mode)
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0)
 (add-to-list 'company-backends 'company-tern)
@@ -794,7 +811,7 @@ the current position of point, then move it to the beginning of the line."
 ;(global-set-key [\M-\S-down] 'move-text-down)
 (global-set-key (kbd "S-s-<up>") 'move-text-up)
 (global-set-key (kbd "S-s-<down>") 'move-text-down)
-(global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
+;; (global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
 (global-set-key (kbd "s-w") 'kill-buffer)
 
 (custom-set-variables
