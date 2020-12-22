@@ -136,6 +136,7 @@
 ;; (eval-after-load "tide"
 ;;   '(define-key tide-mode-map (kbd "C-M-l") '))
 
+(fset 'yes-or-no-p 'y-or-n-p)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Java
@@ -395,6 +396,39 @@
 ;; End Java
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; (use-package ccls
+;;   :ensure t
+;;   :config
+;;   (setq ccls-executable "/usr/local/bin/ccls")
+;;   (setq lsp-prefer-flymake nil)
+;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+;;   :hook ((c-mode c++-mode objc-mode) .
+;;          (lambda () (require 'ccls) (lsp))))
+
+(which-key-mode)
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'cpp-mode-hook 'lsp)
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1 ;; clangd is fast
+      ;; be more ide-ish
+      lsp-headerline-breadcrumb-enable t)
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+  (require 'dap-cpptools)
+  (yas-global-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End C++
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 (require 'back-button)
 (back-button-mode 1)
 
@@ -403,11 +437,18 @@
 (require 'web-mode)
 (require 'add-node-modules-path)
 
+
 (defun web-mode-init-prettier-hook ()
   (add-node-modules-path)
   (prettier-js-mode))
 
 (add-hook 'web-mode-hook  'web-mode-init-prettier-hook)
+
+(use-package web-mode
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2))
 
 (setq js-indent-level 2)
 (setq javascript-indent-level 2)
@@ -692,6 +733,10 @@ the current position of point, then move it to the beginning of the line."
   (doom-themes-treemacs-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
