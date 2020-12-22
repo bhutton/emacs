@@ -587,12 +587,8 @@
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode)
 (add-hook 'ruby-mode-hook 'ruby-test-mode)
 
-(add-hook 'find-file-hook 'linum-mode)
-(add-hook 'text-mode-hook 'linum-mode)
-(add-hook 'prog-mode-hook 'linum-mode)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'hl-line-mode)
-
-;; (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
