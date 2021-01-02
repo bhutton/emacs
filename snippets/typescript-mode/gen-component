@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: React Component
+# key: gencomps
+# --
+import React, {useState} from 'react';
+import PropTypes from 'prop-types';
+
+export function $1($2) {
+    return $1
+}
