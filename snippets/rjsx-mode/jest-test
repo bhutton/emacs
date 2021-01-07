@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Jest Test
+# key: test
+# --
+
+test('$1', $2 () => {
+  $0
+});
