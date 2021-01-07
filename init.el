@@ -245,6 +245,9 @@
   (require 'dap-node)
   (dap-node-setup))
 
+(require 'yaml-mode)
+    (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
 (use-package hydra :ensure t)
 ;; (use-package company-lsp)
 
@@ -470,7 +473,7 @@
                  "*Messages*")
   )
 
-(defun go-test()
+line-spacing(defun go-test()
   (shell-command (concat "cd " (projectile-project-root) "/test && go test &")
                  "*test-runner*"
                  "*Messages*")
@@ -535,7 +538,11 @@
 
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+
 (require 'multiple-cursors)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 (require 'ruby-test-mode)
 
@@ -884,6 +891,7 @@ the current position of point, then move it to the beginning of the line."
  '(jdee-db-active-breakpoint-face-colors (cons "#fafafa" "#3b6ea8"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#fafafa" "#bdbdbd"))
  '(line-spacing 0.2)
+ '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
    '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
