@@ -8,6 +8,7 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ; activate all the packages (in particular autoloads)
 (package-initialize)
@@ -16,10 +17,11 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
+(setq use-package-always-ensure t)
 
 ; list the packages you want
 (setq package-list '
-	(better-defaults helm helm-switch-shell helm-projectile helm-ag ruby-electric rvm seeing-is-believing 
+	(better-defaults helm helm-switch-shell helm-projectile helm-ag ruby-electric rvm seeing-is-believing
 	chruby inf-ruby ruby-test-mode yasnippet flycheck web-mode js2-refactor xref-js2 prettier-js
 	dumb-jump exec-path-from-shell all-the-icons spaceline doom-themes spacemacs-theme projectile-rails
 	centaur-tabs undo-tree tide))
@@ -44,43 +46,41 @@
 ;; Draws a line between the beginning and ending of block indents
 (require 'highlight-indent-guides)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-;; (setq highlight-indent-guides-bitmap-function 'highlight-indent-guides--bitmap-line)
+;; (setq highlight-indent-guides-bitmap -function 'highlight-indent-guides--bitmap-line)
 (setq highlight-indent-guides-method 'bitmap)
 ;; (setq highlight-indent-guides-auto-enabled 'nil)
 ;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
 ;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
 ;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
 
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
+
 (setq package-list '(better-defaults chyla))
+
+(defun my-highlighter (level responsive display)
+  (if (> 1 level)
+      nil
+    (highlight-indent-guides--highlighter-default level responsive display)))
+
+(setq highlight-indent-guides-highlighter-function 'my-highlighter)
 
 (cua-selection-mode 1)
 (yas-global-mode 1)
 (scroll-bar-mode 1)
 (smartparens-global-mode 1)
+(use-package rainbow-delimiters
+  :hook ((prog-mode . rainbow-delimiters-mode)))
 
-;; (require 'linum)
-;; (defun linum-update-window-scale-fix (win)
-;;   "fix linum for scaled text"
-;;   (set-window-margins win
-;;                       (ceiling (* (if (boundp 'text-scale-mode-step)
-;;                                       (expt text-scale-mode-step
-;;                                             text-scale-mode-amount) 1)
-;;                                   (if (car (window-margins))
-;;                                       (car (window-margins)) 1)
-;;                                   ))))
-;; (advice-add #'linum-update-window :after #'linum-update-window-scale-fix)
+;; (use-package tree-sitter
+;;   :init (global-tree-sitter-mode)
+;;   :hook ((ruby-mode . tree-sitter-hl-mode)
+;;          (js-mode . tree-sitter-hl-mode)
+;;          (typescript-mode . tree-sitter-hl-mode)
+;;          (go-mode . tree-sitter-hl-mode)))
+;; (use-package tree-sitter-langs)
 
-
-;; Typography
-                                        ;(set-face-attribute 'default nil
-                                        ;                    :family "Source Code Pro"
-                                        ;                    :height 150
-                                        ;:weight 'normal
-                                        ;:width 'normal
-                                        ;)
-
-
-;;keep cursor at same position when scrolling
 (setq scroll-preserve-screen-position 1)
 ;;scroll window up/down by one line
 (global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
@@ -94,7 +94,7 @@
 (global-set-key (kbd "s-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 (global-set-key (kbd "C-f") #'projectile-find-file)
-(global-set-key (kbd "s-F") #'helm-projectile-ag)
+(global-set-key (kbd "s-F") #'helm-projectile)
 
 (add-hook 'isearch-mode-hook
   (lambda ()
@@ -104,38 +104,27 @@
 
 ;; ;typescript
 ;; (setq create-lockfiles nil)
-(defun setup-tide-mode ()
-   (interactive)
-   (tide-setup)
-   (flycheck-mode +1)
-   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-   (eldoc-mode +1)
-   (tide-hl-identifier-idle-time +1)
-   (company-mode +1))
+;; (defun setup-tide-mode ()
+;;    (interactive)
+;;    (tide-setup)
+;;    (flycheck-mode +1)
+;;    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;    (eldoc-mode +1)
+;;    (tide-hl-identifier-idle-time +1)
+;;    (company-mode +1))
 
 
 ;; ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
 ;; ;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
+;; (add-hook 'before-save-hook 'tide-format-before-save)
 
 ;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
-(add-hook 'lsp-hook #'setup-tide-mode)
+;; (add-hook 'lsp-hook #'setup-tide-mode)
 
-;; (setq web-mode-markup-indent-offset 2)
-;; (setq web-mode-css-indent-offset 2)
-;; (setq web-mode-code-indent-offset 2)
-;; (setq web-mode-indent-style 2)
-
-;; (eval-after-load "tide"
-;;   '(define-key tide-mode-map (kbd "s-b") 'tide-jump-to-definition))
-;; (eval-after-load "tide"
-;;   '(define-key tide-mode-map (kbd "s-[") 'tide-jump-back))
-;; (eval-after-load "tide"
-;;   '(define-key tide-mode-map (kbd "C-M-l") '))
-
+(fset 'yes-or-no-p 'y-or-n-p)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Java
@@ -153,6 +142,9 @@
         require-final-newline nil))
 (add-hook 'java-mode-hook 'tkj-default-code-style-hook)
 
+(use-package evil-nerd-commenter
+  :bind ("s-/" . evilnc-comment-or-uncomment-lines))
+
 (use-package flycheck
   :init
   (add-to-list 'display-buffer-alist
@@ -162,8 +154,6 @@
                  (side            . bottom)
                  (reusable-frames . visible)
                  (window-height   . 0.15))))
-
-;(use-package idle-highlight)
 
 (defun my-java-mode-hook ()
   (auto-fill-mode)
@@ -208,51 +198,55 @@
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
   :hook ((java-mode python-mode go-mode
-          js-mode js2-mode typescript-mode web-mode
+          js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode
           c-mode c++-mode objc-mode) . lsp))
 
-;; (use-package lsp-mode :ensure t
-;;   :hook ((javascript-mode . lsp)
-;;          (js-mode . lsp)
-;;          (js2-mode . lsp)
-;;          (js-jsx-mode . lsp)
-;;          (js2-jsx-mode . lsp)
-;;          (typescript-mode . lsp)
-;;          (web-mode . lsp))
-;;   :commands (lsp lsp-deferred)
-;;   :bind (("\C-\M-b" . lsp-find-implementation)
-;;          ("M-RET" . lsp-execute-code-action))
-;;   :config
-;;   (setq lsp-inhibit-message t
-;;         lsp-eldoc-render-all t
-;;         lsp-enable-file-watchers nil
-;;         lsp-enable-symbol-highlighting t
-;;         lsp-headerline-breadcrumb-enable nil
-;;         lsp-highlight-symbol-at-point t
-;;         lsp-modeline-code-actions-enable nil
-;;         lsp-modeline-diagnostics-enable nil
-;;         )
-  
+(use-package ccls
+  :ensure t
+  :config
+  (setq ccls-executable "ccls")
+  (setq lsp-prefer-flymake nil)
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+  :hook ((c-mode c++-mode objc-mode) .
+         (lambda () (require 'ccls) (lsp))))
 
-;;   ;; Performance tweaks, see
-;;   ;; https://github.com/emacs-lsp/lsp-mode#performance
-;;   (setq lsp-auto-guess-root nil)
-;;   (setq lsp-prefer-flymake nil)
-;;   (setq lsp-file-watch-threshold 2000)
-;;   (setq gc-cons-threshold 204800000000)
-;;   (setq read-process-output-max (* 1024 1024)) ;; 1mb
-;;   ;; (setq lsp-idle-delay 0.500)
-;;   ;; (setq lsp-log-io t)
-;;   (setq lsp-eldoc-hook nil)
-;;   (setq company-lsp-cache-candidates 'auto)
-;;   (define-key lsp-mode-map (kbd "C-t") #'test-suite)
-;;   (define-key lsp-mode-map (kbd "C-M-l") #'format-and-save))
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  ;; :mode "\\.js\\'"
+  :mode "\\.tsx\\'"
+  ;; :mode "\\.jsx\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2)
+  (require 'dap-node)
+  (dap-node-setup))
 
-;;                                         ;(define-key lsp-mode-map (kbd "C-t") #'test-suite)
+(use-package go-mode
+  :mode "\\.go\\'")
 
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t)
+  )
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+(lsp-register-custom-settings
+ '(("gopls.completeUnimported" t t)
+   ("gopls.staticcheck" t t)))
+
+(use-package rjsx-mode
+  :mode "\\.js\\'"
+  :mode "\\.jsx\\'"
+  :hook (rjsx-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2)
+  (require 'dap-node)
+  (dap-node-setup))
 
 (use-package hydra :ensure t)
-(use-package company-lsp :ensure t)
+;; (use-package company-lsp)
 
 (use-package lsp-ui
   :after lsp-mode
@@ -277,6 +271,7 @@
   (lsp-ui-sideline-enable nil)
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-code-actions nil)
+  (lsp-ui-doc-delay 2)
   :config
   ;; Use lsp-ui-doc-webkit only in GUI
   (if (display-graphic-p)
@@ -285,22 +280,6 @@
   ;; https://github.com/emacs-lsp/lsp-ui/issues/243
   (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
     (setq mode-line-format nil)))
-
-
-
-
-
-;; (use-package lsp-ui
-;;   :ensure t
-;;   :config
-;;   (setq lsp-prefer-flymake nil
-;;         lsp-ui-doc-delay 1.0
-;;         lsp-ui-sideline-enable nil
-;;         lsp-ui-sideline-show-symbol nil))
-
-;(require 'dap-firefox)
-;(require 'dap-chrome)
-;(require 'dap-node)
 
 (use-package lsp-java
   :ensure t
@@ -311,7 +290,7 @@
          "-Xmx2G"
          "-XX:+UseG1GC"
          "-XX:+UseStringDeduplication"
-         "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar" 
+         "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
          )
 
         ;; Don't organise imports on save
@@ -329,7 +308,8 @@
 )
 
 (require 'dap-node)
-(require 'dap-firefox)
+;; (require 'dap-firefox)
+(require 'dap-chrome)
 
 (use-package dap-mode
   :ensure t
@@ -380,6 +360,35 @@
 ;; End Java
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(which-key-mode)
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'cpp-mode-hook 'lsp)
+
+(setq gc-cons-threshold 100000000
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.500 ;; clangd is fast
+      ;; be more ide-ish
+      ;; lsp-headerline-breadcrumb-enable t
+      lsp-completion-provider :capf
+      company-lsp-cache-candidates 'auto
+      lsp-enable-file-watchers nil
+      )
+
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+  (require 'dap-cpptools)
+  (yas-global-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End C++
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 (require 'back-button)
 (back-button-mode 1)
 
@@ -388,20 +397,27 @@
 (require 'web-mode)
 (require 'add-node-modules-path)
 
+
 (defun web-mode-init-prettier-hook ()
   (add-node-modules-path)
   (prettier-js-mode))
 
 (add-hook 'web-mode-hook  'web-mode-init-prettier-hook)
 
+(use-package web-mode
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2))
+
 (setq js-indent-level 2)
 (setq javascript-indent-level 2)
 (setq web-mode-markup-indent-offset 2)
 
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . typescript-mode))
+;; (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+;; (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
 (add-hook 'lsp-mode-hook
           (lambda ()
@@ -418,19 +434,11 @@
 
 
 ;; ;; enable typescript-tslint checker
-(flycheck-add-mode 'typescript-tslint 'lsp-mode)
-
-;; (define-key web-mode-map (kbd "C-t") #'test-suite)
-
-;; ;; aligns annotation to the right hand side
-;; (setq company-tooltip-align-annotations t)
+;; (flycheck-add-mode 'typescript-tslint 'lsp-mode)
 
 ;; ;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
+;; (add-hook 'before-save-hook 'tide-format-before-save)
 
-;; (add-hook 'web-mode-hook #'setup-tide-mode)
-
-;; (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
 (defun format-and-save ()
   (interactive)
   (lsp-format-buffer)
@@ -449,6 +457,8 @@
       (npm-test))
     (when(string= (file-name-extension buffer-file-name) "tsx")
       (npm-test))
+    (when(string= (file-name-extension buffer-file-name) "go")
+      (go-test))
     )
   (when(string= (file-name-extension buffer-file-name) "java")
     (dap-java-run-test-class))
@@ -460,41 +470,48 @@
                  "*Messages*")
   )
 
+(defun go-test()
+  (shell-command (concat "cd " (projectile-project-root) "/test && go test &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
+
 (defun test-suite-jest ()
   (interactive)
   (with-output-to-temp-buffer "*jest-runner*"
-    (shell-command (concat "echo " projectile-project- " && cd .. && jest " projectile-project-root " &")
+    (shell-command (concat "echo " projectile-project-root " && cd .. && jest " projectile-project-root " &")
                    "*jest-runner*"
                    "*Messages*")
     ))
 
-;; (require 'js2-refactor)
-;; (require 'xref-js2)
-
-;; (add-hook 'js2-mode-hook #'js2-refactor-mode)
-;; (js2r-add-keybindings-with-prefix "C-c C-r")
-;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-;; (define-key js2-mode-map (kbd "C-t") #'test-suite)
-
-;; (add-hook 'js2-mode-hook (lambda ()
-;;   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-
-;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-
 (require 'company)
-(require 'company-web-html)                          ; load company mode html backend
-;; and/or
-(require 'company-web-jade)                          ; load company mode jade backend
-(require 'company-web-slim)                          ; load company mode slim backend
+(require 'company-box)
+
+;; (require 'company-web-html)                          ; load company mode html backend
+;; (require 'company-web-jade)                          ; load company mode jade backend
+;; (require 'company-web-slim)                          ; load company mode slim backend
+;; ;; (use-package company-mode
+;;   :after lsp-mode
+;;   :hook (prog-mode . company-mode)
+;;   :bind (:map company-active-map
+;;               ("<tab>" . company-completion-selection))
+;;   (:map lsp-mode-map
+;;         ("<tab>" . company-indent-or-complete-common))
+;;   (company-minimum-prefix-length 1)
+;;   (company-idle-delay 0.0))
 
 (add-hook 'after-init-hook 'global-company-mode)
+(add-hook 'company-mode-hook 'company-box-mode)
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0)
-(add-to-list 'company-backends 'company-tern)
-(add-to-list 'company-backends 'ac-js2-company)
+(setq company-lsp-cache-candidates t)
+
+
+;; (add-to-list 'company-backends 'company-tern)
+;; (add-to-list 'company-backends 'ac-js2-company)
 ;; (setq ac-js2-evaluate-calls t)
-(add-to-list 'company-backends 'company-flow)
-(add-to-list 'company-backends 'company-web)
+;; (add-to-list 'company-backends 'company-flow)
+;; (add-to-list 'company-backends 'company-web)
 
 
 (require 'prettier-js)
@@ -504,7 +521,7 @@
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;loads ruby mode when a .rb file is opened.
-(setq abg-required-packages 
+(setq abg-required-packages
       (list 'xml-rpc 'magit 'gh 'inf-ruby))
 
 (dolist (package abg-required-packages)
@@ -529,12 +546,8 @@
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode)
 (add-hook 'ruby-mode-hook 'ruby-test-mode)
 
-(add-hook 'find-file-hook 'linum-mode)
-(add-hook 'text-mode-hook 'linum-mode)
-(add-hook 'prog-mode-hook 'linum-mode)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'hl-line-mode)
-
-;; (add-hook 'javascript-mode-hook 'recompile-on-save-mode)
 
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
@@ -551,12 +564,10 @@
 (add-hook 'ruby-mode-hook 'auto-complete-mode)
 
 
-
 (delete-selection-mode 1)
 
 (setq inhibit-splash-screen t
-      initial-scratch-message nil
-      initial-major-mode 'ruby-mode)
+      initial-scratch-message nil)
 
 (defun duplicate-line()
   (interactive)
@@ -650,10 +661,13 @@ the current position of point, then move it to the beginning of the line."
 
 (require 'all-the-icons)
 
+(when (window-system)
+  (tool-bar-mode -1)
+  ;; (scroll-bar-mode -1)
+  (tooltip-mode -1))
 
 (require 'spaceline-config)
 (spaceline-emacs-theme)
-
 
 (use-package doom-themes
   :config
@@ -671,10 +685,25 @@ the current position of point, then move it to the beginning of the line."
   ;; (load-theme 'doom-opera-light t)
   ;;; OPTIONAL
 
-  (setq doom-themes-treemacs-theme "doom-colors") 
+  (setq doom-themes-treemacs-theme "doom-colors")
   (doom-themes-treemacs-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+
+
+;; (use-package doom-themes
+;;   :config
+;;   (let ((chosen-theme 'doom-one-light))
+;;     (doom-themes-visual-bell-config)
+;;     (doom-themes-org-config)
+;;     (setq doom-challenger-deep-brighter-comments t
+;;           doom-challenger-deep-brighter-modeline t)
+;;     (load-theme chosen-theme)))
+
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
@@ -685,17 +714,39 @@ the current position of point, then move it to the beginning of the line."
 ;; (treemacs-load-theme "Default")
 ;; (treemacs-load-theme "Netbeans")
 ;; (treemacs-load-theme "Idea")
-(setq centaur-tabs-style "box")
-(setq centaur-tabs-height 32)
-(setq centaur-tabs-set-icons t)
-(setq centaur-tabs-gray-out-icons 'buffer)
-(setq centaur-tabs-set-bar 'under)
-(setq x-underline-at-descent-line t)
-(centaur-tabs-mode)
-(centaur-tabs-headline-match)
-(centaur-tabs-group-by-projectile-project)
-(global-set-key (kbd "s-{") 'centaur-tabs-backward)
-(global-set-key (kbd "s-}") 'centaur-tabs-forward)
+
+
+;; (setq centaur-tabs-style "box")
+;; (setq centaur-tabs-height 32)
+;; (setq centaur-tabs-set-icons t)
+;; (setq centaur-tabs-gray-out-icons 'buffer)
+;; (setq centaur-tabs-set-bar 'under)
+;; (setq x-underline-at-descent-line t)
+;; (centaur-tabs-mode)
+;; (centaur-tabs-headline-match)
+;; (centaur-tabs-group-by-projectile-project)
+;; (global-set-key (kbd "s-{") 'centaur-tabs-backward)
+;; (global-set-key (kbd "s-}") 'centaur-tabs-forward)
+
+(use-package centaur-tabs
+  :demand
+  :config
+  (centaur-tabs-mode t)
+  :custom
+  (centaur-tabs-gray-out-icons 'buffer)
+  (centaur-tabs-style "box")
+  (centaur-tabs-height 36)
+  (centaur-tabs-set-icons t)
+  (centaur-tabs-set-modified-marker t)
+  (centaur-tabs-modified-marker "●")
+  (centaur-tabs-buffer-groups-function #'centaur-tabs-projectile-buffer-groups)
+  (x-underline-at-descent-line t)
+  (centaur-tabs-gray-out-icons 'buffer)
+  (centaur-tabs-set-bar 'under)
+
+  :bind
+  (("s-{" . #'centaur-tabs-backward)
+   ("s-}" . #'centaur-tabs-forward)))
 
 
 ;; (scroll-bar-mode)
@@ -732,6 +783,10 @@ the current position of point, then move it to the beginning of the line."
 
 (global-set-key (kbd "S-s-f") 'helm-projectile-find-file)
 (global-set-key (kbd "S-<delete>") 'kill-whole-line)
+
+(use-package multiple-cursors
+  :bind (("C-c m m" . #'mc/edit-lines )
+         ("C-c m d" . #'mc/mark-all-dwim )))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -794,7 +849,7 @@ the current position of point, then move it to the beginning of the line."
 ;(global-set-key [\M-\S-down] 'move-text-down)
 (global-set-key (kbd "S-s-<up>") 'move-text-up)
 (global-set-key (kbd "S-s-<down>") 'move-text-down)
-(global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
+;; (global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
 (global-set-key (kbd "s-w") 'kill-buffer)
 
 (custom-set-variables
@@ -887,33 +942,37 @@ the current position of point, then move it to the beginning of the line."
 ;; (package-initialize)
 
 ;; Click [here](https://github.com/hbin/dotfiles-for-emacs) to take a further look.
-(set-frame-font "Menlo:pixelsize=14")
-;;(set-frame-font "Hack:pixelsize=14")
+(ignore-errors(set-frame-font "Menlo-14"))
 
 ;; If you use Emacs Daemon mode
 (add-to-list 'default-frame-alist
               ;; (cons 'font "Hack:pixelsize=14"))
-(cons 'font "Menlo:pixelsize=14"))
+(cons 'font "Menlo-14"))
+;;(set-frame-font "Hack-14" nil t)
+;; If you use Emacs Daemon mode
+(add-to-list 'default-frame-alist
+              ;; (cons 'font "Hack:pixelsize=14"))
+(cons 'font "Menlo-14"))
 ;;(set-frame-font "Hack-14" nil t)
 
-(defvar line-padding 3)
-(defun add-line-padding ()
-  "Add extra padding between lines"
+;; (defvar line-padding 3)
+;; (defun add-line-padding ()
+;;   "Add extra padding between lines"
 
-  ; remove padding overlays if they already exist
-  (let ((overlays (overlays-at (point-min))))
-    (while overlays
-      (let ((overlay (car overlays)))
-        (if (overlay-get overlay 'is-padding-overlay)
-            (delete-overlay overlay)))
-      (setq overlays (cdr overlays))))
+;;   ; remove padding overlays if they already exist
+;;   (let ((overlays (overlays-at (point-min))))
+;;     (while overlays
+;;       (let ((overlay (car overlays)))
+;;         (if (overlay-get overlay 'is-padding-overlay)
+;;             (delete-overlay overlay)))
+;;       (setq overlays (cdr overlays))))
 
-  ; add a new padding overlay
-  (let ((padding-overlay (make-overlay (point-min) (point-max))))
-    (overlay-put padding-overlay 'is-padding-overlay t)
-    (overlay-put padding-overlay 'line-spacing (* .1 line-padding))
-    (overlay-put padding-overlay 'line-height (+ 1 (* .1 line-padding))))
-  (setq mark-active nil))
+;;   ; add a new padding overlay
+;;   (let ((padding-overlay (make-overlay (point-min) (point-max))))
+;;     (overlay-put padding-overlay 'is-padding-overlay t)
+;;     (overlay-put padding-overlay 'line-spacing (* .1 line-padding))
+;;     (overlay-put padding-overlay 'line-height (+ 1 (* .1 line-padding))))
+;;   (setq mark-active nil))
 
 
 (defun xah-toggle-line-spacing ()
@@ -928,7 +987,7 @@ Version 2017-06-02"
 
 ;; (add-hook 'buffer-list-update-hook 'add-line-padding)
 
-(setq-default cursor-type 'bar) 
+(setq-default cursor-type 'bar)
 ;; (setq line-spacing 2)
 
 ; list the repositories containing them
@@ -1000,11 +1059,23 @@ taken from http://stackoverflow.com/a/4116113/446256"
       column-number-mode t
       frame-title-format (concat invocation-name "@" (system-name) " {%f}")
       inhibit-startup-screen t
-      initial-scratch-message "# Hi Ben, what do you want to do today?\n\n"
+      initial-scratch-message nil
       initial-major-mode 'markdown-mode
       ;; no visible or audible bells, please
       visible-bell nil
       ring-bell-function (lambda nil (message "")))
+
+;; Disable backups/autosaves
+(setq
+ make-backup-files nil
+ auto-save-default nil
+ create-lockfiles nil)
+
+(delete-selection-mode t)
+(column-number-mode)
+
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
+(setq require-final-newline t)
 
 ;; Nice window divider in TTY emacs
 (defun my-change-window-divider ()
@@ -1013,27 +1084,27 @@ taken from http://stackoverflow.com/a/4116113/446256"
     (set-window-display-table (selected-window) display-table)))
 (add-hook 'window-configuration-change-hook 'my-change-window-divider)
 
-(defun tkj-presentation-mode()
-  (interactive)
-  (when window-system
-    (progn
-      (use-package one-themes)
-      (load-theme 'one-light t)
-      (set-face-attribute 'default nil
-                          :family "Source Code Pro"
-                          :height 140
-                          :weight 'normal
-                          :width 'normal))))
+;; (defun tkj-presentation-mode()
+;;   (interactive)
+;;   (when window-system
+;;     (progn
+;;       (use-package one-themes)
+;;       (load-theme 'one-light t)
+;;       (set-face-attribute 'default nil
+;;                           :family "Source Code Pro"
+;;                           :height 140
+;;                           :weight 'normal
+;;                           :width 'normal))))
 
-(defun tkj-left-margin-focus()
-  (interactive)
-  (set-window-margins nil 10))
+;; (defun tkj-left-margin-focus()
+;;   (interactive)
+;;   (set-window-margins nil 10))
 
-(defun tkj-left-margin-zero()
-  (interactive)
-  (set-window-margins nil 0))
+;; (defun tkj-left-margin-zero()
+;;   (interactive)
+;;   (set-window-margins nil 0))
 
-(set-default 'truncate-lines t)
+;; (set-default 'truncate-lines t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Automatically expand these words and characters
@@ -1087,6 +1158,7 @@ taken from http://stackoverflow.com/a/4116113/446256"
 
   :bind
   ("C-x C-b" . 'tkj-list-buffers))
+(helm-mode 1)
 
 (defun close-all-buffers ()
   (interactive)
@@ -1136,5 +1208,5 @@ taken from http://stackoverflow.com/a/4116113/446256"
 (when (fboundp 'imagemagick-register-types)
   (imagemagick-register-types))
 
-(toggle-frame-maximized)
 
+;; (toggle-frame-maximized)
