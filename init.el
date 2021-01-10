@@ -204,11 +204,14 @@
 (use-package ccls
   :ensure t
   :config
-  (setq ccls-executable "ccls")
+  (setq ccls-executable "/usr/local/bin/ccls")
   (setq lsp-prefer-flymake nil)
   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
-  :hook ((c-mode c++-mode objc-mode) .
+  :hook ((c-mode c++-mode objc-mode cuda-mode) .
          (lambda () (require 'ccls) (lsp))))
+
+(require 'flymake-google-cpplint)
+(add-hook 'c++-mode-hook 'flymake-google-cpplint-load)
 
 (use-package typescript-mode
   :mode "\\.ts\\'"
@@ -256,7 +259,7 @@
   :diminish
   :commands lsp-ui-mode
   :custom-face
-  (lsp-ui-doc-background ((t (:background nil))))
+  (lsp-ui-doc-background ((t (:background "lightgrey"))))
   (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
   :bind
   (:map lsp-ui-mode-map
@@ -270,10 +273,10 @@
   :custom
   (lsp-ui-doc-header t)
   (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-border (face-foreground 'default))
   (lsp-ui-sideline-enable nil)
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-code-actions nil)
+  (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
   (lsp-ui-doc-delay 2)
   :config
   ;; Use lsp-ui-doc-webkit only in GUI
@@ -283,6 +286,8 @@
   ;; https://github.com/emacs-lsp/lsp-ui/issues/243
   (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
     (setq mode-line-format nil)))
+
+(setq lsp-prefer-capf t)
 
 (use-package lsp-java
   :ensure t
@@ -468,7 +473,7 @@
   )
 
 (defun npm-test()
-  (shell-command (concat "CI=true npm test --prefix &")
+  (shell-command (concat "npm test &")
                  "*test-runner*"
                  "*Messages*")
   )
