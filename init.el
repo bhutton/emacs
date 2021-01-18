@@ -94,7 +94,8 @@
 (global-set-key (kbd "s-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 (global-set-key (kbd "C-f") #'projectile-find-file)
-(global-set-key (kbd "s-F") #'helm-projectile)
+(global-set-key (kbd "s-F") #'helm-projectile-ag)
+(global-set-key (kbd "M-s") #'company-yasnippet)
 
 (add-hook 'isearch-mode-hook
   (lambda ()
@@ -240,8 +241,8 @@
    ("gopls.staticcheck" t t)))
 
 (use-package rjsx-mode
-  :mode "\\.js\\'"
-  :mode "\\.jsx\\'"
+  ;; :mode "\\.js\\'"
+  ;; :mode "\\.jsx\\'"
   :hook (rjsx-mode . lsp-deferred)
   :config
   (setq typescript-indent-level 2)
@@ -422,10 +423,10 @@
 (setq javascript-indent-level 2)
 (setq web-mode-markup-indent-offset 2)
 
-;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
 ;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . typescript-mode))
-;; (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-;; (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
+;; (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.js\\'" . lsp-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
 (add-hook 'lsp-mode-hook
           (lambda ()
