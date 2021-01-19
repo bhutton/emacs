@@ -83,23 +83,27 @@
 
 (setq scroll-preserve-screen-position 1)
 ;;scroll window up/down by one line
-(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
+(global-set-key (kbd "M-<up>") (kbd "C-u 1 M-v"))
+(global-set-key (kbd "M-<down>") (kbd "C-u 1 C-v"))
 (global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
+(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
+(global-set-key (kbd "M-.") (kbd "C-x ^"))
+(global-set-key (kbd "M-,") (kbd "C-u -1 C-x ^"))
 (global-set-key (kbd "M-s-<down>") (kbd "C-x ^"))
 (global-set-key (kbd "M-s-<up>") (kbd "C-u -1 C-x ^"))
 
 (global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
-(global-set-key (kbd "s-b") #'xref-find-definitions)
-(global-set-key (kbd "s-r") #'replace-string)
+;; (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
+(global-set-key (kbd "M-b") #'xref-find-definitions)
+(global-set-key (kbd "M-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 (global-set-key (kbd "C-f") #'projectile-find-file)
-(global-set-key (kbd "s-F") #'helm-projectile-ag)
+(global-set-key (kbd "M-F") #'helm-projectile-ag)
 (global-set-key (kbd "M-s") #'company-yasnippet)
 
 (add-hook 'isearch-mode-hook
   (lambda ()
-  (define-key isearch-mode-map (kbd "s-f") 'isearch-repeat-forward)
+  (define-key isearch-mode-map (kbd "M-f") 'isearch-repeat-forward)
   )
 )
 
@@ -180,8 +184,8 @@
 (add-hook 'java-mode-hook 'my-java-mode-hook)
 
 ;(use-package vterm :ensure t)
-(add-to-list 'load-path "~/.emacs.d/emacs-libvterm")
-(require 'vterm)
+;; (add-to-list 'load-path "~/.emacs.d/emacs-libvterm")
+;; (require 'vterm)
 
 (use-package projectile :ensure t)
 (use-package yasnippet :ensure t)
@@ -651,7 +655,7 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
 (global-set-key (kbd "M-C-<up>") 'windmove-up)
 (global-set-key (kbd "M-C-<down>") 'windmove-down)
-(global-set-key (kbd "M-<down>") 'windmove-delete-down)
+(global-set-key (kbd "M-<ESC>") 'windmove-delete-down)
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
 (global-set-key (kbd "s-1") 'treemacs-select-window)
@@ -758,8 +762,13 @@ the current position of point, then move it to the beginning of the line."
   (centaur-tabs-set-bar 'under)
 
   :bind
-  (("s-{" . #'centaur-tabs-backward)
-   ("s-}" . #'centaur-tabs-forward)))
+  (
+   ("s-{" . #'centaur-tabs-backward)
+   ("s-}" . #'centaur-tabs-forward)
+   ("C-{" . #'centaur-tabs-backward)
+   ("C-}" . #'centaur-tabs-forward)
+   )
+  )
 
 
 ;; (scroll-bar-mode)
