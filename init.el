@@ -724,7 +724,7 @@ the current position of point, then move it to the beginning of the line."
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
-(exec-path-from-shell-copy-env "GEM_PATH")
+;; (exec-path-from-shell-copy-env "GEM_PATH")
 (projectile-rails-global-mode)
 
 (treemacs)
