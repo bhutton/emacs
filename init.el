@@ -648,14 +648,14 @@ the current position of point, then move it to the beginning of the line."
   (exec-path-from-shell-copy-env "PATH")
 (exec-path-from-shell-initialize))
 
-(global-set-key (kbd "s-d") 'duplicate-line-or-region)
+(global-set-key (kbd "C-d") 'duplicate-line-or-region)
 (global-set-key (kbd "S-<return>") 'insert-line-below)
 (global-set-key (kbd "M-]") 'other-window)
 (global-set-key (kbd "M-C-<right>") 'windmove-right)
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
 (global-set-key (kbd "M-C-<up>") 'windmove-up)
 (global-set-key (kbd "M-C-<down>") 'windmove-down)
-(global-set-key (kbd "M-<ESC>") 'windmove-delete-down)
+(global-set-key (kbd "C-M-?") 'windmove-delete-down)
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
 (global-set-key (kbd "s-1") 'treemacs-select-window)
@@ -869,8 +869,8 @@ the current position of point, then move it to the beginning of the line."
 
 ;(global-set-key [\M-\S-up] 'move-text-up)
 ;(global-set-key [\M-\S-down] 'move-text-down)
-(global-set-key (kbd "S-s-<up>") 'move-text-up)
-(global-set-key (kbd "S-s-<down>") 'move-text-down)
+(global-set-key (kbd "S-M-<up>") 'move-text-up)
+(global-set-key (kbd "S-M-<down>") 'move-text-down)
 ;; (global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
 (global-set-key (kbd "s-w") 'kill-buffer)
 
