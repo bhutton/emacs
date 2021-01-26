@@ -148,7 +148,8 @@
 (add-hook 'java-mode-hook 'tkj-default-code-style-hook)
 
 (use-package evil-nerd-commenter
-  :bind ("s-/" . evilnc-comment-or-uncomment-lines))
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines)
+  )
 
 (use-package flycheck
   :init
@@ -655,11 +656,11 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
 (global-set-key (kbd "M-C-<up>") 'windmove-up)
 (global-set-key (kbd "M-C-<down>") 'windmove-down)
-(global-set-key (kbd "C-M-?") 'windmove-delete-down)
+(global-set-key (kbd "M-?") 'windmove-delete-down)
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
-(global-set-key (kbd "s-1") 'treemacs-select-window)
-(global-set-key (kbd "s-e") 'mc/edit-ends-of-lines)
+(global-set-key (kbd "C-1") 'treemacs-select-window)
+(global-set-key (kbd "C-c m e") 'mc/edit-ends-of-lines)
 
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
@@ -872,7 +873,7 @@ the current position of point, then move it to the beginning of the line."
 (global-set-key (kbd "S-M-<up>") 'move-text-up)
 (global-set-key (kbd "S-M-<down>") 'move-text-down)
 ;; (global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
-(global-set-key (kbd "s-w") 'kill-buffer)
+(global-set-key (kbd "M-w") 'kill-buffer)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
