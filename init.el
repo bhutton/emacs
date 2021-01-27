@@ -82,11 +82,10 @@
 ;; (use-package tree-sitter-langs)
 
 (setq scroll-preserve-screen-position 1)
-;;scroll window up/down by one line
-(global-set-key (kbd "M-<up>") (kbd "C-u 1 M-v"))
-(global-set-key (kbd "M-<down>") (kbd "C-u 1 C-v"))
-(global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
-(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
+(global-set-key (kbd "M-<up>") #'scroll-down-line)
+(global-set-key (kbd "M-<down>") #'scroll-up-line)
+(global-set-key (kbd "s-<up>") #'scroll-down-line)
+(global-set-key (kbd "s-<down>") #'scroll-up-line)
 (global-set-key (kbd "M->") (kbd "C-x ^"))
 (global-set-key (kbd "M-<") (kbd "C-u -1 C-x ^"))
 (global-set-key (kbd "M-s-<down>") (kbd "C-x ^"))
@@ -975,14 +974,9 @@ the current position of point, then move it to the beginning of the line."
 
 ;; If you use Emacs Daemon mode
 (add-to-list 'default-frame-alist
-              ;; (cons 'font "Hack:pixelsize=14"))
 (cons 'font "Menlo-14"))
-;;(set-frame-font "Hack-14" nil t)
-;; If you use Emacs Daemon mode
 (add-to-list 'default-frame-alist
-              ;; (cons 'font "Hack:pixelsize=14"))
 (cons 'font "Menlo-14"))
-;;(set-frame-font "Hack-14" nil t)
 
 ;; (defvar line-padding 3)
 ;; (defun add-line-padding ()
