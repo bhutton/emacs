@@ -101,6 +101,10 @@
 (global-set-key (kbd "M-F") #'helm-projectile-ag)
 (global-set-key (kbd "M-s") #'company-yasnippet)
 
+(global-set-key (kbd "C-z") #'undo)
+(global-set-key (kbd "C-c C-c") #'cua-copy-region)
+(global-set-key (kbd "C-v") #'cua-paste)
+
 (add-hook 'isearch-mode-hook
   (lambda ()
   (define-key isearch-mode-map (kbd "M-f") 'isearch-repeat-forward)
