@@ -104,6 +104,7 @@
 (global-set-key (kbd "C-z") #'undo)
 (global-set-key (kbd "C-c C-c") #'cua-copy-region)
 (global-set-key (kbd "C-v") #'cua-paste)
+(global-set-key (kbd "C-s") #'save-buffer)
 
 (add-hook 'isearch-mode-hook
   (lambda ()
