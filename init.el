@@ -978,6 +978,14 @@ the current position of point, then move it to the beginning of the line."
                (cons 'font "Menlo-14"))
 )
 
+(when(eq system-type 'windows-nt)
+    (ignore-errors(set-frame-font "Consolas"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "Consolas"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "Consolas"))
+)
+
 ;; (defvar line-padding 3)
 ;; (defun add-line-padding ()
 ;;   "Add extra padding between lines"
