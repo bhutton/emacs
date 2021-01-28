@@ -971,11 +971,11 @@ the current position of point, then move it to the beginning of the line."
 
 
 (when(eq system-type 'darwin)
-    (ignore-errors(set-frame-font "Menlo-14"))
+    (ignore-errors(set-frame-font "Menlo-15"))
   (add-to-list 'default-frame-alist
-               (cons 'font "Menlo-14"))
+               (cons 'font "Menlo-15"))
   (add-to-list 'default-frame-alist
-               (cons 'font "Menlo-14"))
+               (cons 'font "Menlo-15"))
 )
 
 (when(eq system-type 'windows-nt)
