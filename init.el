@@ -969,14 +969,14 @@ the current position of point, then move it to the beginning of the line."
 	     ))
 ;; (package-initialize)
 
-;; Click [here](https://github.com/hbin/dotfiles-for-emacs) to take a further look.
-(ignore-errors(set-frame-font "Menlo-14"))
 
-;; If you use Emacs Daemon mode
-(add-to-list 'default-frame-alist
-(cons 'font "Menlo-14"))
-(add-to-list 'default-frame-alist
-(cons 'font "Menlo-14"))
+(when(eq system-type 'darwin)
+    (ignore-errors(set-frame-font "Menlo-14"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "Menlo-14"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "Menlo-14"))
+)
 
 ;; (defvar line-padding 3)
 ;; (defun add-line-padding ()
