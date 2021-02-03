@@ -489,7 +489,7 @@
   )
 
 line-spacing(defun go-test()
-  (shell-command (concat "cd " (projectile-project-root) "/test && go test &")
+  (shell-command (concat "cd " (projectile-project-root) " && go test ./... &")
                  "*test-runner*"
                  "*Messages*")
   )
