@@ -211,6 +211,10 @@
           js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode
           c-mode c++-mode objc-mode) . lsp))
 
+(use-package lsp-dart
+  :ensure t
+  :hook (dart-mode . lsp))
+
 (use-package ccls
   :ensure t
   :config
@@ -479,7 +483,7 @@
       (go-test))
     )
   (when(string= (file-name-extension buffer-file-name) "java")
-    (dap-java-run-test-class))
+    (mvn-test))
   )
 
 (defun npm-test()
@@ -487,6 +491,13 @@
                  "*test-runner*"
                  "*Messages*")
   )
+
+(defun mvn-test()
+  (shell-command (concat "cd " (projectile-project-root) " && mvn test &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
+
 
 line-spacing(defun go-test()
   (shell-command (concat "cd " (projectile-project-root) " && go test ./... &")
