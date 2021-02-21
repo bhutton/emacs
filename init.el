@@ -273,7 +273,7 @@
   :diminish
   :commands lsp-ui-mode
   :custom-face
-  (lsp-ui-doc-background ((t (:background "lightgrey"))))
+  (lsp-ui-doc-background ((t (:background nil))))
   (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
   :bind
   (:map lsp-ui-mode-map
@@ -302,6 +302,9 @@
     (setq mode-line-format nil)))
 
 (setq lsp-prefer-capf t)
+
+(setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home/")
+(setq lsp-java-java-path "/usr/local/Cellar/openjdk@11/11.0.9/bin/java")
 
 (use-package lsp-java
   :ensure t
@@ -515,6 +518,26 @@ line-spacing(defun go-test()
 
 (require 'company)
 (require 'company-box)
+(require 'company-tabnine)
+(add-hook 'after-init-hook 'global-company-mode)
+;; (add-hook 'company-mode-hook 'company-box-mode)
+(add-to-list 'company-backends #'company-tabnine)
+
+;; workaround for company-transformers
+(setq company-tabnine--disable-next-transform nil)
+(defun my-company--transform-candidates (func &rest args)
+  (if (not company-tabnine--disable-next-transform)
+      (apply func args)
+    (setq company-tabnine--disable-next-transform nil)
+    (car args)))
+
+(defun my-company-tabnine (func &rest args)
+  (when (eq (car args) 'candidates)
+    (setq company-tabnine--disable-next-transform t))
+  (apply func args))
+
+(advice-add #'company--transform-candidates :around #'my-company--transform-candidates)
+(advice-add #'company-tabnine :around #'my-company-tabnine)
 
 ;; (require 'company-web-html)                          ; load company mode html backend
 ;; (require 'company-web-jade)                          ; load company mode jade backend
@@ -529,11 +552,11 @@ line-spacing(defun go-test()
 ;;   (company-minimum-prefix-length 1)
 ;;   (company-idle-delay 0.0))
 
-(add-hook 'after-init-hook 'global-company-mode)
-(add-hook 'company-mode-hook 'company-box-mode)
+
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0)
 (setq company-lsp-cache-candidates t)
+(setq company-show-numbers t)
 
 
 ;; (add-to-list 'company-backends 'company-tern)
@@ -981,12 +1004,20 @@ the current position of point, then move it to the beginning of the line."
 ;; (package-initialize)
 
 
+;; (when(eq system-type 'darwin)
+;;     (ignore-errors(set-frame-font "Menlo-15"))
+;;   (add-to-list 'default-frame-alist
+;;                (cons 'font "Menlo-15"))
+;;   (add-to-list 'default-frame-alist
+;;                (cons 'font "Menlo-15"))
+;; )
+
 (when(eq system-type 'darwin)
-    (ignore-errors(set-frame-font "Menlo-15"))
+    (ignore-errors(set-frame-font "DejaVu Sans Mono-15"))
   (add-to-list 'default-frame-alist
-               (cons 'font "Menlo-15"))
+               (cons 'font "DejaVu Sans Mono-15"))
   (add-to-list 'default-frame-alist
-               (cons 'font "Menlo-15"))
+               (cons 'font "DejaVu Sans Mono-15"))
 )
 
 (when(eq system-type 'windows-nt)
