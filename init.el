@@ -687,7 +687,7 @@ the current position of point, then move it to the beginning of the line."
   (exec-path-from-shell-copy-env "PATH")
 (exec-path-from-shell-initialize))
 
-(global-set-key (kbd "C-d") 'duplicate-line-or-region)
+(global-set-key (kbd "M-d") 'duplicate-line-or-region)
 (global-set-key (kbd "S-<return>") 'insert-line-below)
 ;; (global-set-key (kbd "M-]") 'osther-window)
 (global-set-key (kbd "M-C-<right>") 'windmove-right)
