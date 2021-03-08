@@ -18,6 +18,7 @@
   (package-refresh-contents))
 
 (setq use-package-always-ensure t)
+(setq-default truncate-lines t)
 
 ; list the packages you want
 (setq package-list '
@@ -224,8 +225,8 @@
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
          (lambda () (require 'ccls) (lsp))))
 
-(require 'flymake-google-cpplint)
-(add-hook 'c++-mode-hook 'flymake-google-cpplint-load)
+;(require 'flymake-google-cpplint)
+;(add-hook 'c++-mode-hook 'flymake-google-cpplint-load)
 
 (use-package typescript-mode
   :mode "\\.ts\\'"
@@ -309,6 +310,9 @@
 (use-package lsp-java
   :ensure t
   :init
+  ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-X;; X:+UseStringDeduplication" "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar" "-Xbootclasspath/a:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar")
+  ;;       )
+
   (setq lsp-java-vmargs
         (list
          "-noverify"
@@ -316,6 +320,7 @@
          "-XX:+UseG1GC"
          "-XX:+UseStringDeduplication"
          "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
+         "-Xbootclasspath/a:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
          )
 
         ;; Don't organise imports on save
@@ -326,6 +331,16 @@
         ;;
         ;; lsp-java-java-path "~/.emacs.d/oracle-jdk-12.0.1/bin/java"
         lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home/bin/java"
+
+        lsp-file-watch-ignored
+        '(".idea" ".ensime_cache" ".eunit" "node_modules"
+          ".git" ".hg" ".fslckout" "_FOSSIL_"
+          ".bzr" "_darcs" ".tox" ".svn" ".stack-work"
+          "build")
+
+        lsp-java-import-order '["" "java" "javax" "#"]
+        ;; Don't organize imports on save
+        lsp-java-save-action-organize-imports nil
         )
 
   :config
@@ -377,7 +392,8 @@
   (global-set-key (kbd "M-b") 'lsp-find-implementation)
   (global-set-key (kbd "C-b") 'lsp-find-implementation)
   ;; (define-key lsp-mode-map (kbd "C-t") #'dap-java-run-test-class)
-  (setq dap-java-test-additional-args '("-n" "\".*(Test|IT).*\""))
+  ;; (setq dap-java-test-additional-args '("-n" "\".*(Test|IT).*\""))
+  ;; (setq JUNIT_CLASS_PATH "/Users/ben/.emacs.d/eclipse.jdt.ls/test-runner/junit-platform-console-standalone.jar:./target/classes:./target/test-classes:/Users/ben/.m2/repository/org/assertj/assertj-core/3.17.2/assertj-core-3.17.2.jar:/Users/ben/.emacs.d/workspace/.cache:/Users/ben/.m2:/Users/ben/.m2/repository/org/springframework/spring-websocket/5.2.3.RELEASE/spring-websocket-5.2.3.RELEASE.jar:/Users/ben/.m2/repository/org/springframework/spring-messaging/5.2.3.RELEASE/spring-messaging-5.2.3.RELEASE.jar:/Users/ben/.m2/repository/com/securemessenger/common/1.0-SNAPSHOT/common-1.0-SNAPSHOT.jar:/Users/ben/.m2/repository/org/springframework/spring-test/5.3.0-M2/spring-test-5.3.0-M2.jar:/Users/ben/.m2/repository/org/mockito/mockito-core/3.6.0/mockito-core-3.6.0.ja:/Users/ben/.m2/repository/org/mockito/mockito-junit-jupiter/3.6.0/mockito-junit-jupiter-3.6.0.jar:/Users/ben/.m2/repository/org/mockito/mockito-core/3.6.0/mockito-core-3.6.0.jar:/Users/ben/.m2/repository/org/springframework/spring-context/5.3.1/spring-context-5.3.1.jar:/Users/ben/.m2/repository/org/springframework/spring-core/5.3.1/spring-core-5.3.1.jar:/Users/ben/.m2/repository/org/springframework/spring-test/5.3.0-M2/spring-test-5.3.0-M2.jar:/Users/ben/.m2/repository/org/apache/commons/commons-parent/48/commons-parent-48.pom:/Users/ben/.m2/repository/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar:/Users/ben/.m2/repository/org/apache/commons/commons-exec/1.3/commons-exec-1.3.jar:/Users/ben/.m2/repository/org/apache/commons/commons-exec/1.3/commons-exec-1.3.jar:/Users/ben/.m2/repository/org/apache/commons/commons-compress/1.9/commons-compress-1.9.jar:/Users/ben/.m2/repository/org/springframework/spring-context/5.3.1/spring-context-5.3.1.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.11.2/jackson-datatype-jdk8-2.11.2.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.11.2/jackson-datatype-jsr310-2.11.2.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.12.1/jackson-core-2.12.1.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.12.1/jackson-databind-2.12.1.jar")
   )
 
 
@@ -518,10 +534,10 @@ line-spacing(defun go-test()
 
 (require 'company)
 (require 'company-box)
-(require 'company-tabnine)
+;; (require 'company-tabnine)
 (add-hook 'after-init-hook 'global-company-mode)
 ;; (add-hook 'company-mode-hook 'company-box-mode)
-(add-to-list 'company-backends #'company-tabnine)
+;; (add-to-list 'company-backends #'company-tabnine)
 
 ;; workaround for company-transformers
 (setq company-tabnine--disable-next-transform nil)
