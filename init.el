@@ -22,10 +22,10 @@
 
 ; list the packages you want
 (setq package-list '
-	(better-defaults helm helm-switch-shell helm-projectile helm-ag ruby-electric rvm seeing-is-believing
-	chruby inf-ruby ruby-test-mode yasnippet flycheck web-mode js2-refactor xref-js2 prettier-js
-	dumb-jump exec-path-from-shell all-the-icons spaceline doom-themes spacemacs-theme projectile-rails
-	centaur-tabs undo-tree tide))
+	  (better-defaults helm helm-switch-shell helm-projectile helm-ag seeing-is-believing
+                       yasnippet flycheck web-mode js2-refactor xref-js2 prettier-js
+                       dumb-jump exec-path-from-shell all-the-icons spaceline
+                       doom-themes spacemacs-theme projectile-rails centaur-tabs undo-tree))
 
 ; install the missing packages
 (dolist (package package-list)
@@ -74,14 +74,6 @@
 (use-package rainbow-delimiters
   :hook ((prog-mode . rainbow-delimiters-mode)))
 
-;; (use-package tree-sitter
-;;   :init (global-tree-sitter-mode)
-;;   :hook ((ruby-mode . tree-sitter-hl-mode)
-;;          (js-mode . tree-sitter-hl-mode)
-;;          (typescript-mode . tree-sitter-hl-mode)
-;;          (go-mode . tree-sitter-hl-mode)))
-;; (use-package tree-sitter-langs)
-
 (setq scroll-preserve-screen-position 1)
 (global-set-key (kbd "M-<up>") #'scroll-down-line)
 (global-set-key (kbd "M-<down>") #'scroll-up-line)
@@ -112,18 +104,6 @@
   )
 )
 
-;; ;typescript
-;; (setq create-lockfiles nil)
-;; (defun setup-tide-mode ()
-;;    (interactive)
-;;    (tide-setup)
-;;    (flycheck-mode +1)
-;;    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;    (eldoc-mode +1)
-;;    (tide-hl-identifier-idle-time +1)
-;;    (company-mode +1))
-
-
 ;; ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
@@ -152,6 +132,13 @@
         require-final-newline nil))
 (add-hook 'java-mode-hook 'tkj-default-code-style-hook)
 
+(use-package super-save
+  :ensure t
+  :config
+  (super-save-mode +1))
+
+(super-save-mode +1)
+
 (use-package evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines)
   )
@@ -166,19 +153,23 @@
                  (reusable-frames . visible)
                  (window-height   . 0.15))))
 
+;;(use-package idle-highlight)
+
+;; (use-package gtags)
+(setq xref-prompt-for-identifier nil)
+
 (defun my-java-mode-hook ()
   (auto-fill-mode)
   (flycheck-mode)
   (git-gutter+-mode)
   (gtags-mode)
-  ;(idle-highlight)
+  ;; (idle-highlight)
   (subword-mode)
   (yas-minor-mode)
   (set-fringe-style '(8 . 0))
   (define-key c-mode-base-map (kbd "C-M-j") 'tkj-insert-serial-version-uuid)
   (define-key c-mode-base-map (kbd "C-m") 'c-context-line-break)
   (define-key c-mode-base-map (kbd "S-<f7>") 'gtags-find-tag-from-here)
-  (define-key c-mode-base-map (kbd "C-t") #'dap-java-run-test-class)
 
   ;; Fix indentation for anonymous classes
   (c-set-offset 'substatement-open 0)
@@ -208,7 +199,7 @@
   :bind (:map lsp-mode-map ("C-t" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook ((java-mode python-mode go-mode
+  :hook ((python-mode go-mode lsp-java
           js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode
           c-mode c++-mode objc-mode) . lsp))
 
@@ -292,8 +283,9 @@
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-code-actions nil)
   (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
-  (lsp-ui-doc-delay 2)
+  (lsp-ui-doc-delay 5)
   :config
+  (setq lsp-ui-flycheck-enable t)
   ;; Use lsp-ui-doc-webkit only in GUI
   (if (display-graphic-p)
       (setq lsp-ui-doc-use-webkit t))
@@ -304,22 +296,21 @@
 
 (setq lsp-prefer-capf t)
 
-(setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home/")
-(setq lsp-java-java-path "/usr/local/Cellar/openjdk@11/11.0.9/bin/java")
+(setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/")
+(setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/bin/java")
 
 (use-package lsp-java
   :ensure t
   :init
   ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-X;; X:+UseStringDeduplication" "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar" "-Xbootclasspath/a:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar")
   ;;       )
-
   (setq lsp-java-vmargs
         (list
          "-noverify"
          "-Xmx2G"
          "-XX:+UseG1GC"
          "-XX:+UseStringDeduplication"
-         "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
+         "-javaagent:/Users/ben/.m2/repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
          "-Xbootclasspath/a:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
          )
 
@@ -555,32 +546,10 @@ line-spacing(defun go-test()
 (advice-add #'company--transform-candidates :around #'my-company--transform-candidates)
 (advice-add #'company-tabnine :around #'my-company-tabnine)
 
-;; (require 'company-web-html)                          ; load company mode html backend
-;; (require 'company-web-jade)                          ; load company mode jade backend
-;; (require 'company-web-slim)                          ; load company mode slim backend
-;; ;; (use-package company-mode
-;;   :after lsp-mode
-;;   :hook (prog-mode . company-mode)
-;;   :bind (:map company-active-map
-;;               ("<tab>" . company-completion-selection))
-;;   (:map lsp-mode-map
-;;         ("<tab>" . company-indent-or-complete-common))
-;;   (company-minimum-prefix-length 1)
-;;   (company-idle-delay 0.0))
-
-
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0)
 (setq company-lsp-cache-candidates t)
 (setq company-show-numbers t)
-
-
-;; (add-to-list 'company-backends 'company-tern)
-;; (add-to-list 'company-backends 'ac-js2-company)
-;; (setq ac-js2-evaluate-calls t)
-;; (add-to-list 'company-backends 'company-flow)
-;; (add-to-list 'company-backends 'company-web)
-
 
 (require 'prettier-js)
 (add-hook 'js2-mode-hook 'prettier-js-mode)
@@ -609,32 +578,8 @@ line-spacing(defun go-test()
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
-(require 'ruby-test-mode)
-
-(add-hook 'ruby-mode-hook
-          (lambda () (rvm-activate-corresponding-ruby)))
-(add-hook 'ruby-mode-hook 'yard-mode)
-(add-hook 'ruby-mode-hook 'ruby-electric-mode)
-(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
-(add-hook 'ruby-mode-hook 'ruby-test-mode)
-
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'hl-line-mode)
-
-(add-to-list 'auto-mode-alist
-             '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
-(add-to-list 'auto-mode-alist
-             '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . ruby-mode))
-
-(require 'rvm)
-(rvm-use-default)
-
-(setq seeing-is-believing-prefix "C-.")
-(add-hook 'ruby-mode-hook 'seeing-is-believing)
-(require 'seeing-is-believing)
-
-(add-hook 'ruby-mode-hook 'auto-complete-mode)
-
 
 (delete-selection-mode 1)
 
@@ -767,16 +712,6 @@ the current position of point, then move it to the beginning of the line."
   :init (doom-modeline-mode 1))
 
 
-;; (use-package doom-themes
-;;   :config
-;;   (let ((chosen-theme 'doom-one-light))
-;;     (doom-themes-visual-bell-config)
-;;     (doom-themes-org-config)
-;;     (setq doom-challenger-deep-brighter-comments t
-;;           doom-challenger-deep-brighter-modeline t)
-;;     (load-theme chosen-theme)))
-
-
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
 ;; (exec-path-from-shell-copy-env "GEM_PATH")
@@ -786,19 +721,6 @@ the current position of point, then move it to the beginning of the line."
 ;; (treemacs-load-theme "Default")
 ;; (treemacs-load-theme "Netbeans")
 ;; (treemacs-load-theme "Idea")
-
-
-;; (setq centaur-tabs-style "box")
-;; (setq centaur-tabs-height 32)
-;; (setq centaur-tabs-set-icons t)
-;; (setq centaur-tabs-gray-out-icons 'buffer)
-;; (setq centaur-tabs-set-bar 'under)
-;; (setq x-underline-at-descent-line t)
-;; (centaur-tabs-mode)
-;; (centaur-tabs-headline-match)
-;; (centaur-tabs-group-by-projectile-project)
-;; (global-set-key (kbd "s-{") 'centaur-tabs-backward)
-;; (global-set-key (kbd "s-}") 'centaur-tabs-forward)
 
 (use-package centaur-tabs
   :demand
@@ -922,11 +844,8 @@ the current position of point, then move it to the beginning of the line."
         (comment-or-uncomment-region beg end)))
 
 
-;(global-set-key [\M-\S-up] 'move-text-up)
-;(global-set-key [\M-\S-down] 'move-text-down)
 (global-set-key (kbd "S-M-<up>") 'move-text-up)
 (global-set-key (kbd "S-M-<down>") 'move-text-down)
-;; (global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
 (global-set-key (kbd "M-w") 'kill-buffer)
 
 (custom-set-variables
@@ -964,8 +883,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
- '(safe-local-variable-values '((ruby-test-runner . rspec)))
+   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
@@ -990,44 +908,6 @@ the current position of point, then move it to the beginning of the line."
  '(vc-annotate-very-old-color nil))
 
 
-(require 'flymake)
-
-;; I don't like the default colors :)
-(set-face-background 'flymake-errline "white")
-(set-face-background 'flymake-warnline "white")
-
-;; Invoke ruby with '-c' to get syntax checking
-(defun flymake-ruby-init ()
-  (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-	 (local-file  (file-relative-name
-                       temp-file
-                       (file-name-directory buffer-file-name))))
-    (list "ruby" (list "-c" local-file))))
-
-(push '(".+\\.rb$" flymake-ruby-init) flymake-allowed-file-name-masks)
-(push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
-
-(push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3) flymake-err-line-patterns)
-
-(add-hook 'ruby-mode-hook
-          '(lambda ()
-
-	     ;; Don't want flymake mode for ruby regions in rhtml files and also on read only files
-	     (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
-		 (flymake-mode))
-	     ))
-;; (package-initialize)
-
-
-;; (when(eq system-type 'darwin)
-;;     (ignore-errors(set-frame-font "Menlo-15"))
-;;   (add-to-list 'default-frame-alist
-;;                (cons 'font "Menlo-15"))
-;;   (add-to-list 'default-frame-alist
-;;                (cons 'font "Menlo-15"))
-;; )
-
 (when(eq system-type 'darwin)
     (ignore-errors(set-frame-font "DejaVu Sans Mono-15"))
   (add-to-list 'default-frame-alist
@@ -1044,26 +924,6 @@ the current position of point, then move it to the beginning of the line."
                (cons 'font "Consolas"))
 )
 
-;; (defvar line-padding 3)
-;; (defun add-line-padding ()
-;;   "Add extra padding between lines"
-
-;;   ; remove padding overlays if they already exist
-;;   (let ((overlays (overlays-at (point-min))))
-;;     (while overlays
-;;       (let ((overlay (car overlays)))
-;;         (if (overlay-get overlay 'is-padding-overlay)
-;;             (delete-overlay overlay)))
-;;       (setq overlays (cdr overlays))))
-
-;;   ; add a new padding overlay
-;;   (let ((padding-overlay (make-overlay (point-min) (point-max))))
-;;     (overlay-put padding-overlay 'is-padding-overlay t)
-;;     (overlay-put padding-overlay 'line-spacing (* .1 line-padding))
-;;     (overlay-put padding-overlay 'line-height (+ 1 (* .1 line-padding))))
-;;   (setq mark-active nil))
-
-
 (defun xah-toggle-line-spacing ()
   "Toggle line spacing between no extra space to extra half line height.
 URL `http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html'
@@ -1074,15 +934,7 @@ Version 2017-06-02"
     (setq line-spacing 0.5))
   (redraw-frame (selected-frame)))
 
-;; (add-hook 'buffer-list-update-hook 'add-line-padding)
-
 (setq-default cursor-type 'bar)
-;; (setq line-spacing 2)
-
-; list the repositories containing them
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Shell
@@ -1114,9 +966,6 @@ taken from http://stackoverflow.com/a/4116113/446256"
 
 ;; snippets, please
 (add-hook 'sh-mode-hook 'yas-minor-mode)
-
-;; on the fly syntax checking
-(add-hook 'sh-mode-hook 'flycheck-mode)
 
 ;; show git changes in the gutter
 (add-hook 'sh-mode-hook 'git-gutter+-mode)
@@ -1167,33 +1016,11 @@ taken from http://stackoverflow.com/a/4116113/446256"
 (setq require-final-newline t)
 
 ;; Nice window divider in TTY emacs
-(defun my-change-window-divider ()
-  (let ((display-table (or buffer-display-table standard-display-table)))
-    (set-display-table-slot display-table 5 ?│)
-    (set-window-display-table (selected-window) display-table)))
-(add-hook 'window-configuration-change-hook 'my-change-window-divider)
-
-;; (defun tkj-presentation-mode()
-;;   (interactive)
-;;   (when window-system
-;;     (progn
-;;       (use-package one-themes)
-;;       (load-theme 'one-light t)
-;;       (set-face-attribute 'default nil
-;;                           :family "Source Code Pro"
-;;                           :height 140
-;;                           :weight 'normal
-;;                           :width 'normal))))
-
-;; (defun tkj-left-margin-focus()
-;;   (interactive)
-;;   (set-window-margins nil 10))
-
-;; (defun tkj-left-margin-zero()
-;;   (interactive)
-;;   (set-window-margins nil 0))
-
-;; (set-default 'truncate-lines t)
+;; (defun my-change-window-divider ()
+;;   (let ((display-table (or buffer-display-table standard-display-table)))
+;;     (set-display-table-slot display-table 5 ?│)
+;;     (set-window-display-table (selected-window) display-table)))
+;; (add-hook 'window-configuration-change-hook 'my-change-window-divider)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Automatically expand these words and characters
