@@ -10,6 +10,9 @@
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 ; activate all the packages (in particular autoloads)
 (package-initialize)
 
@@ -25,7 +28,7 @@
 	  (better-defaults helm helm-switch-shell helm-projectile helm-ag seeing-is-believing
                        yasnippet flycheck web-mode js2-refactor xref-js2 prettier-js
                        dumb-jump exec-path-from-shell all-the-icons spaceline
-                       doom-themes spacemacs-theme projectile-rails centaur-tabs undo-tree))
+                       doom-themes spacemacs-theme projectile-rails centaur-tabs))
 
 ; install the missing packages
 (dolist (package package-list)
@@ -43,6 +46,10 @@
  '(default ((t (:background nil)))))
 
 (require 'smartparens-config)
+
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
 
 ;; Draws a line between the beginning and ending of block indents
 (require 'highlight-indent-guides)
@@ -301,39 +308,6 @@
 
 (use-package lsp-java
   :ensure t
-  :init
-  ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-X;; X:+UseStringDeduplication" "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar" "-Xbootclasspath/a:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar")
-  ;;       )
-  (setq lsp-java-vmargs
-        (list
-         "-noverify"
-         "-Xmx2G"
-         "-XX:+UseG1GC"
-         "-XX:+UseStringDeduplication"
-         "-javaagent:/Users/ben/.m2/repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
-         "-Xbootclasspath/a:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
-         )
-
-        ;; Don't organise imports on save
-        lsp-java-save-action-organize-imports nil
-
-        ;; Currently (2019-04-24), dap-mode works best with Oracle
-        ;; JDK, see https://github.com/emacs-lsp/dap-mode/issues/31
-        ;;
-        ;; lsp-java-java-path "~/.emacs.d/oracle-jdk-12.0.1/bin/java"
-        lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home/bin/java"
-
-        lsp-file-watch-ignored
-        '(".idea" ".ensime_cache" ".eunit" "node_modules"
-          ".git" ".hg" ".fslckout" "_FOSSIL_"
-          ".bzr" "_darcs" ".tox" ".svn" ".stack-work"
-          "build")
-
-        lsp-java-import-order '["" "java" "javax" "#"]
-        ;; Don't organize imports on save
-        lsp-java-save-action-organize-imports nil
-        )
-
   :config
   (add-hook 'java-mode-hook #'lsp)
 )
@@ -694,13 +668,7 @@ the current position of point, then move it to the beginning of the line."
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
-  ;; (load-theme 'doom-solarized-light t)
-  ;; (load-theme 'doom-material)
   (load-theme 'doom-one-light t)
-  ;; (load-theme 'doom-tomorrow-day t)
-  ;; (load-theme 'spacemacs-light t)
-  ;; (load-theme 'doom-opera-light t)
-  ;;; OPTIONAL
 
   (setq doom-themes-treemacs-theme "doom-colors")
   (doom-themes-treemacs-config)
@@ -792,12 +760,10 @@ the current position of point, then move it to the beginning of the line."
 ;; undo tree mode                                                         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;turn on everywhere
-(global-undo-tree-mode 1)
 ;; make ctrl-z undo
 (global-set-key (kbd "s-z") 'undo)
 ;; make ctrl-Z redo
-(defalias 'redo 'undo-tree-redo)
-(global-set-key (kbd "s-Z") 'redo)
+(global-set-key (kbd "s-Z") 'undo-redo)
 
 (set-face-attribute 'default nil :height 130)
 
@@ -883,7 +849,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
