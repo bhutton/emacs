@@ -194,6 +194,11 @@
 (use-package projectile :ensure t)
 (use-package yasnippet :ensure t)
 
+(setq lsp-headerline-breadcrumb-enable-diagnostics nil)
+(setq lsp-modeline-code-actions-enable nil)
+(setq lsp-ui-doc-show-with-cursor nil)
+(setq lsp-modeline-code-actions-enable t)
+
 (use-package lsp-mode
   :defer t
   :commands lsp
@@ -228,9 +233,9 @@
 
 (use-package typescript-mode
   :mode "\\.ts\\'"
-  ;; :mode "\\.js\\'"
+  :mode "\\.js\\'"
   :mode "\\.tsx\\'"
-  ;; :mode "\\.jsx\\'"
+  :mode "\\.jsx\\'"
   :hook (typescript-mode . lsp-deferred)
   :config
   (setq typescript-indent-level 2)
@@ -266,6 +271,16 @@
 
 (use-package hydra :ensure t)
 ;; (use-package company-lsp)
+
+;; (use-package lsp-ui-mode
+;;   :ensure lsp-ui
+;;   :hook lsp-mode
+;;   :commands lsp-ui-mode
+;;   :config
+;;   (lsp-ui-doc-mode)
+;;   (lsp-ui-sideline-mode)
+;;   (setq lsp-ui-doc-position 'top)
+;;   )
 
 (use-package lsp-ui
   :after lsp-mode
