@@ -1,4 +1,8 @@
+;;; package --- emac configuration
 (require 'package)
+;;; Commentary:
+
+;;; Code:
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 (eval-when-compile
@@ -324,6 +328,14 @@
 (use-package lsp-java
   :ensure t
   :config
+  (setq lsp-java-vmargs
+      (list
+         "-noverify"
+         "-Xmx1G"
+         "-XX:+UseG1GC"
+         "-XX:+UseStringDeduplication"
+         "-javaagent:/Users/ben/.m2/repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"))
+
   (add-hook 'java-mode-hook #'lsp)
 )
 
