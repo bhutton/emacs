@@ -1,17 +1,4 @@
-;;; package --- emac configuration
-;; (package-initialize)
-;;(require 'package)
-;;; Commentary:
-
-;;; Code:
-;;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
-;;(eval-when-compile
-  ;; Following line is not needed if use-package.el is in ~/.emacs.d
-;;  (add-to-list 'load-path "~/.emacs.d/use-package/")
-;;  (require 'use-package))
-
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/"))
       gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
@@ -58,8 +45,6 @@
 (setq mark-ring-max 6)
 (setq global-mark-ring-max 6)
 
-;;(require
-;; 'better-defaults)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -78,7 +63,6 @@
 
 ;; Draws a line between the beginning and ending of block indents
 (use-package highlight-indent-guides)
-(require 'highlight-indent-guides)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 (setq highlight-indent-guides-method 'bitmap)
 
@@ -161,6 +145,8 @@
   (super-save-mode +1))
 
 (super-save-mode +1)
+(setq super-save-auto-save-when-idle t)
+(setq auto-save-default nil)
 
 (use-package evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines)
@@ -258,10 +244,6 @@
   )
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
-;;(lsp-register-custom-settings
-;; '(("gopls.completeUnimported" t t)
-;;   ("gopls.staticcheck" t t)))
-
 (use-package rjsx-mode
   ;; :mode "\\.js\\'"
   ;; :mode "\\.jsx\\'"
@@ -321,10 +303,10 @@
   :config
   (setq lsp-java-vmargs
       (list
-         "-noverify"
-         "-Xmx1G"
-         "-XX:+UseG1GC"
-         "-XX:+UseStringDeduplication"
+  ;;        "-noverify"
+  ;;        "-Xmx1G"
+  ;;        "-XX:+UseG1GC"
+  ;;        "-XX:+UseStringDeduplication"
          "-javaagent:/Users/ben/.m2/repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"))
 
   (add-hook 'java-mode-hook #'lsp)
@@ -677,6 +659,7 @@ the current position of point, then move it to the beginning of the line."
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
+  ;; (load-theme 'doom-one-light t)
   (load-theme 'doom-one-light t)
 
   (setq doom-themes-treemacs-theme "doom-colors")
@@ -819,9 +802,9 @@ the current position of point, then move it to the beginning of the line."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
-   ["#fafafa" "#99324b" "#4f894c" "#9a7500" "#3b6ea8" "#97365b" "#398eac" "#2a2a2a"])
+   ["#282c34" "#99324b" "#4f894c" "#9a7500" "#3b6ea8" "#97365b" "#398eac" "#2a2a2a"])
  '(custom-safe-themes
-   '("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
+   '("f4876796ef5ee9c82b125a096a590c9891cec31320569fc6ff602ff99ed73dca" "08a27c4cde8fcbb2869d71fdc9fa47ab7e4d31c27d40d59bf05729c4640ce834" "8f5a7a9a3c510ef9cbb88e600c0b4c53cdcdb502cfe3eb50040b7e13c6f4e78e" "aaa4c36ce00e572784d424554dcc9641c82d1155370770e231e10c649b59a074" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
  '(ensime-sem-high-faces
    '((var :foreground "#000000" :underline
           (:style wave :color "yellow"))
@@ -848,7 +831,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+   '(git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
@@ -931,6 +914,8 @@ taken from http://stackoverflow.com/a/4116113/446256"
 
 ;; snippets, please
 (add-hook 'sh-mode-hook 'yas-minor-mode)
+
+(use-package git-gutter+)
 
 ;; show git changes in the gutter
 (add-hook 'sh-mode-hook 'git-gutter+-mode)
@@ -1033,6 +1018,9 @@ taken from http://stackoverflow.com/a/4116113/446256"
   :bind
   ("C-x C-b" . 'tkj-list-buffers))
 (helm-mode 1)
+
+(use-package helm-projectile)
+(use-package helm-ag)
 
 (defun close-all-buffers ()
   (interactive)
