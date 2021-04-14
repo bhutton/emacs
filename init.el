@@ -206,8 +206,7 @@
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
   :hook ((python-mode go-mode lsp-java
-          js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode
-          c-mode c++-mode objc-mode) . lsp))
+          js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode c-mode c++-mode) . lsp))
 
 (use-package lsp-dart
   :ensure t
@@ -218,7 +217,20 @@
   :config
   (setq ccls-executable "/usr/local/bin/ccls")
   (setq lsp-prefer-flymake nil)
+  (setq ccls-initialization-options
+        '(:clang (:extraArgs ["-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1"
+                              "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+                              "-isystem/usr/local/include"
+                              "-isystem/usr/local/include/gtest"
+                              "-isystem/usr/local/lib"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"]
+                   :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0")))
   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+  (setq flycheck-gcc-include-path '("/usr/local/include"))
+  (setq flycheck-clang-include-path '("/usr/local/include"))
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
          (lambda () (require 'ccls) (lsp))))
 
@@ -514,7 +526,6 @@ line-spacing(defun go-test()
 (require 'prettier-js)
 (add-hook 'js2-mode-hook 'prettier-js-mode)
 (add-hook 'js-mode-hook 'prettier-js-mode)
-(add-hook 'lsp-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;loads ruby mode when a .rb file is opened.
