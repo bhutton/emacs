@@ -205,7 +205,7 @@
   :bind (:map lsp-mode-map ("C-t" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook ((python-mode go-mode lsp-java
+  :hook ((python-mode go-mode lsp-java ccls
           js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode c-mode c++-mode) . lsp))
 
 (use-package lsp-dart
@@ -361,7 +361,11 @@
   (global-set-key (kbd "<f9>") 'dap-continue)
   (global-set-key (kbd "M-b") 'lsp-find-implementation)
   (global-set-key (kbd "C-b") 'lsp-find-implementation)
+  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/11.1.0_1/Toolchains/LLVM11.1.0.xctoolchain/usr/bin/lldb-vscode"))
   )
+
+(require 'dap-lldb)
+(require 'dap-cpptools)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
