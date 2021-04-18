@@ -1,14 +1,34 @@
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(setq package-archives '(("melpa" . "http://melpa.org/packages/")
+                         ("gnu" . "http://elpa.gnu.org/packages/"))
+      gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
-(eval-when-compile
-  ;; Following line is not needed if use-package.el is in ~/.emacs.d
-  (add-to-list 'load-path "~/.emacs.d/use-package/")
-  (require 'use-package))
+;; Add ELPA packages to the loadpp path
+(let ((default-directory "~/.emacs.d/elpa"))
+  (normal-top-level-add-subdirs-to-load-path))
+
+
+;; Ensure use-package is installed and loaded
+(condition-case nil
+    (require 'use-package)
+  (file-error
+   (require 'package)
+   (package-initialize)
+   (package-refresh-contents)
+   (package-install 'use-package)
+   (require 'use-package)))
+
+;; Set to true to have use-package install all packages mentioned if
+;; they're not already installed.
+(setq use-package-always-ensure nil)
+
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ; activate all the packages (in particular autoloads)
 (package-initialize)
@@ -18,40 +38,33 @@
   (package-refresh-contents))
 
 (setq use-package-always-ensure t)
-
-; list the packages you want
-(setq package-list '
-	(better-defaults helm helm-switch-shell helm-projectile helm-ag ruby-electric rvm seeing-is-believing
-	chruby inf-ruby ruby-test-mode yasnippet flycheck web-mode js2-refactor xref-js2 prettier-js
-	dumb-jump exec-path-from-shell all-the-icons spaceline doom-themes spacemacs-theme projectile-rails
-	centaur-tabs undo-tree tide))
-
-; install the missing packages
-(dolist (package package-list)
-  (unless (package-installed-p package)
-    (package-install package)))
+(setq-default truncate-lines t)
 
 (setq scroll-step 1)
 
 (setq mark-ring-max 6)
 (setq global-mark-ring-max 6)
 
-(require
- 'better-defaults)
 (custom-set-faces
- '(default ((t (:background nil)))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil))))
+ '(lsp-ui-doc-background ((t (:background nil))))
+ '(lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic))))))
 
+(use-package smartparens)
 (require 'smartparens-config)
 
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 ;; Draws a line between the beginning and ending of block indents
-(require 'highlight-indent-guides)
+(use-package highlight-indent-guides)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-;; (setq highlight-indent-guides-bitmap -function 'highlight-indent-guides--bitmap-line)
 (setq highlight-indent-guides-method 'bitmap)
-;; (setq highlight-indent-guides-auto-enabled 'nil)
-;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
-;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
-;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
@@ -67,63 +80,46 @@
 (setq highlight-indent-guides-highlighter-function 'my-highlighter)
 
 (cua-selection-mode 1)
+(use-package yasnippet)
+(require 'yasnippet)
 (yas-global-mode 1)
 (scroll-bar-mode 1)
 (smartparens-global-mode 1)
 (use-package rainbow-delimiters
   :hook ((prog-mode . rainbow-delimiters-mode)))
 
-;; (use-package tree-sitter
-;;   :init (global-tree-sitter-mode)
-;;   :hook ((ruby-mode . tree-sitter-hl-mode)
-;;          (js-mode . tree-sitter-hl-mode)
-;;          (typescript-mode . tree-sitter-hl-mode)
-;;          (go-mode . tree-sitter-hl-mode)))
-;; (use-package tree-sitter-langs)
-
 (setq scroll-preserve-screen-position 1)
-;;scroll window up/down by one line
-(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
-(global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
+(global-set-key (kbd "M-<up>") #'scroll-down-line)
+(global-set-key (kbd "M-<down>") #'scroll-up-line)
+(global-set-key (kbd "s-<up>") #'scroll-down-line)
+(global-set-key (kbd "s-<down>") #'scroll-up-line)
+(global-set-key (kbd "M->") (kbd "C-x ^"))
+(global-set-key (kbd "M-<") (kbd "C-u -1 C-x ^"))
 (global-set-key (kbd "M-s-<down>") (kbd "C-x ^"))
 (global-set-key (kbd "M-s-<up>") (kbd "C-u -1 C-x ^"))
 
 (global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
-(global-set-key (kbd "s-b") #'xref-find-definitions)
-(global-set-key (kbd "s-r") #'replace-string)
+;; (global-set-key (kbd "s-t") #'helm-projectile-find-file-dwim)
+(global-set-key (kbd "M-b") #'xref-find-definitions)
+(global-set-key (kbd "M-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 (global-set-key (kbd "C-f") #'projectile-find-file)
-(global-set-key (kbd "s-F") #'helm-projectile-ag)
+(global-set-key (kbd "M-F") #'helm-projectile-ag)
 (global-set-key (kbd "M-s") #'company-yasnippet)
+
+(global-set-key (kbd "C-z") #'undo)
+(global-set-key (kbd "C-c C-c") #'cua-copy-region)
+(global-set-key (kbd "C-v") #'cua-paste)
+(global-set-key (kbd "C-s") #'save-buffer)
 
 (add-hook 'isearch-mode-hook
   (lambda ()
-  (define-key isearch-mode-map (kbd "s-f") 'isearch-repeat-forward)
+  (define-key isearch-mode-map (kbd "M-f") 'isearch-repeat-forward)
   )
 )
 
-;; ;typescript
-;; (setq create-lockfiles nil)
-;; (defun setup-tide-mode ()
-;;    (interactive)
-;;    (tide-setup)
-;;    (flycheck-mode +1)
-;;    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;    (eldoc-mode +1)
-;;    (tide-hl-identifier-idle-time +1)
-;;    (company-mode +1))
-
-
 ;; ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
-
-;; ;; formats the buffer before saving
-;; (add-hook 'before-save-hook 'tide-format-before-save)
-
-;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-
-;; (add-hook 'lsp-hook #'setup-tide-mode)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -143,8 +139,18 @@
         require-final-newline nil))
 (add-hook 'java-mode-hook 'tkj-default-code-style-hook)
 
+(use-package super-save
+  :ensure t
+  :config
+  (super-save-mode +1))
+
+(super-save-mode +1)
+(setq super-save-auto-save-when-idle t)
+(setq auto-save-default nil)
+
 (use-package evil-nerd-commenter
-  :bind ("s-/" . evilnc-comment-or-uncomment-lines))
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines)
+  )
 
 (use-package flycheck
   :init
@@ -156,19 +162,19 @@
                  (reusable-frames . visible)
                  (window-height   . 0.15))))
 
+(setq xref-prompt-for-identifier nil)
+
 (defun my-java-mode-hook ()
   (auto-fill-mode)
   (flycheck-mode)
   (git-gutter+-mode)
   (gtags-mode)
-  ;(idle-highlight)
   (subword-mode)
   (yas-minor-mode)
   (set-fringe-style '(8 . 0))
   (define-key c-mode-base-map (kbd "C-M-j") 'tkj-insert-serial-version-uuid)
   (define-key c-mode-base-map (kbd "C-m") 'c-context-line-break)
   (define-key c-mode-base-map (kbd "S-<f7>") 'gtags-find-tag-from-here)
-  (define-key c-mode-base-map (kbd "C-t") #'dap-java-run-test-class)
 
   ;; Fix indentation for anonymous classes
   (c-set-offset 'substatement-open 0)
@@ -179,12 +185,13 @@
   (c-set-offset 'arglist-intro '++))
 (add-hook 'java-mode-hook 'my-java-mode-hook)
 
-;(use-package vterm :ensure t)
-(add-to-list 'load-path "~/.emacs.d/emacs-libvterm")
-(require 'vterm)
-
 (use-package projectile :ensure t)
 (use-package yasnippet :ensure t)
+
+(setq lsp-headerline-breadcrumb-enable-diagnostics nil)
+(setq lsp-modeline-code-actions-enable nil)
+(setq lsp-ui-doc-show-with-cursor nil)
+(setq lsp-modeline-code-actions-enable t)
 
 (use-package lsp-mode
   :defer t
@@ -198,27 +205,40 @@
   :bind (:map lsp-mode-map ("C-t" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook ((java-mode python-mode go-mode
-          js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode
-          c-mode c++-mode objc-mode) . lsp))
+  :hook ((python-mode go-mode lsp-java ccls
+          js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode c-mode c++-mode) . lsp))
+
+(use-package lsp-dart
+  :ensure t
+  :hook (dart-mode . lsp))
 
 (use-package ccls
   :ensure t
   :config
   (setq ccls-executable "/usr/local/bin/ccls")
   (setq lsp-prefer-flymake nil)
+  (setq ccls-initialization-options
+        '(:clang (:extraArgs ["-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1"
+                              "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+                              "-isystem/usr/local/include"
+                              "-isystem/usr/local/include/gtest"
+                              "-isystem/usr/local/lib"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"]
+                   :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0")))
   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+  (setq flycheck-gcc-include-path '("/usr/local/include"))
+  (setq flycheck-clang-include-path '("/usr/local/include"))
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
          (lambda () (require 'ccls) (lsp))))
 
-(require 'flymake-google-cpplint)
-(add-hook 'c++-mode-hook 'flymake-google-cpplint-load)
-
 (use-package typescript-mode
   :mode "\\.ts\\'"
-  ;; :mode "\\.js\\'"
+  :mode "\\.js\\'"
   :mode "\\.tsx\\'"
-  ;; :mode "\\.jsx\\'"
+  :mode "\\.jsx\\'"
   :hook (typescript-mode . lsp-deferred)
   :config
   (setq typescript-indent-level 2)
@@ -236,10 +256,6 @@
   )
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
-(lsp-register-custom-settings
- '(("gopls.completeUnimported" t t)
-   ("gopls.staticcheck" t t)))
-
 (use-package rjsx-mode
   ;; :mode "\\.js\\'"
   ;; :mode "\\.jsx\\'"
@@ -249,18 +265,18 @@
   (require 'dap-node)
   (dap-node-setup))
 
+(use-package yaml-mode)
 (require 'yaml-mode)
     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
 (use-package hydra :ensure t)
-;; (use-package company-lsp)
 
 (use-package lsp-ui
   :after lsp-mode
   :diminish
   :commands lsp-ui-mode
   :custom-face
-  (lsp-ui-doc-background ((t (:background "lightgrey"))))
+  (lsp-ui-doc-background ((t (:background nil))))
   (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
   :bind
   (:map lsp-ui-mode-map
@@ -278,8 +294,9 @@
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-code-actions nil)
   (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
-  (lsp-ui-doc-delay 2)
+  (lsp-ui-doc-delay 5)
   :config
+  (setq lsp-ui-flycheck-enable t)
   ;; Use lsp-ui-doc-webkit only in GUI
   (if (display-graphic-p)
       (setq lsp-ui-doc-use-webkit t))
@@ -290,29 +307,20 @@
 
 (setq lsp-prefer-capf t)
 
+(setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/")
+(setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/bin/java")
+
 (use-package lsp-java
   :ensure t
-  :init
-  (setq lsp-java-vmargs
-        (list
-         "-noverify"
-         "-Xmx2G"
-         "-XX:+UseG1GC"
-         "-XX:+UseStringDeduplication"
-         "-javaagent:/Users/ben/.m2//repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"
-         )
-
-        ;; Don't organise imports on save
-        lsp-java-save-action-organize-imports nil
-
-        ;; Currently (2019-04-24), dap-mode works best with Oracle
-        ;; JDK, see https://github.com/emacs-lsp/dap-mode/issues/31
-        ;;
-        ;; lsp-java-java-path "~/.emacs.d/oracle-jdk-12.0.1/bin/java"
-        lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home/bin/java"
-        )
-
   :config
+  (setq lsp-java-vmargs
+      (list
+  ;;        "-noverify"
+  ;;        "-Xmx1G"
+  ;;        "-XX:+UseG1GC"
+  ;;        "-XX:+UseStringDeduplication"
+         "-javaagent:/Users/ben/.m2/repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"))
+
   (add-hook 'java-mode-hook #'lsp)
 )
 
@@ -347,28 +355,24 @@
   :ensure nil
   :after (lsp-java)
 
-  ;; The :bind here makes use-package fail to lead the dap-java block!
-  ;; :bind
-  ;; (("C-c R" . dap-java-run-test-class)
-  ;;  ("C-c d" . dap-java-debug-test-method)
-  ;;  ("C-c r" . dap-java-run-test-method)
-  ;;  )
-
   :config
   (global-set-key (kbd "<f7>") 'dap-step-in)
   (global-set-key (kbd "<f8>") 'dap-next)
   (global-set-key (kbd "<f9>") 'dap-continue)
-  (global-set-key (kbd "s-b") 'lsp-find-implementation)
+  (global-set-key (kbd "M-b") 'lsp-find-implementation)
   (global-set-key (kbd "C-b") 'lsp-find-implementation)
-  ;; (define-key lsp-mode-map (kbd "C-t") #'dap-java-run-test-class)
-  (setq dap-java-test-additional-args '("-n" "\".*(Test|IT).*\""))
+  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/11.1.0_1/Toolchains/LLVM11.1.0.xctoolchain/usr/bin/lldb-vscode"))
   )
+
+(require 'dap-lldb)
+(require 'dap-cpptools)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End Java
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package which-key)
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'cpp-mode-hook 'lsp)
@@ -397,13 +401,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
+(use-package back-button)
 (require 'back-button)
 (back-button-mode 1)
 
 (require 'flycheck)
 
+(use-package web-mode)
 (require 'web-mode)
+(use-package add-node-modules-path)
 (require 'add-node-modules-path)
 
 
@@ -423,10 +429,6 @@
 (setq javascript-indent-level 2)
 (setq web-mode-markup-indent-offset 2)
 
-;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . typescript-mode))
-;; (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
-;; (add-to-list 'auto-mode-alist '("\\.js\\'" . lsp-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
 (add-hook 'lsp-mode-hook
           (lambda ()
@@ -441,12 +443,6 @@
           (lambda ()
             (when (string-equal "js" (file-name-extension buffer-file-name)))))
 
-
-;; ;; enable typescript-tslint checker
-;; (flycheck-add-mode 'typescript-tslint 'lsp-mode)
-
-;; ;; formats the buffer before saving
-;; (add-hook 'before-save-hook 'tide-format-before-save)
 
 (defun format-and-save ()
   (interactive)
@@ -470,7 +466,7 @@
       (go-test))
     )
   (when(string= (file-name-extension buffer-file-name) "java")
-    (dap-java-run-test-class))
+    (mvn-test))
   )
 
 (defun npm-test()
@@ -479,8 +475,15 @@
                  "*Messages*")
   )
 
+(defun mvn-test()
+  (shell-command (concat "cd " (projectile-project-root) " && mvn test &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
+
+
 line-spacing(defun go-test()
-  (shell-command (concat "cd " (projectile-project-root) "/test && go test &")
+  (shell-command (concat "cd " (projectile-project-root) " && go test ./... &")
                  "*test-runner*"
                  "*Messages*")
   )
@@ -493,40 +496,40 @@ line-spacing(defun go-test()
                    "*Messages*")
     ))
 
+(use-package company)
 (require 'company)
+(use-package company-box)
 (require 'company-box)
-
-;; (require 'company-web-html)                          ; load company mode html backend
-;; (require 'company-web-jade)                          ; load company mode jade backend
-;; (require 'company-web-slim)                          ; load company mode slim backend
-;; ;; (use-package company-mode
-;;   :after lsp-mode
-;;   :hook (prog-mode . company-mode)
-;;   :bind (:map company-active-map
-;;               ("<tab>" . company-completion-selection))
-;;   (:map lsp-mode-map
-;;         ("<tab>" . company-indent-or-complete-common))
-;;   (company-minimum-prefix-length 1)
-;;   (company-idle-delay 0.0))
-
+;; (require 'company-tabnine)
 (add-hook 'after-init-hook 'global-company-mode)
-(add-hook 'company-mode-hook 'company-box-mode)
+;; (add-hook 'company-mode-hook 'company-box-mode)
+;; (add-to-list 'company-backends #'company-tabnine)
+
+;; workaround for company-transformers
+(setq company-tabnine--disable-next-transform nil)
+(defun my-company--transform-candidates (func &rest args)
+  (if (not company-tabnine--disable-next-transform)
+      (apply func args)
+    (setq company-tabnine--disable-next-transform nil)
+    (car args)))
+
+(defun my-company-tabnine (func &rest args)
+  (when (eq (car args) 'candidates)
+    (setq company-tabnine--disable-next-transform t))
+  (apply func args))
+
+(advice-add #'company--transform-candidates :around #'my-company--transform-candidates)
+(advice-add #'company-tabnine :around #'my-company-tabnine)
+
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0)
 (setq company-lsp-cache-candidates t)
+(setq company-show-numbers t)
 
-
-;; (add-to-list 'company-backends 'company-tern)
-;; (add-to-list 'company-backends 'ac-js2-company)
-;; (setq ac-js2-evaluate-calls t)
-;; (add-to-list 'company-backends 'company-flow)
-;; (add-to-list 'company-backends 'company-web)
-
-
+(use-package prettier-js)
 (require 'prettier-js)
 (add-hook 'js2-mode-hook 'prettier-js-mode)
 (add-hook 'js-mode-hook 'prettier-js-mode)
-(add-hook 'lsp-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;loads ruby mode when a .rb file is opened.
@@ -545,37 +548,14 @@ line-spacing(defun go-test()
 (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
 
+(use-package multiple-cursors)
 (require 'multiple-cursors)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
-(require 'ruby-test-mode)
-
-(add-hook 'ruby-mode-hook
-          (lambda () (rvm-activate-corresponding-ruby)))
-(add-hook 'ruby-mode-hook 'yard-mode)
-(add-hook 'ruby-mode-hook 'ruby-electric-mode)
-(add-hook 'ruby-mode-hook 'ruby-refactor-mode)
-(add-hook 'ruby-mode-hook 'ruby-test-mode)
-
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'hl-line-mode)
-
-(add-to-list 'auto-mode-alist
-             '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
-(add-to-list 'auto-mode-alist
-             '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . ruby-mode))
-
-(require 'rvm)
-(rvm-use-default)
-
-(setq seeing-is-believing-prefix "C-.")
-(add-hook 'ruby-mode-hook 'seeing-is-believing)
-(require 'seeing-is-believing)
-
-(add-hook 'ruby-mode-hook 'auto-complete-mode)
-
 
 (delete-selection-mode 1)
 
@@ -638,31 +618,31 @@ the current position of point, then move it to the beginning of the line."
     (when (eq pt (point))
       (beginning-of-line))))
 
+(use-package exec-path-from-shell)
 (when (memq window-system '(mac ns x))
   (require 'exec-path-from-shell)
   (setq-default exec-path-from-shell-shell-name "/bin/zsh")
   (exec-path-from-shell-copy-env "PATH")
 (exec-path-from-shell-initialize))
 
-(global-set-key (kbd "s-d") 'duplicate-line-or-region)
+(global-set-key (kbd "M-d") 'duplicate-line-or-region)
 (global-set-key (kbd "S-<return>") 'insert-line-below)
-(global-set-key (kbd "M-]") 'other-window)
 (global-set-key (kbd "M-C-<right>") 'windmove-right)
 (global-set-key (kbd "M-C-<left>") 'windmove-left)
 (global-set-key (kbd "M-C-<up>") 'windmove-up)
 (global-set-key (kbd "M-C-<down>") 'windmove-down)
-(global-set-key (kbd "M-<down>") 'windmove-delete-down)
+(global-set-key (kbd "M-?") 'windmove-delete-down)
 (global-set-key (kbd "s-<s-right>") 'move-end-of-line)
 (global-set-key (kbd "s-<s-left>") 'smart-line-beginning)
-(global-set-key (kbd "s-1") 'treemacs-select-window)
-(global-set-key (kbd "s-e") 'mc/edit-ends-of-lines)
+(global-set-key (kbd "C-1") 'treemacs-select-window)
+(global-set-key (kbd "C-c m e") 'mc/edit-ends-of-lines)
 
 (define-key prog-mode-map (kbd "M-RET") 'emr-show-refactor-menu)
 (define-key prog-mode-map (kbd "C-t") 'rspec-verify-all)
 (define-key prog-mode-map (kbd "s-<s-right>") 'move-end-of-line)
 (define-key prog-mode-map (kbd "s-<s-left>") 'smart-line-beginning)
-(define-key prog-mode-map (kbd "s-[") 'back-button-global-backward)
-(define-key prog-mode-map (kbd "s-]") 'back-button-global-forward)
+(define-key prog-mode-map (kbd "M-[") 'back-button-global-backward)
+(define-key prog-mode-map (kbd "M-]") 'back-button-global-forward)
 
 (require 'treemacs)
 (require 'dash)
@@ -672,16 +652,20 @@ the current position of point, then move it to the beginning of the line."
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (projectile-mode +1)
 
+(use-package all-the-icons)
 (require 'all-the-icons)
 
 (when (window-system)
   (tool-bar-mode -1)
-  ;; (scroll-bar-mode -1)
   (tooltip-mode -1))
 
+(use-package spaceline)
 (require 'spaceline-config)
 (spaceline-emacs-theme)
 
+(use-package solaire-mode)
+
+;(use-package doom)
 (use-package doom-themes
   :config
 
@@ -690,13 +674,8 @@ the current position of point, then move it to the beginning of the line."
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
-  ;; (load-theme 'doom-solarized-light t)
-  ;; (load-theme 'doom-material)
+  ;; (load-theme 'doom-one-light t)
   (load-theme 'doom-one-light t)
-  ;; (load-theme 'doom-tomorrow-day t)
-  ;; (load-theme 'spacemacs-light t)
-  ;; (load-theme 'doom-opera-light t)
-  ;;; OPTIONAL
 
   (setq doom-themes-treemacs-theme "doom-colors")
   (doom-themes-treemacs-config)
@@ -705,41 +684,13 @@ the current position of point, then move it to the beginning of the line."
 
 (use-package doom-modeline
   :ensure t
-  :init (doom-modeline-mode 1))
-
-
-;; (use-package doom-themes
-;;   :config
-;;   (let ((chosen-theme 'doom-one-light))
-;;     (doom-themes-visual-bell-config)
-;;     (doom-themes-org-config)
-;;     (setq doom-challenger-deep-brighter-comments t
-;;           doom-challenger-deep-brighter-modeline t)
-;;     (load-theme chosen-theme)))
-
+  :hook (after-init . doom-modeline-mode))
 
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
-(exec-path-from-shell-copy-env "GEM_PATH")
-(projectile-rails-global-mode)
+;;(projectile-rails-global-mode)
 
 (treemacs)
-;; (treemacs-load-theme "Default")
-;; (treemacs-load-theme "Netbeans")
-;; (treemacs-load-theme "Idea")
-
-
-;; (setq centaur-tabs-style "box")
-;; (setq centaur-tabs-height 32)
-;; (setq centaur-tabs-set-icons t)
-;; (setq centaur-tabs-gray-out-icons 'buffer)
-;; (setq centaur-tabs-set-bar 'under)
-;; (setq x-underline-at-descent-line t)
-;; (centaur-tabs-mode)
-;; (centaur-tabs-headline-match)
-;; (centaur-tabs-group-by-projectile-project)
-;; (global-set-key (kbd "s-{") 'centaur-tabs-backward)
-;; (global-set-key (kbd "s-}") 'centaur-tabs-forward)
 
 (use-package centaur-tabs
   :demand
@@ -758,14 +709,14 @@ the current position of point, then move it to the beginning of the line."
   (centaur-tabs-set-bar 'under)
 
   :bind
-  (("s-{" . #'centaur-tabs-backward)
-   ("s-}" . #'centaur-tabs-forward)))
+  (
+   ("s-{" . #'centaur-tabs-backward)
+   ("s-}" . #'centaur-tabs-forward)
+   ("C-{" . #'centaur-tabs-backward)
+   ("C-}" . #'centaur-tabs-forward)
+   )
+  )
 
-
-;; (scroll-bar-mode)
-
-;(setq treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
-;      treemacs-indentation 1)
 
   (setq treemacs-icon-tag-node-open-png   (propertize "− " 'face 'font-lock-keyword-face)
         treemacs-icon-tag-node-closed-png (propertize "+ " 'face 'font-lock-keyword-face)
@@ -806,12 +757,10 @@ the current position of point, then move it to the beginning of the line."
 ;; undo tree mode                                                         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;turn on everywhere
-(global-undo-tree-mode 1)
 ;; make ctrl-z undo
 (global-set-key (kbd "s-z") 'undo)
 ;; make ctrl-Z redo
-(defalias 'redo 'undo-tree-redo)
-(global-set-key (kbd "s-Z") 'redo)
+(global-set-key (kbd "s-Z") 'undo-redo)
 
 (set-face-attribute 'default nil :height 130)
 
@@ -858,12 +807,9 @@ the current position of point, then move it to the beginning of the line."
         (comment-or-uncomment-region beg end)))
 
 
-;(global-set-key [\M-\S-up] 'move-text-up)
-;(global-set-key [\M-\S-down] 'move-text-down)
-(global-set-key (kbd "S-s-<up>") 'move-text-up)
-(global-set-key (kbd "S-s-<down>") 'move-text-down)
-;; (global-set-key (kbd "s-/") 'comment-or-uncomment-region-or-line)
-(global-set-key (kbd "s-w") 'kill-buffer)
+(global-set-key (kbd "S-M-<up>") 'move-text-up)
+(global-set-key (kbd "S-M-<down>") 'move-text-down)
+(global-set-key (kbd "M-w") 'kill-buffer)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -871,9 +817,9 @@ the current position of point, then move it to the beginning of the line."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
-   ["#fafafa" "#99324b" "#4f894c" "#9a7500" "#3b6ea8" "#97365b" "#398eac" "#2a2a2a"])
+   ["#282c34" "#99324b" "#4f894c" "#9a7500" "#3b6ea8" "#97365b" "#398eac" "#2a2a2a"])
  '(custom-safe-themes
-   '("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
+   '("f4876796ef5ee9c82b125a096a590c9891cec31320569fc6ff602ff99ed73dca" "08a27c4cde8fcbb2869d71fdc9fa47ab7e4d31c27d40d59bf05729c4640ce834" "8f5a7a9a3c510ef9cbb88e600c0b4c53cdcdb502cfe3eb50040b7e13c6f4e78e" "aaa4c36ce00e572784d424554dcc9641c82d1155370770e231e10c649b59a074" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
  '(ensime-sem-high-faces
    '((var :foreground "#000000" :underline
           (:style wave :color "yellow"))
@@ -900,8 +846,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode tide find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode undo-tree rubocop kaolin-themes sublimity minimap magit enh-ruby-mode twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing rvm ruby-test-mode ruby-refactor ruby-electric rspec-mode recompile-on-save projectile-rails one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme chruby centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag ac-inf-ruby))
- '(safe-local-variable-values '((ruby-test-runner . rspec)))
+   '(git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
@@ -926,68 +871,21 @@ the current position of point, then move it to the beginning of the line."
  '(vc-annotate-very-old-color nil))
 
 
-(require 'flymake)
+(when(eq system-type 'darwin)
+    (ignore-errors(set-frame-font "DejaVu Sans Mono-15"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "DejaVu Sans Mono-15"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "DejaVu Sans Mono-15"))
+)
 
-;; I don't like the default colors :)
-(set-face-background 'flymake-errline "white")
-(set-face-background 'flymake-warnline "white")
-
-;; Invoke ruby with '-c' to get syntax checking
-(defun flymake-ruby-init ()
-  (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-	 (local-file  (file-relative-name
-                       temp-file
-                       (file-name-directory buffer-file-name))))
-    (list "ruby" (list "-c" local-file))))
-
-(push '(".+\\.rb$" flymake-ruby-init) flymake-allowed-file-name-masks)
-(push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
-
-(push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3) flymake-err-line-patterns)
-
-(add-hook 'ruby-mode-hook
-          '(lambda ()
-
-	     ;; Don't want flymake mode for ruby regions in rhtml files and also on read only files
-	     (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
-		 (flymake-mode))
-	     ))
-;; (package-initialize)
-
-;; Click [here](https://github.com/hbin/dotfiles-for-emacs) to take a further look.
-(ignore-errors(set-frame-font "Menlo-14"))
-
-;; If you use Emacs Daemon mode
-(add-to-list 'default-frame-alist
-              ;; (cons 'font "Hack:pixelsize=14"))
-(cons 'font "Menlo-14"))
-;;(set-frame-font "Hack-14" nil t)
-;; If you use Emacs Daemon mode
-(add-to-list 'default-frame-alist
-              ;; (cons 'font "Hack:pixelsize=14"))
-(cons 'font "Menlo-14"))
-;;(set-frame-font "Hack-14" nil t)
-
-;; (defvar line-padding 3)
-;; (defun add-line-padding ()
-;;   "Add extra padding between lines"
-
-;;   ; remove padding overlays if they already exist
-;;   (let ((overlays (overlays-at (point-min))))
-;;     (while overlays
-;;       (let ((overlay (car overlays)))
-;;         (if (overlay-get overlay 'is-padding-overlay)
-;;             (delete-overlay overlay)))
-;;       (setq overlays (cdr overlays))))
-
-;;   ; add a new padding overlay
-;;   (let ((padding-overlay (make-overlay (point-min) (point-max))))
-;;     (overlay-put padding-overlay 'is-padding-overlay t)
-;;     (overlay-put padding-overlay 'line-spacing (* .1 line-padding))
-;;     (overlay-put padding-overlay 'line-height (+ 1 (* .1 line-padding))))
-;;   (setq mark-active nil))
-
+(when(eq system-type 'windows-nt)
+    (ignore-errors(set-frame-font "Consolas"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "Consolas"))
+  (add-to-list 'default-frame-alist
+               (cons 'font "Consolas"))
+)
 
 (defun xah-toggle-line-spacing ()
   "Toggle line spacing between no extra space to extra half line height.
@@ -999,15 +897,7 @@ Version 2017-06-02"
     (setq line-spacing 0.5))
   (redraw-frame (selected-frame)))
 
-;; (add-hook 'buffer-list-update-hook 'add-line-padding)
-
 (setq-default cursor-type 'bar)
-;; (setq line-spacing 2)
-
-; list the repositories containing them
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Shell
@@ -1040,8 +930,7 @@ taken from http://stackoverflow.com/a/4116113/446256"
 ;; snippets, please
 (add-hook 'sh-mode-hook 'yas-minor-mode)
 
-;; on the fly syntax checking
-(add-hook 'sh-mode-hook 'flycheck-mode)
+(use-package git-gutter+)
 
 ;; show git changes in the gutter
 (add-hook 'sh-mode-hook 'git-gutter+-mode)
@@ -1090,35 +979,6 @@ taken from http://stackoverflow.com/a/4116113/446256"
 
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (setq require-final-newline t)
-
-;; Nice window divider in TTY emacs
-(defun my-change-window-divider ()
-  (let ((display-table (or buffer-display-table standard-display-table)))
-    (set-display-table-slot display-table 5 ?│)
-    (set-window-display-table (selected-window) display-table)))
-(add-hook 'window-configuration-change-hook 'my-change-window-divider)
-
-;; (defun tkj-presentation-mode()
-;;   (interactive)
-;;   (when window-system
-;;     (progn
-;;       (use-package one-themes)
-;;       (load-theme 'one-light t)
-;;       (set-face-attribute 'default nil
-;;                           :family "Source Code Pro"
-;;                           :height 140
-;;                           :weight 'normal
-;;                           :width 'normal))))
-
-;; (defun tkj-left-margin-focus()
-;;   (interactive)
-;;   (set-window-margins nil 10))
-
-;; (defun tkj-left-margin-zero()
-;;   (interactive)
-;;   (set-window-margins nil 0))
-
-;; (set-default 'truncate-lines t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Automatically expand these words and characters
@@ -1174,6 +1034,9 @@ taken from http://stackoverflow.com/a/4116113/446256"
   ("C-x C-b" . 'tkj-list-buffers))
 (helm-mode 1)
 
+(use-package helm-projectile)
+(use-package helm-ag)
+
 (defun close-all-buffers ()
   (interactive)
   (mapc 'kill-buffer (buffer-list)))
@@ -1221,6 +1084,3 @@ taken from http://stackoverflow.com/a/4116113/446256"
 ;; use imagemagick, if available
 (when (fboundp 'imagemagick-register-types)
   (imagemagick-register-types))
-
-
-;; (toggle-frame-maximized)

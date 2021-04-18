@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: BeforeEach
+# key: @BeforeEach
+# --
+@BeforeEach
+void setup(){
+    $1
+}

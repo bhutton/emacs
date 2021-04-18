@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Test
+# key: @Test
+# --
+@Test
+void $1(){
+    $2
+}
