@@ -57,6 +57,8 @@
 (use-package smartparens)
 (require 'smartparens-config)
 
+(use-package swiper)
+
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
@@ -104,19 +106,20 @@
 (global-set-key (kbd "M-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 (global-set-key (kbd "C-f") #'projectile-find-file)
-(global-set-key (kbd "M-F") #'helm-projectile-ag)
+(global-set-key (kbd "M-F") #'helm-projectile-grep)
 (global-set-key (kbd "M-s") #'company-yasnippet)
 
 (global-set-key (kbd "C-z") #'undo)
 (global-set-key (kbd "C-c C-c") #'cua-copy-region)
 (global-set-key (kbd "C-v") #'cua-paste)
 (global-set-key (kbd "C-s") #'save-buffer)
+(global-set-key (kbd "C-M-s") #'swiper)
 
-(add-hook 'isearch-mode-hook
-  (lambda ()
-  (define-key isearch-mode-map (kbd "M-f") 'isearch-repeat-forward)
-  )
-)
+;; (add-hook 'isearch-mode-hook
+;;   (lambda ()
+;;   (define-key isearch-mode-map (kbd "M-f") 'isearch-repeat-forward)
+;;   )
+;; )
 
 ;; ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -361,8 +364,7 @@
   (global-set-key (kbd "<f9>") 'dap-continue)
   (global-set-key (kbd "M-b") 'lsp-find-implementation)
   (global-set-key (kbd "C-b") 'lsp-find-implementation)
-  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/11.1.0_1/Toolchains/LLVM11.1.0.xctoolchain/usr/bin/lldb-vscode"))
-  )
+  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/11.1.0_1/Toolchains/LLVM11.1.0.xctoolchain/usr/bin/lldb-vscode")))
 
 (require 'dap-lldb)
 (require 'dap-cpptools)
@@ -846,7 +848,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+   '(wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
