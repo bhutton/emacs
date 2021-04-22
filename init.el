@@ -106,7 +106,7 @@
 (global-set-key (kbd "M-r") #'replace-string)
 (global-set-key (kbd "C-M-l") #'lsp-format-buffer)
 (global-set-key (kbd "C-f") #'projectile-find-file)
-(global-set-key (kbd "M-F") #'helm-projectile-grep)
+(global-set-key (kbd "M-F") #'helm-projectile-ag)
 (global-set-key (kbd "M-s") #'company-yasnippet)
 
 (global-set-key (kbd "C-z") #'undo)
@@ -114,6 +114,9 @@
 (global-set-key (kbd "C-v") #'cua-paste)
 (global-set-key (kbd "C-s") #'save-buffer)
 (global-set-key (kbd "C-M-s") #'swiper)
+(global-set-key (kbd "s-f") #'swiper)
+(global-set-key (kbd "s-F") #'helm-projectile-grep)
+
 
 ;; (add-hook 'isearch-mode-hook
 ;;   (lambda ()
