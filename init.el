@@ -262,18 +262,18 @@
   )
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
-(use-package rjsx-mode
-  ;; :mode "\\.js\\'"
-  ;; :mode "\\.jsx\\'"
-  :hook (rjsx-mode . lsp-deferred)
-  :config
-  (setq typescript-indent-level 2)
-  (require 'dap-node)
-  (dap-node-setup))
+;; (use-package rjsx-mode
+;;   ;; :mode "\\.js\\'"
+;;   ;; :mode "\\.jsx\\'"
+;;   :hook (rjsx-mode . lsp-deferred)
+;;   :config
+;;   (setq typescript-indent-level 2)
+;;   (require 'dap-node)
+;;   (dap-node-setup))
 
-(use-package yaml-mode)
-(require 'yaml-mode)
-    (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+;; (use-package yaml-mode)
+;; (require 'yaml-mode)
+;;     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
 (use-package hydra :ensure t)
 
@@ -367,7 +367,7 @@
   (global-set-key (kbd "<f9>") 'dap-continue)
   (global-set-key (kbd "M-b") 'lsp-find-implementation)
   (global-set-key (kbd "C-b") 'lsp-find-implementation)
-  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/11.1.0_1/Toolchains/LLVM11.1.0.xctoolchain/usr/bin/lldb-vscode")))
+  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/12.0.0/bin/lldb-vscode")))
 
 (require 'dap-lldb)
 (require 'dap-cpptools)
