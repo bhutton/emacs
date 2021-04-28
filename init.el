@@ -229,11 +229,11 @@
                               "-isystem/usr/local/include"
                               "-isystem/usr/local/include/gtest"
                               "-isystem/usr/local/lib"
-                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5/include"
                               "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
                               "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
                               "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"]
-                   :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0")))
+                   :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5")))
   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
   (setq flycheck-gcc-include-path '("/usr/local/include"))
   (setq flycheck-clang-include-path '("/usr/local/include"))
@@ -367,7 +367,7 @@
   (global-set-key (kbd "<f9>") 'dap-continue)
   (global-set-key (kbd "M-b") 'lsp-find-implementation)
   (global-set-key (kbd "C-b") 'lsp-find-implementation)
-  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/12.0.0/bin/lldb-vscode")))
+  (setq dap-lldb-debug-program '("/usr/local/Cellar/llvm/12.0.0/Toolchains/LLVM12.0.0.xctoolchain/usr/bin/lldb-vscode")))
 
 (require 'dap-lldb)
 (require 'dap-cpptools)
@@ -404,7 +404,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (use-package back-button)
 (require 'back-button)
@@ -448,6 +447,8 @@
           (lambda ()
             (when (string-equal "js" (file-name-extension buffer-file-name)))))
 
+(add-hook 'eshell-mode-hook (lambda () (company-mode -1)) 'append)
+(add-hook 'eshell-mode-hook (lambda () (helm-mode -1)) 'append)
 
 (defun format-and-save ()
   (interactive)
@@ -509,6 +510,8 @@ line-spacing(defun go-test()
 (add-hook 'after-init-hook 'global-company-mode)
 ;; (add-hook 'company-mode-hook 'company-box-mode)
 ;; (add-to-list 'company-backends #'company-tabnine)
+
+(remove-hook 'eshell-mode-hook 'helm-mode)
 
 ;; workaround for company-transformers
 (setq company-tabnine--disable-next-transform nil)
@@ -814,7 +817,7 @@ the current position of point, then move it to the beginning of the line."
 
 (global-set-key (kbd "S-M-<up>") 'move-text-up)
 (global-set-key (kbd "S-M-<down>") 'move-text-down)
-(global-set-key (kbd "M-w") 'kill-buffer)
+(global-set-key (kbd "s-w") 'kill-buffer)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
