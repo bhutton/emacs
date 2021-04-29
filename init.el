@@ -511,8 +511,6 @@ line-spacing(defun go-test()
 ;; (add-hook 'company-mode-hook 'company-box-mode)
 ;; (add-to-list 'company-backends #'company-tabnine)
 
-(remove-hook 'eshell-mode-hook 'helm-mode)
-
 ;; workaround for company-transformers
 (setq company-tabnine--disable-next-transform nil)
 (defun my-company--transform-candidates (func &rest args)
