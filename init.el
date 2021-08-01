@@ -209,36 +209,37 @@
   (read-process-output-max (* 1024 1024))
   (lsp-eldoc-hook nil)
   :bind (:map lsp-mode-map ("C-t" . test-suite))
+  :bind (:map lsp-mode-map ("C-r" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook ((python-mode go-mode lsp-java ccls
+  :hook ((python-mode go-mode lsp-java
           js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode c-mode c++-mode) . lsp))
 
 (use-package lsp-dart
   :ensure t
   :hook (dart-mode . lsp))
 
-(use-package ccls
-  :ensure t
-  :config
-  (setq ccls-executable "/usr/local/bin/ccls")
-  (setq lsp-prefer-flymake nil)
-  (setq ccls-initialization-options
-        '(:clang (:extraArgs ["-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1"
-                              "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
-                              "-isystem/usr/local/include"
-                              "-isystem/usr/local/include/gtest"
-                              "-isystem/usr/local/lib"
-                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5/include"
-                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
-                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
-                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"]
-                   :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5")))
-  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
-  (setq flycheck-gcc-include-path '("/usr/local/include"))
-  (setq flycheck-clang-include-path '("/usr/local/include"))
-  :hook ((c-mode c++-mode objc-mode cuda-mode) .
-         (lambda () (require 'ccls) (lsp))))
+;; (use-package ccls
+;;   :ensure t
+;;   :config
+;;   (setq ccls-executable "/usr/local/bin/ccls")
+;;   (setq lsp-prefer-flymake nil)
+;;   (setq ccls-initialization-options
+;;         '(:clang (:extraArgs ["-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1"
+;;                               "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+;;                               "-isystem/usr/local/include"
+;;                               "-isystem/usr/local/include/gtest"
+;;                               "-isystem/usr/local/lib"
+;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5/include"
+;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"]
+;;                    :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5")))
+;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+;;   (setq flycheck-gcc-include-path '("/usr/local/include"))
+;;   (setq flycheck-clang-include-path '("/usr/local/include"))
+;;   :hook ((c-mode c++-mode objc-mode cuda-mode) .
+;;          (lambda () (require 'ccls) (lsp))))
 
 (use-package typescript-mode
   :mode "\\.ts\\'"
@@ -371,6 +372,7 @@
 
 (require 'dap-lldb)
 (require 'dap-cpptools)
+(setq lsp-clangd-binary-path "/usr/local/Cellar/llvm/12.0.1/bin/clangd")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -470,6 +472,8 @@
       (npm-test))
     (when(string= (file-name-extension buffer-file-name) "go")
       (go-test))
+    (when(string= (file-name-extension buffer-file-name) "cpp")
+      (cpp-test))
     )
   (when(string= (file-name-extension buffer-file-name) "java")
     (mvn-test))
@@ -488,11 +492,18 @@
   )
 
 
-line-spacing(defun go-test()
+(defun go-test()
   (shell-command (concat "cd " (projectile-project-root) " && go test ./... &")
                  "*test-runner*"
                  "*Messages*")
   )
+
+(defun cpp-test()
+  (shell-command (concat (projectile-project-root) "build.sh &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
+
 
 (defun test-suite-jest ()
   (interactive)
@@ -654,6 +665,7 @@ the current position of point, then move it to the beginning of the line."
 (require 'dash)
 
 (require 'projectile)
+(setq projectile-indexing-method 'native)
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (projectile-mode +1)
@@ -852,7 +864,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+   '(clang clangd lsp-clangd wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-treemacs lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
