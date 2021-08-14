@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: reactfunction
+# key: reactfunction
+# --
+
+import React from 'react';
+
+const $1 = () => {
+  return (
+    $2
+  )
+}
+
+export default $1;
