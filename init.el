@@ -1,3 +1,5 @@
+(setenv "LIBRARY_PATH" "/usr/local/opt/gcc/lib/gcc/11:/usr/local/opt/libgccjit/lib/gcc/11:/usr/local/opt/gcc/lib/gcc/11/gcc/x86_64-apple-darwin20/11.2.0")
+(setenv "LIBRARY_PATH" "/usr/local/opt/gcc/lib/gcc/11:/usr/local/opt/libgccjit/lib/gcc/11:/usr/local/opt/gcc/lib/gcc/11/gcc/x86_64-apple-darwin20/11.2.0")
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/"))
@@ -208,7 +210,7 @@
   (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
   (lsp-file-watch-threshold 2000)
   (read-process-output-max (* 1024 1024))
-  (lsp-eldoc-hook nil)
+  ;; (lsp-eldoc-hook nil)
   :bind (:map lsp-mode-map ("C-t" . test-suite))
   :bind (:map lsp-mode-map ("C-r" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
@@ -220,27 +222,27 @@
   :ensure t
   :hook (dart-mode . lsp))
 
-;; (use-package ccls
-;;   :ensure t
-;;   :config
-;;   (setq ccls-executable "/usr/local/bin/ccls")
-;;   (setq lsp-prefer-flymake nil)
-;;   (setq ccls-initialization-options
-;;         '(:clang (:extraArgs ["-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1"
-;;                               "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
-;;                               "-isystem/usr/local/include"
-;;                               "-isystem/usr/local/include/gtest"
-;;                               "-isystem/usr/local/lib"
-;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5/include"
-;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
-;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
-;;                               "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"]
-;;                    :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5")))
-;;   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
-;;   (setq flycheck-gcc-include-path '("/usr/local/include"))
-;;   (setq flycheck-clang-include-path '("/usr/local/include"))
-;;   :hook ((c-mode c++-mode objc-mode cuda-mode) .
-;;          (lambda () (require 'ccls) (lsp))))
+(use-package ccls
+  :ensure t
+  :config
+  (setq ccls-executable "/usr/local/bin/ccls")
+  (setq lsp-prefer-flymake nil)
+  (setq ccls-initialization-options
+        '(:clang (:extraArgs ["-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1"
+                              "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+                              "-isystem/usr/local/include"
+                              "-isystem/usr/local/include/gtest"
+                              "-isystem/usr/local/lib"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+                              "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"]
+                   :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.5")))
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+  (setq flycheck-gcc-include-path '("/usr/local/include"))
+  (setq flycheck-clang-include-path '("/usr/local/include"))
+  :hook ((c-mode c++-mode objc-mode cuda-mode) .
+         (lambda () (require 'ccls) (lsp))))
 
 (use-package typescript-mode
   :mode "\\.ts\\'"
@@ -499,12 +501,18 @@
                  "*Messages*")
   )
 
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
 (defun cpp-test()
   (shell-command (concat (projectile-project-root) "build.sh &")
                  "*test-runner*"
                  "*Messages*")
   )
 
+(defun my-shell-execute(cmd)
+   (interactive "sShell command: ")
+   (shell (get-buffer-create "my-shell-buf"))
+   (process-send-string (get-buffer-process "my-shell-buf") (concat "reset\n" (projectile-project-root) cmd "build.sh\nexit 0 &> /dev/null\n")))
 
 (defun test-suite-jest ()
   (interactive)
@@ -515,13 +523,14 @@
     ))
 
 (use-package company)
+(use-package company-tabnine)
 (require 'company)
 (use-package company-box)
 (require 'company-box)
-;; (require 'company-tabnine)
+(require 'company-tabnine)
 (add-hook 'after-init-hook 'global-company-mode)
-;; (add-hook 'company-mode-hook 'company-box-mode)
-;; (add-to-list 'company-backends #'company-tabnine)
+(add-hook 'company-mode-hook 'company-box-mode)
+(add-to-list 'company-backends #'company-tabnine)
 
 ;; workaround for company-transformers
 (setq company-tabnine--disable-next-transform nil)
@@ -706,65 +715,65 @@ the current position of point, then move it to the beginning of the line."
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
-(use-package smart-mode-line
-  :disabled
-  :if dw/is-termux
-  :config
-  (setq sml/no-confirm-load-theme t)
-  (sml/setup)
-  (sml/apply-theme 'respectful)  ; Respect the theme colors
-  (setq sml/mode-width 'right
-      sml/name-width 60)
+;; (use-package smart-mode-line
+;;   :disabled
+;;   :if dw/is-termux
+;;   :config
+;;   (setq sml/no-confirm-load-theme t)
+;;   (sml/setup)
+;;   (sml/apply-theme 'respectful)  ; Respect the theme colors
+;;   (setq sml/mode-width 'right
+;;       sml/name-width 60)
 
-  (setq-default mode-line-format
-  `("%e"
-      mode-line-front-space
-      evil-mode-line-tag
-      mode-line-mule-info
-      mode-line-client
-      mode-line-modified
-      mode-line-remote
-      mode-line-frame-identification
-      mode-line-buffer-identification
-      sml/pos-id-separator
-      (vc-mode vc-mode)
-      " "
-      ;mode-line-position
-      sml/pre-modes-separator
-      mode-line-modes
-      " "
-      mode-line-misc-info))
+;;   (setq-default mode-line-format
+;;   `("%e"
+;;       mode-line-front-space
+;;       evil-mode-line-tag
+;;       mode-line-mule-info
+;;       mode-line-client
+;;       mode-line-modified
+;;       mode-line-remote
+;;       mode-line-frame-identification
+;;       mode-line-buffer-identification
+;;       sml/pos-id-separator
+;;       (vc-mode vc-mode)
+;;       " "
+;;       ;mode-line-position
+;;       sml/pre-modes-separator
+;;       mode-line-modes
+;;       " "
+;;       mode-line-misc-info))
 
-  (setq rm-excluded-modes
-    (mapconcat
-      'identity
-      ; These names must start with a space!
-      '(" GitGutter" " MRev" " company"
-      " Helm" " Undo-Tree" " Projectile.*" " Z" " Ind"
-      " Org-Agenda.*" " ElDoc" " SP/s" " cider.*")
-      "\\|")))
-
-;; (use-package doom-modeline
-;;   :ensure t
-;;   :hook (after-init . doom-modeline-mode))
+;;   (setq rm-excluded-modes
+;;     (mapconcat
+;;       'identity
+;;       ; These names must start with a space!
+;;       '(" GitGutter" " MRev" " company"
+;;       " Helm" " Undo-Tree" " Projectile.*" " Z" " Ind"
+;;       " Org-Agenda.*" " ElDoc" " SP/s" " cider.*")
+;;       "\\|")))
 
 (use-package doom-modeline
-  :after eshell     ;; Make sure it gets hooked after eshell
-  :hook (after-init . doom-modeline-init)
-  :custom-face
-  (mode-line ((t (:height 0.85))))
-  (mode-line-inactive ((t (:height 0.85))))
-  :custom
-  (doom-modeline-height 15)
-  (doom-modeline-bar-width 6)
-  ;; (doom-modeline-lsp t)
-  ;; (doom-modeline-github nil)
-  (doom-modeline-mu4e nil)
-  (doom-modeline-irc nil)
-  (doom-modeline-minor-modes t)
-  (doom-modeline-persp-name nil)
-  (doom-modeline-buffer-file-name-style 'truncate-except-project)
-  (doom-modeline-major-mode-icon nil))
+  :ensure t
+  :hook (after-init . doom-modeline-mode))
+
+;; (use-package doom-modeline
+ ;;  :after eshell     ;; Make sure it gets hooked after eshell
+ ;;  :hook (after-init . doom-modeline-init)
+ ;;  :custom-face
+ ;;  (mode-line ((t (:height 0.85))))
+ ;;  (mode-line-inactive ((t (:height 0.85))))
+ ;;  :custom
+ ;;  (doom-modeline-height 15)
+ ;;  (doom-modeline-bar-width 6)
+ ;;  ;; (doom-modeline-lsp t)
+ ;;  ;; (doom-modeline-github nil)
+ ;;  (doom-modeline-mu4e nil)
+ ;;  (doom-modeline-irc nil)
+ ;;  (doom-modeline-minor-modes t)
+ ;;  (doom-modeline-persp-name nil)
+ ;;  (doom-modeline-buffer-file-name-style 'truncate-except-project)
+ ;;  (doom-modeline-major-mode-icon nil))
 
 
 (when (memq window-system '(mac ns x))
@@ -930,7 +939,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(diminish spacegray-theme spaceline-all-the-icons treemacs-all-the-icons doom-modeline clang clangd lsp-clangd wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+   '(company-tabnine diminish spacegray-theme spaceline-all-the-icons treemacs-all-the-icons doom-modeline clang clangd lsp-clangd wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
