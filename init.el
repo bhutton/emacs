@@ -85,7 +85,7 @@
 (use-package yasnippet)
 (require 'yasnippet)
 (yas-global-mode 1)
-(scroll-bar-mode 1)
+(scroll-bar-mode 0)
 (smartparens-global-mode 1)
 (use-package rainbow-delimiters
   :hook ((prog-mode . rainbow-delimiters-mode)))
@@ -316,7 +316,9 @@
 
 (setq lsp-prefer-capf t)
 
+;; (setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk1.8.0_251.jdk/Contents/Home/")
 (setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/")
+;; (setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk1.8.0_251.jdk/Contents/Home/bin/java")
 (setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/bin/java")
 
 (use-package lsp-java
@@ -493,6 +495,12 @@
                  "*Messages*")
   )
 
+;; (defun mvn-test()
+;;   (shell-command (concat "cd " (projectile-project-root) "api && ./gradlew test &")
+;;                  "*test-runner*"
+;;                  "*Messages*")
+;;   )
+
 
 (defun go-test()
   (shell-command (concat "cd " (projectile-project-root) " && go test ./... &")
@@ -522,14 +530,14 @@
     ))
 
 (use-package company)
-(use-package company-tabnine)
+;; (use-package company-tabnine)
 (require 'company)
 (use-package company-box)
 (require 'company-box)
-(require 'company-tabnine)
+;; (require 'company-tabnine)
 (add-hook 'after-init-hook 'global-company-mode)
 (add-hook 'company-mode-hook 'company-box-mode)
-(add-to-list 'company-backends #'company-tabnine)
+;; (add-to-list 'company-backends #'company-tabnine)
 
 ;; workaround for company-transformers
 (setq company-tabnine--disable-next-transform nil)
@@ -707,6 +715,7 @@ the current position of point, then move it to the beginning of the line."
 
   ;; (load-theme 'doom-opera-light t)
   (load-theme 'doom-one-light t)
+  ;; (load-theme 'doom-solarized-dark t)
   ;; (load-theme 'doom-one t)
 
   (setq doom-themes-treemacs-theme "doom-colors")
@@ -911,7 +920,7 @@ the current position of point, then move it to the beginning of the line."
  '(ansi-color-names-vector
    ["#282c34" "#99324b" "#4f894c" "#9a7500" "#3b6ea8" "#97365b" "#398eac" "#2a2a2a"])
  '(custom-safe-themes
-   '("246a9596178bb806c5f41e5b571546bb6e0f4bd41a9da0df5dfbca7ec6e2250c" "f4876796ef5ee9c82b125a096a590c9891cec31320569fc6ff602ff99ed73dca" "08a27c4cde8fcbb2869d71fdc9fa47ab7e4d31c27d40d59bf05729c4640ce834" "8f5a7a9a3c510ef9cbb88e600c0b4c53cdcdb502cfe3eb50040b7e13c6f4e78e" "aaa4c36ce00e572784d424554dcc9641c82d1155370770e231e10c649b59a074" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
+   '("835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" "cf922a7a5c514fad79c483048257c5d8f242b21987af0db813d3f0b138dfaf53" "4f1d2476c290eaa5d9ab9d13b60f2c0f1c8fa7703596fa91b235db7f99a9441b" "246a9596178bb806c5f41e5b571546bb6e0f4bd41a9da0df5dfbca7ec6e2250c" "f4876796ef5ee9c82b125a096a590c9891cec31320569fc6ff602ff99ed73dca" "08a27c4cde8fcbb2869d71fdc9fa47ab7e4d31c27d40d59bf05729c4640ce834" "8f5a7a9a3c510ef9cbb88e600c0b4c53cdcdb502cfe3eb50040b7e13c6f4e78e" "aaa4c36ce00e572784d424554dcc9641c82d1155370770e231e10c649b59a074" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f8c30fa07ba7e8fe884f22b428dae6724955fa61ad84a658c3b0164ae391fb52" "8c847a5675ece40017de93045a28ebd9ede7b843469c5dec78988717f943952a" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "cd736a63aa586be066d5a1f0e51179239fe70e16a9f18991f6f5d99732cabb32" "6b289bab28a7e511f9c54496be647dc60f5bd8f9917c9495978762b99d8c96a0" "84da7b37214b4ac095a55518502dfa82633bee74f64daf6e1785322e77516f96" "49ec957b508c7d64708b40b0273697a84d3fee4f15dd9fc4a9588016adee3dad" "10461a3c8ca61c52dfbbdedd974319b7f7fd720b091996481c8fb1dded6c6116" "fe666e5ac37c2dfcf80074e88b9252c71a22b6f5d2f566df9a7aa4f9bea55ef8" "030346c2470ddfdaca479610c56a9c2aa3e93d5de3a9696f335fd46417d8d3e4" "a63355b90843b228925ce8b96f88c587087c3ee4f428838716505fd01cf741c8" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
  '(ensime-sem-high-faces
    '((var :foreground "#000000" :underline
           (:style wave :color "yellow"))
@@ -938,7 +947,7 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(company-tabnine diminish spacegray-theme spaceline-all-the-icons treemacs-all-the-icons doom-modeline clang clangd lsp-clangd wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui lsp-java lsp-mode jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+   '(lsp-java company-tabnine diminish spacegray-theme spaceline-all-the-icons treemacs-all-the-icons doom-modeline clang clangd lsp-clangd wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
