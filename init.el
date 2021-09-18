@@ -81,6 +81,19 @@
 
 (setq highlight-indent-guides-highlighter-function 'my-highlighter)
 
+(use-package helm
+  :init
+  (defun tkj-list-buffers()
+    (interactive)
+    (let ((helm-full-frame t))
+      (helm-mini)))
+
+  :bind
+  ("C-x C-b" . 'tkj-list-buffers))
+(helm-mode 1)
+
+(show-paren-mode 1)
+
 (cua-selection-mode 1)
 (use-package yasnippet)
 (require 'yasnippet)
@@ -317,9 +330,9 @@
 (setq lsp-prefer-capf t)
 
 ;; (setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk1.8.0_251.jdk/Contents/Home/")
-(setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/")
+(setenv "JAVA_HOME"  "/Library/Java/JavaVirtualMachines/jdk-11.0.11.jdk/Contents/Home/")
 ;; (setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk1.8.0_251.jdk/Contents/Home/bin/java")
-(setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/bin/java")
+(setq lsp-java-java-path "/Library/Java/JavaVirtualMachines/jdk-11.0.11.jdk/Contents/Home/bin/java")
 
 (use-package lsp-java
   :ensure t
@@ -330,7 +343,7 @@
   ;;        "-Xmx1G"
   ;;        "-XX:+UseG1GC"
   ;;        "-XX:+UseStringDeduplication"
-         "-javaagent:/Users/ben/.m2/repository/org/projectlombok/lombok/1.18.10/lombok-1.18.10.jar"))
+         "-javaagent:/Users/ben/Downloads/lombok.jar"))
 
   (add-hook 'java-mode-hook #'lsp)
 )
@@ -689,7 +702,7 @@ the current position of point, then move it to the beginning of the line."
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 (projectile-mode +1)
 
-;; (use-package all-the-icons)
+(use-package all-the-icons)
 (require 'all-the-icons)
 
 (when (window-system)
@@ -790,7 +803,8 @@ the current position of point, then move it to the beginning of the line."
 
 (use-package diminish)
 
-
+(use-package treemacs-all-the-icons)
+(treemacs-load-theme "all-the-icons")
 (treemacs)
 
 (use-package centaur-tabs
@@ -1145,16 +1159,16 @@ taken from http://stackoverflow.com/a/4116113/446256"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Make C-x C-b maximise the buffer list window, this saves two
 ;; additional shortcuts from the normal behaviour.
-(use-package helm
-  :init
-  (defun tkj-list-buffers()
-    (interactive)
-    (let ((helm-full-frame t))
-      (helm-mini)))
+;(use-package helm
+;  :init
+;  (defun tkj-list-buffers()
+;    (interactive)
+;    (let ((helm-full-frame t))
+;      (helm-mini)))
 
-  :bind
-  ("C-x C-b" . 'tkj-list-buffers))
-(helm-mode 1)
+;  :bind
+;  ("C-x C-b" . 'tkj-list-buffers))
+;(helm-mode 1)
 
 (use-package helm-projectile)
 (use-package helm-ag)
