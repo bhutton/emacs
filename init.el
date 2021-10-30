@@ -187,7 +187,7 @@
 (defun my-java-mode-hook ()
   (auto-fill-mode)
   (flycheck-mode)
-  (git-gutter+-mode)
+  (git-gutter-mode)
   (gtags-mode)
   (subword-mode)
   (yas-minor-mode)
@@ -227,8 +227,44 @@
   :bind (:map lsp-mode-map ("C-r" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook ((python-mode go-mode lsp-java
-          js-mode js2-mode typescript-mode web-mode javascript-mode rjsx-mode c-mode c++-mode) . lsp))
+  :bind (:map lsp-mode-map ("M-<return>" . lsp-execute-code-action))
+  :bind (:map lsp-mode-map ("s-r" . lsp-rename))
+  :hook ((go-mode lsp-java python-mode js-mode js2-mode typescript-mode
+          web-mode javascript-mode rjsx-mode c-mode c++-mode yaml-mode) . lsp))
+
+;; (use-package lsp-pyright
+;;   :ensure t
+;;   :hook (python-mode . (lambda ()
+;;                           (require 'lsp-pyright)
+;;                           (lsp))))  ; or lsp-deferred
+
+(use-package pyvenv
+  :ensure t
+  :init
+  (setenv "WORKON_HOME" "~/.pyenv/versions"))
+  ;; )
+
+(use-package yaml-mode)
+
+(use-package lsp-python-ms
+  :ensure t
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-python-ms)
+                          (lsp))))  ; or lsp-deferred
+
+(add-hook 'hack-local-variables-hook
+      (lambda ()
+    (when (derived-mode-p 'python-mode)
+      (require 'lsp-python-ms)
+      (lsp)))) ; or lsp-deferred
+
+(require 'dap-python)
+
+(defun lsp-python-ms-format-buffer ()
+  (interactive)
+  (when (and (executable-find "yapf") buffer-file-name)
+    (call-process "yapf" nil nil nil "-i" buffer-file-name)))
 
 (use-package lsp-dart
   :ensure t
@@ -476,28 +512,42 @@
 
 (defun test-suite ()
   (interactive)
-  (lsp-format-buffer)
   (projectile-save-project-buffers)
   (with-output-to-temp-buffer "*test-runner*"
     (when(string= (file-name-extension buffer-file-name) "js")
+      (lsp-format-buffer)
       (npm-test))
     (when(string= (file-name-extension buffer-file-name) "jsx")
+      (lsp-format-buffer)
       (npm-test))
     (when(string= (file-name-extension buffer-file-name) "ts")
+      (lsp-format-buffer)
       (npm-test))
     (when(string= (file-name-extension buffer-file-name) "tsx")
+      (lsp-format-buffer)
       (npm-test))
     (when(string= (file-name-extension buffer-file-name) "go")
+      (lsp-format-buffer)
       (go-test))
     (when(string= (file-name-extension buffer-file-name) "cpp")
+      (lsp-format-buffer)
       (cpp-test))
+    (when(string= (file-name-extension buffer-file-name) "py")
+      (python-test))
     )
   (when(string= (file-name-extension buffer-file-name) "java")
+    (lsp-format-buffer)
     (mvn-test))
   )
 
 (defun npm-test()
   (shell-command (concat "npm test &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
+
+(defun python-test()
+  (shell-command (concat "cd " (projectile-project-root) " && python3 -m unittest &")
                  "*test-runner*"
                  "*Messages*")
   )
@@ -508,11 +558,11 @@
                  "*Messages*")
   )
 
-;; (defun mvn-test()
-;;   (shell-command (concat "cd " (projectile-project-root) "api && ./gradlew test &")
-;;                  "*test-runner*"
-;;                  "*Messages*")
-;;   )
+(defun mvn-test()
+  (shell-command (concat "cd " (projectile-project-root) " && ./gradlew test &")
+                 "*test-runner*"
+                 "*Messages*")
+  )
 
 
 (defun go-test()
@@ -553,20 +603,20 @@
 ;; (add-to-list 'company-backends #'company-tabnine)
 
 ;; workaround for company-transformers
-(setq company-tabnine--disable-next-transform nil)
-(defun my-company--transform-candidates (func &rest args)
-  (if (not company-tabnine--disable-next-transform)
-      (apply func args)
-    (setq company-tabnine--disable-next-transform nil)
-    (car args)))
+;; (setq company-tabnine--disable-next-transform nil)
+;; (defun my-company--transform-candidates (func &rest args)
+;;   (if (not company-tabnine--disable-next-transform)
+;;       (apply func args)
+;;     (setq company-tabnine--disable-next-transform nil)
+;;     (car args)))
 
-(defun my-company-tabnine (func &rest args)
-  (when (eq (car args) 'candidates)
-    (setq company-tabnine--disable-next-transform t))
-  (apply func args))
+;; (defun my-company-tabnine (func &rest args)
+;;   (when (eq (car args) 'candidates)
+;;     (setq company-tabnine--disable-next-transform t))
+;;   (apply func args))
 
-(advice-add #'company--transform-candidates :around #'my-company--transform-candidates)
-(advice-add #'company-tabnine :around #'my-company-tabnine)
+;; (advice-add #'company--transform-candidates :around #'my-company--transform-candidates)
+;; (advice-add #'company-tabnine :around #'my-company-tabnine)
 
 (setq company-minimum-prefix-length 1)
 (setq company-idle-delay 0)
@@ -735,6 +785,67 @@ the current position of point, then move it to the beginning of the line."
   (doom-themes-treemacs-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
+
+;;; Git Gutter
+;;Git gutter is great for giving visual feedback on changes, but it doesn't play well
+;;with org-mode using org-indent. So I don't use it globally.
+;; (use-package git-gutter
+;;   :defer t
+;;   :hook ((markdown-mode . git-gutter-mode)
+;;          (prog-mode . git-gutter-mode)
+;;          (conf-mode . git-gutter-mode))
+;;   :init
+;;   :config
+;;   (setq git-gutter:disabled-modes '(org-mode asm-mode image-mode)
+;;         git-gutter:update-interval 1
+;;         git-gutter:window-width 2
+;;         git-gutter:ask-p nil)
+;;   (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
+;;                          :hint nil)
+;;    "
+;;  Git gutter:
+;;    _j_: next hunk        _s_tage hunk     _q_uit
+;;    _k_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
+;;    ^ ^                   _p_opup hunk
+;;    _h_: first hunk
+;;    _l_: last hunk        set start _R_evision
+;;  "
+;;  ("j" git-gutter:next-hunk)
+;;  ("k" git-gutter:previous-hunk)
+;;  ("h" (progn (goto-char (point-min))
+;;              (git-gutter:next-hunk 1)))
+;;  ("l" (progn (goto-char (point-min))
+;;              (git-gutter:previous-hunk 1)))
+;;  ("s" git-gutter:stage-hunk)
+;;  ("r" git-gutter:revert-hunk)
+;;  ("p" git-gutter:popup-hunk)
+;;  ("R" git-gutter:set-start-revision)
+;;  ("q" nil :color blue)
+;;  ("Q" (progn (git-gutter-mode -1)
+;;              ;; git-gutter-fringe doesn't seem to
+;;              ;; clear the markup right away
+;;              (sit-for 0.1)
+;;              (git-gutter:clear))
+;;              :color blue)))
+
+(use-package git-gutter-fringe
+  :diminish git-gutter-mode
+  :after git-gutter
+  :demand fringe-helper
+  :config
+  ;; subtle diff indicators in the fringe
+  ;; places the git gutter outside the margins.
+  (setq-default fringes-outside-margins t)
+  ;; thin fringe bitmaps
+  (define-fringe-bitmap 'git-gutter-fr:added
+  [224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224]
+  nil nil 'center)
+  (define-fringe-bitmap 'git-gutter-fr:modified
+  [224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224 224]
+  nil nil 'center)
+  (define-fringe-bitmap 'git-gutter-fr:deleted
+  [0 0 0 0 0 0 0 0 0 0 0 0 0 128 192 224 240 248]
+  nil nil 'center))
 
 ;; (use-package smart-mode-line
 ;;   :disabled
@@ -954,6 +1065,7 @@ the current position of point, then move it to the beginning of the line."
      (package :foreground "#000000")
      (deprecated :strike-through "#000000")))
  '(fci-rule-color "#9e9e9e")
+ '(ignored-local-variable-values '((lsp-python-ms-python-executable . "/.../bin/python")))
  '(j dee-db-requested-breakpoint-face-colors)
  '(jdee-db-active-breakpoint-face-colors (cons "#fafafa" "#3b6ea8"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#fafafa" "#bdbdbd"))
@@ -961,7 +1073,8 @@ the current position of point, then move it to the beginning of the line."
  '(line-spacing-vertical-center 1)
  '(objed-cursor-color "#99324b")
  '(package-selected-packages
-   '(lsp-java company-tabnine diminish spacegray-theme spaceline-all-the-icons treemacs-all-the-icons doom-modeline clang clangd lsp-clangd wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+   '(git-gutter-fringe git-gutter yaml-mode pyvenv lsp-python-ms lsp-java company-tabnine diminish spacegray-theme spaceline-all-the-icons treemacs-all-the-icons doom-modeline clang clangd lsp-clangd wgrep-helm ivy-searcher swiper git-gutter+ highlight-indent-guides helm idle-highlight-in-visible-buffers-mode smooth-scroll lsp-ui jest-test-mode yasnippet-snippets clojure-mode-extra-font-locking cider spaceline treemacs-evil jest npm-mode find-file-in-project helm-rg ac-js2 company-flow company-tern tern-auto-complete tern treemacs-magit xref-js2 js2-refactor prettier-js company web-mode yard-mode rubocop kaolin-themes sublimity minimap magit twilight-bright-theme treemacs-projectile treemacs-icons-dired sublime-themes spacemacs-theme solarized-theme seeing-is-believing one-themes mocha material-theme leuven-theme intellij-theme helm-projectile helm-ag flatui-theme exec-path-from-shell espresso-theme emr doom-themes color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized chyla-theme centaur-tabs bundler better-defaults auto-complete-exuberant-ctags apropospriate-theme all-the-icons-dired ag))
+ '(safe-local-variable-values '((lsp-python-ms-python-executable . "/.../bin/python")))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
@@ -1066,10 +1179,10 @@ taken from http://stackoverflow.com/a/4116113/446256"
 ;; snippets, please
 (add-hook 'sh-mode-hook 'yas-minor-mode)
 
-(use-package git-gutter+)
+(use-package git-gutter)
 
 ;; show git changes in the gutter
-(add-hook 'sh-mode-hook 'git-gutter+-mode)
+(add-hook 'sh-mode-hook 'git-gutter-mode)
 
 ;; Allow functions on the form <word>.<rest>(). Without my change,
 ;; allowing punctuation characters in the function name,, only
