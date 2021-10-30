@@ -132,12 +132,6 @@
 (global-set-key (kbd "s-F") #'helm-projectile-grep)
 
 
-;; (add-hook 'isearch-mode-hook
-;;   (lambda ()
-;;   (define-key isearch-mode-map (kbd "M-f") 'isearch-repeat-forward)
-;;   )
-;; )
-
 ;; ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
@@ -222,7 +216,6 @@
   (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
   (lsp-file-watch-threshold 2000)
   (read-process-output-max (* 1024 1024))
-  ;; (lsp-eldoc-hook nil)
   :bind (:map lsp-mode-map ("C-t" . test-suite))
   :bind (:map lsp-mode-map ("C-r" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
@@ -232,17 +225,10 @@
   :hook ((go-mode lsp-java python-mode js-mode js2-mode typescript-mode
           web-mode javascript-mode rjsx-mode c-mode c++-mode yaml-mode) . lsp))
 
-;; (use-package lsp-pyright
-;;   :ensure t
-;;   :hook (python-mode . (lambda ()
-;;                           (require 'lsp-pyright)
-;;                           (lsp))))  ; or lsp-deferred
-
 (use-package pyvenv
   :ensure t
   :init
   (setenv "WORKON_HOME" "~/.pyenv/versions"))
-  ;; )
 
 (use-package yaml-mode)
 
@@ -314,19 +300,6 @@
   )
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
-;; (use-package rjsx-mode
-;;   ;; :mode "\\.js\\'"
-;;   ;; :mode "\\.jsx\\'"
-;;   :hook (rjsx-mode . lsp-deferred)
-;;   :config
-;;   (setq typescript-indent-level 2)
-;;   (require 'dap-node)
-;;   (dap-node-setup))
-
-;; (use-package yaml-mode)
-;; (require 'yaml-mode)
-;;     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-
 (use-package hydra :ensure t)
 
 (use-package lsp-ui
@@ -375,10 +348,6 @@
   :config
   (setq lsp-java-vmargs
       (list
-  ;;        "-noverify"
-  ;;        "-Xmx1G"
-  ;;        "-XX:+UseG1GC"
-  ;;        "-XX:+UseStringDeduplication"
          "-javaagent:/Users/ben/Downloads/lombok.jar"))
 
   (add-hook 'java-mode-hook #'lsp)
@@ -765,7 +734,6 @@ the current position of point, then move it to the beginning of the line."
 
 (use-package solaire-mode)
 
-;(use-package doom)
 (use-package spacegray-theme :defer t)
 (use-package doom-themes
   :ensure t
@@ -786,48 +754,6 @@ the current position of point, then move it to the beginning of the line."
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
-;;; Git Gutter
-;;Git gutter is great for giving visual feedback on changes, but it doesn't play well
-;;with org-mode using org-indent. So I don't use it globally.
-;; (use-package git-gutter
-;;   :defer t
-;;   :hook ((markdown-mode . git-gutter-mode)
-;;          (prog-mode . git-gutter-mode)
-;;          (conf-mode . git-gutter-mode))
-;;   :init
-;;   :config
-;;   (setq git-gutter:disabled-modes '(org-mode asm-mode image-mode)
-;;         git-gutter:update-interval 1
-;;         git-gutter:window-width 2
-;;         git-gutter:ask-p nil)
-;;   (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
-;;                          :hint nil)
-;;    "
-;;  Git gutter:
-;;    _j_: next hunk        _s_tage hunk     _q_uit
-;;    _k_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
-;;    ^ ^                   _p_opup hunk
-;;    _h_: first hunk
-;;    _l_: last hunk        set start _R_evision
-;;  "
-;;  ("j" git-gutter:next-hunk)
-;;  ("k" git-gutter:previous-hunk)
-;;  ("h" (progn (goto-char (point-min))
-;;              (git-gutter:next-hunk 1)))
-;;  ("l" (progn (goto-char (point-min))
-;;              (git-gutter:previous-hunk 1)))
-;;  ("s" git-gutter:stage-hunk)
-;;  ("r" git-gutter:revert-hunk)
-;;  ("p" git-gutter:popup-hunk)
-;;  ("R" git-gutter:set-start-revision)
-;;  ("q" nil :color blue)
-;;  ("Q" (progn (git-gutter-mode -1)
-;;              ;; git-gutter-fringe doesn't seem to
-;;              ;; clear the markup right away
-;;              (sit-for 0.1)
-;;              (git-gutter:clear))
-;;              :color blue)))
-
 (use-package git-gutter-fringe
   :diminish git-gutter-mode
   :after git-gutter
@@ -847,70 +773,12 @@ the current position of point, then move it to the beginning of the line."
   [0 0 0 0 0 0 0 0 0 0 0 0 0 128 192 224 240 248]
   nil nil 'center))
 
-;; (use-package smart-mode-line
-;;   :disabled
-;;   :if dw/is-termux
-;;   :config
-;;   (setq sml/no-confirm-load-theme t)
-;;   (sml/setup)
-;;   (sml/apply-theme 'respectful)  ; Respect the theme colors
-;;   (setq sml/mode-width 'right
-;;       sml/name-width 60)
-
-;;   (setq-default mode-line-format
-;;   `("%e"
-;;       mode-line-front-space
-;;       evil-mode-line-tag
-;;       mode-line-mule-info
-;;       mode-line-client
-;;       mode-line-modified
-;;       mode-line-remote
-;;       mode-line-frame-identification
-;;       mode-line-buffer-identification
-;;       sml/pos-id-separator
-;;       (vc-mode vc-mode)
-;;       " "
-;;       ;mode-line-position
-;;       sml/pre-modes-separator
-;;       mode-line-modes
-;;       " "
-;;       mode-line-misc-info))
-
-;;   (setq rm-excluded-modes
-;;     (mapconcat
-;;       'identity
-;;       ; These names must start with a space!
-;;       '(" GitGutter" " MRev" " company"
-;;       " Helm" " Undo-Tree" " Projectile.*" " Z" " Ind"
-;;       " Org-Agenda.*" " ElDoc" " SP/s" " cider.*")
-;;       "\\|")))
-
 (use-package doom-modeline
   :ensure t
   :hook (after-init . doom-modeline-mode))
 
-;; (use-package doom-modeline
- ;;  :after eshell     ;; Make sure it gets hooked after eshell
- ;;  :hook (after-init . doom-modeline-init)
- ;;  :custom-face
- ;;  (mode-line ((t (:height 0.85))))
- ;;  (mode-line-inactive ((t (:height 0.85))))
- ;;  :custom
- ;;  (doom-modeline-height 15)
- ;;  (doom-modeline-bar-width 6)
- ;;  ;; (doom-modeline-lsp t)
- ;;  ;; (doom-modeline-github nil)
- ;;  (doom-modeline-mu4e nil)
- ;;  (doom-modeline-irc nil)
- ;;  (doom-modeline-minor-modes t)
- ;;  (doom-modeline-persp-name nil)
- ;;  (doom-modeline-buffer-file-name-style 'truncate-except-project)
- ;;  (doom-modeline-major-mode-icon nil))
-
-
 (when (memq window-system '(mac ns x))
 (exec-path-from-shell-initialize))
-;;(projectile-rails-global-mode)
 
 (use-package diminish)
 
@@ -1098,34 +966,12 @@ the current position of point, then move it to the beginning of the line."
     (cons 360 "#9e9e9e")))
  '(vc-annotate-very-old-color nil))
 
-;; Set the font face based on platform
-;; (pcase system-type
-;;   ((or 'gnu/linux 'windows-nt 'cygwin)
-;;    (set-face-attribute 'default nil
-;;                        :font "JetBrains Mono"
-;;                        :weight 'light
-;;   ('darwin (set-face-attribute 'default nil :font "Fira Mono" :height 170)))
-
-;; ;; Set the fixed pitch face
-;; (set-face-attribute 'fixed-pitch nil
-;;                     :font "JetBrains Mono"
-;;                     :weight 'light
-;;                     :height (dw/system-settings-get 'emacs/fixed-face-size))
-
-;; ;; Set the variable pitch face
-;; (set-face-attribute 'variable-pitch nil
-;;                     ;; :font "Cantarell"
-;;                     :font "Iosevka Aile"
-;;                     :height (dw/system-settings-get 'emacs/variable-face-size)
-;;                     :weight 'light)
-
 (when(eq system-type 'darwin)
     (ignore-errors(set-frame-font "DejaVu Sans Mono-15"))
   (add-to-list 'default-frame-alist
                (cons 'font "DejaVu Sans Mono-15"))
   (add-to-list 'default-frame-alist
                (cons 'font "DejaVu Sans Mono-15"))
-  ;; (set-face-attribute 'default nil :font "Fira Mono" :height 170)
 )
 
 (when(eq system-type 'windows-nt)
@@ -1270,18 +1116,6 @@ taken from http://stackoverflow.com/a/4116113/446256"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Buffers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Make C-x C-b maximise the buffer list window, this saves two
-;; additional shortcuts from the normal behaviour.
-;(use-package helm
-;  :init
-;  (defun tkj-list-buffers()
-;    (interactive)
-;    (let ((helm-full-frame t))
-;      (helm-mini)))
-
-;  :bind
-;  ("C-x C-b" . 'tkj-list-buffers))
-;(helm-mode 1)
 
 (use-package helm-projectile)
 (use-package helm-ag)
