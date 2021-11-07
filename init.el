@@ -74,12 +74,12 @@
 
 (setq package-list '(better-defaults chyla))
 
-(defun my-highlighter (level responsive display)
-  (if (> 1 level)
-      nil
-    (highlight-indent-guides--highlighter-default level responsive display)))
+;; (defun my-highlighter (level responsive display)
+;;   (if (> 1 level)
+;;       nil
+;;     (highlight-indent-guides--highlighter-default level responsive display)))
 
-(setq highlight-indent-guides-highlighter-function 'my-highlighter)
+;; (setq highlight-indent-guides-highlighter-function 'my-highlighter)
 
 (use-package helm
   :init
@@ -216,6 +216,7 @@
   (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
   (lsp-file-watch-threshold 2000)
   (read-process-output-max (* 1024 1024))
+  ;; (lsp-eldoc-hook nil)
   :bind (:map lsp-mode-map ("C-t" . test-suite))
   :bind (:map lsp-mode-map ("C-r" . test-suite))
   :bind (:map lsp-mode-map ("C-M-l" . format-and-save))
@@ -522,13 +523,13 @@
   )
 
 (defun mvn-test()
-  (shell-command (concat "cd " (projectile-project-root) " && mvn test &")
+  (shell-command (concat "cd " (projectile-project-root) " && ./gradlew test &")
                  "*test-runner*"
                  "*Messages*")
   )
 
 (defun mvn-test()
-  (shell-command (concat "cd " (projectile-project-root) " && ./gradlew test &")
+  (shell-command (concat "cd " (projectile-project-root) " && mvn test &")
                  "*test-runner*"
                  "*Messages*")
   )
@@ -619,6 +620,7 @@
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'hl-line-mode)
@@ -734,7 +736,7 @@ the current position of point, then move it to the beginning of the line."
 
 (use-package solaire-mode)
 
-(use-package spacegray-theme :defer t)
+;; (use-package spacegray-theme :defer t)
 (use-package doom-themes
   :ensure t
   :config
@@ -749,7 +751,7 @@ the current position of point, then move it to the beginning of the line."
   ;; (load-theme 'doom-solarized-dark t)
   ;; (load-theme 'doom-one t)
 
-  (setq doom-themes-treemacs-theme "doom-colors")
+  (setq doom-themes-treemacs-theme "doom-atom")
   (doom-themes-treemacs-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
@@ -1167,3 +1169,4 @@ taken from http://stackoverflow.com/a/4116113/446256"
 ;; use imagemagick, if available
 (when (fboundp 'imagemagick-register-types)
   (imagemagick-register-types))
+(set-face-background hl-line-face "#fffae3")
